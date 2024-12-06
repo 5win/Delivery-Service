@@ -15,8 +15,8 @@ import lombok.Getter;
 @Table(name = "shops")
 public class ShopJpaEntity extends BaseTimeEntity {
 
-    @Column(name = "shop_name", nullable = false, unique = true)
-    private String shopName;
+    @Column(name = "name", nullable = false, unique = true)
+    private String name;
 
     @Column(name = "phone")
     private String phone;

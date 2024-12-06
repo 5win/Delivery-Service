@@ -18,10 +18,10 @@ public class ShopSaveRequest {
 
     public ShopJpaEntity toEntity() {
         return ShopJpaEntity.builder()
-            .shopName(this.shopName)
+            .name(this.shopName)
             .phone(this.phone)
             .category(CategoryJpaEntity.builder()
-                .category(categoryName)
+                .name(categoryName)
                 .build())
             .minimumOrderAmount(this.minimumOrderAmount)
             .build();

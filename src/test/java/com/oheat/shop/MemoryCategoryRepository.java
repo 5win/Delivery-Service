@@ -12,7 +12,7 @@ public class MemoryCategoryRepository implements CategoryRepository {
 
     @Override
     public void save(CategoryJpaEntity categoryJpaEntity) {
-        categories.put(categoryJpaEntity.getCategory(), categoryJpaEntity);
+        categories.put(categoryJpaEntity.getName(), categoryJpaEntity);
     }
 
     @Override

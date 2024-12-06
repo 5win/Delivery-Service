@@ -19,7 +19,7 @@ public class CategoryService {
             });
 
         categoryRepository.save(CategoryJpaEntity.builder()
-            .category(categoryName)
+            .name(categoryName)
             .build());
     }
 }

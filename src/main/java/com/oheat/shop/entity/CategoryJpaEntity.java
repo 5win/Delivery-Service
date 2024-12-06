@@ -15,5 +15,5 @@ import lombok.Getter;
 public class CategoryJpaEntity extends BaseTimeEntity {
 
     @Column(name = "category", nullable = false, unique = true)
-    private String category;
+    private String name;
 }

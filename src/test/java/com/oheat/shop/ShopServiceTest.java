@@ -51,7 +51,7 @@ public class ShopServiceTest {
     void shopNameDuplicate_thenFail() {
         memoryShopRepository.save(
             ShopJpaEntity.builder()
-                .shopName("오잇")
+                .name("오잇")
                 .build());
 
         assertThrows(DuplicateShopNameException.class, () -> {
@@ -74,7 +74,7 @@ public class ShopServiceTest {
     @DisplayName("카테고리명이 중복되면 카테고리 추가 실패")
     void categoryNameDuplicate_thenFail() {
         memoryCategoryRepository.save(CategoryJpaEntity.builder()
-            .category("치킨")
+            .name("치킨")
             .build());
 
         assertThrows(DuplicateCategoryException.class, () -> {

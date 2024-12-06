@@ -14,11 +14,11 @@ public class MemoryShopRepository implements ShopRepository {
 
     @Override
     public void save(ShopJpaEntity shopJpaEntity) {
-        shops.put(shopJpaEntity.getShopName(), shopJpaEntity);
+        shops.put(shopJpaEntity.getName(), shopJpaEntity);
     }
 
     @Override
-    public Optional<ShopJpaEntity> findByName(String shopName) {
-        return Optional.ofNullable(shops.get(shopName));
+    public Optional<ShopJpaEntity> findByName(String name) {
+        return Optional.ofNullable(shops.get(name));
     }
 }

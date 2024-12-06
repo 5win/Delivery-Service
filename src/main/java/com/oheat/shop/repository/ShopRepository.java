@@ -7,5 +7,5 @@ public interface ShopRepository {
 
     void save(ShopJpaEntity shopJpaEntity);
 
-    Optional<ShopJpaEntity> findByName(String shopName);
+    Optional<ShopJpaEntity> findByName(String name);
 }
