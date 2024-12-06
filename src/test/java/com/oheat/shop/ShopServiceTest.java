@@ -57,9 +57,20 @@ public class ShopServiceTest {
     }
 
     @Test
-    @DisplayName("카테고리가 없으면 매장 등록 실패")
-    void whenCategoryNotExists_thenFail() {
+    @DisplayName("카테고리가 null이면 매장 등록 실패")
+    void whenCategoryIsNull_thenFail() {
+        assertThrows(RuntimeException.class, () -> {
+            shopService.registerShop(ShopSaveRequest.builder()
+                .shopName("bbq")
+                .categoryName(null)
+                .minimumOrderAmount(14_000)
+                .build());
+        });
+    }
 
+    @Test
+    @DisplayName("존재하지 않는 카테고리이면 매장 등록 실패")
+    void whenCategoryNotExists_thenFail() {
         assertThrows(CategoryNotExistsException.class, () -> {
             shopService.registerShop(ShopSaveRequest.builder()
                 .shopName("bbq")
