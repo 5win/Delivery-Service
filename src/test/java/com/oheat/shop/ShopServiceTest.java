@@ -1,5 +1,6 @@
 package com.oheat.shop;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.oheat.shop.dto.ShopSaveRequest;
@@ -29,6 +30,21 @@ public class ShopServiceTest {
     }
 
     @Test
+    @DisplayName("매장 이름 중복되지 않으면 매장 등록 성공")
+    void shopNameNotDuplicate_thenSuccess() {
+        categoryService.registerCategory("치킨");
+
+        assertDoesNotThrow(() -> {
+            shopService.registerShop(
+                ShopSaveRequest.builder()
+                    .shopName("bbq")
+                    .categoryName("치킨")
+                    .build()
+            );
+        });
+    }
+
+    @Test
     @DisplayName("매장 이름이 중복되면 매장 등록 실패")
     void shopNameDuplicate_thenFail() {
         memoryShopRepository.save(
@@ -41,6 +57,14 @@ public class ShopServiceTest {
                 ShopSaveRequest.builder()
                     .shopName("오잇")
                     .build());
+        });
+    }
+
+    @Test
+    @DisplayName("카테고리명이 중복되지 않으면 카테고리 추가 성공")
+    void categoryNameNotDuplicate_thenSuccess() {
+        assertDoesNotThrow(() -> {
+            categoryService.registerCategory("치킨");
         });
     }
 
