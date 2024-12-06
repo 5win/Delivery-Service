@@ -9,6 +9,8 @@ import com.oheat.shop.entity.ShopJpaEntity;
 import com.oheat.shop.exception.CategoryNotExistsException;
 import com.oheat.shop.exception.DuplicateCategoryException;
 import com.oheat.shop.exception.DuplicateShopNameException;
+import com.oheat.shop.repository.CategoryRepository;
+import com.oheat.shop.repository.ShopRepository;
 import com.oheat.shop.service.CategoryService;
 import com.oheat.shop.service.ShopService;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,8 +22,8 @@ public class ShopServiceTest {
 
     private ShopService shopService;
     private CategoryService categoryService;
-    private final MemoryShopRepository memoryShopRepository = new MemoryShopRepository();
-    private final MemoryCategoryRepository memoryCategoryRepository = new MemoryCategoryRepository();
+    private final ShopRepository memoryShopRepository = new MemoryShopRepository();
+    private final CategoryRepository memoryCategoryRepository = new MemoryCategoryRepository();
 
     @BeforeEach
     void setUp() {
