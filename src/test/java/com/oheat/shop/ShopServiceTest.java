@@ -1,9 +1,15 @@
 package com.oheat.shop;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import com.oheat.shop.dto.ShopSaveRequest;
+import com.oheat.shop.entity.CategoryJpaEntity;
 import com.oheat.shop.entity.ShopJpaEntity;
+import com.oheat.shop.exception.CategoryNotExistsException;
+import com.oheat.shop.exception.DuplicateCategoryException;
+import com.oheat.shop.exception.DuplicateShopNameException;
+import com.oheat.shop.service.CategoryService;
 import com.oheat.shop.service.ShopService;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
@@ -12,11 +18,14 @@ import org.junit.jupiter.api.Test;
 public class ShopServiceTest {
 
     private ShopService shopService;
+    private CategoryService categoryService;
     private final MemoryShopRepository memoryShopRepository = new MemoryShopRepository();
+    private final MemoryCategoryRepository memoryCategoryRepository = new MemoryCategoryRepository();
 
     @BeforeEach
     void setUp() {
-        shopService = new ShopService(memoryShopRepository);
+        shopService = new ShopService(memoryShopRepository, memoryCategoryRepository);
+        categoryService = new CategoryService(memoryCategoryRepository);
     }
 
     @Test
@@ -27,18 +36,37 @@ public class ShopServiceTest {
                 .shopName("오잇")
                 .build());
 
-        Assertions.assertThatThrownBy(() ->
+        assertThrows(DuplicateShopNameException.class, () -> {
             shopService.registerShop(
                 ShopSaveRequest.builder()
                     .shopName("오잇")
-                    .build()));
+                    .build());
+        });
     }
 
-    @Disabled
+    @Test
+    @DisplayName("카테고리명이 중복되면 카테고리 추가 실패")
+    void categoryNameDuplicate_thenFail() {
+        memoryCategoryRepository.save(CategoryJpaEntity.builder()
+            .category("치킨")
+            .build());
+
+        assertThrows(DuplicateCategoryException.class, () -> {
+            categoryService.registerCategory("치킨");
+        });
+    }
+
     @Test
     @DisplayName("카테고리가 없으면 매장 등록 실패")
     void whenCategoryNotExists_thenFail() {
 
+        assertThrows(CategoryNotExistsException.class, () -> {
+            shopService.registerShop(ShopSaveRequest.builder()
+                .shopName("bbq")
+                .categoryName("치킨")
+                .minimumOrderAmount(14_000)
+                .build());
+        });
     }
 
     @Disabled
