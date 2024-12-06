@@ -22,7 +22,7 @@ public class ShopJpaEntity extends BaseTimeEntity {
     private String phone;
 
     @ManyToOne
-    @JoinColumn(name = "category", referencedColumnName = "category", nullable = false)
+    @JoinColumn(name = "category", referencedColumnName = "name", nullable = false)
     private CategoryJpaEntity category;
 
     @Column(name = "minimum_order_amount", nullable = false)
