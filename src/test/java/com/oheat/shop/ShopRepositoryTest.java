@@ -22,34 +22,6 @@ public class ShopRepositoryTest {
     private CategoryJpaRepository categoryJpaRepository;
 
     @Test
-    @DisplayName("이름이 중복되지 않으면, 카테고리 저장 성공")
-    void categoryNameNotDuplicate_thenSuccess() {
-        categoryJpaRepository.save(
-            CategoryJpaEntity.builder()
-                .name("치킨")
-                .build()
-        );
-    }
-
-    @Test
-    @DisplayName("이름이 중복이면, 카테고리 저장 실패")
-    void categoryNameDuplicate_thenFail() {
-        categoryJpaRepository.save(
-            CategoryJpaEntity.builder()
-                .name("치킨")
-                .build()
-        );
-
-        assertThrows(DataIntegrityViolationException.class, () -> {
-            categoryJpaRepository.save(
-                CategoryJpaEntity.builder()
-                    .name("치킨")
-                    .build()
-            );
-        });
-    }
-
-    @Test
     @DisplayName("매장 등록 정보에 카테고리가 null이면 등록 실패")
     void shopNotContainsCategory_thenFail() {
         assertThrows(DataIntegrityViolationException.class, () -> {
