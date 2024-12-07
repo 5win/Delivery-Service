@@ -50,7 +50,7 @@ public class CategoryCRUDTest {
         memoryCategoryRepository.save(CategoryJpaEntity.builder().name("피자").build());
         memoryCategoryRepository.save(CategoryJpaEntity.builder().name("야식").build());
 
-        List<CategoryJpaEntity> result = memoryCategoryRepository.findAll();
+        List<String> result = categoryService.findAllCategory();
 
         Assertions.assertThat(result.size()).isEqualTo(3);
     }
