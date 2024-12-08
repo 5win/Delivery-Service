@@ -9,6 +9,8 @@ public interface ShopRepository {
 
     void save(ShopJpaEntity shopJpaEntity);
 
+    Optional<ShopJpaEntity> findById(Long id);
+
     Optional<ShopJpaEntity> findByName(String name);
 
     List<ShopJpaEntity> findByCategory(CategoryJpaEntity category);

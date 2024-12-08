@@ -20,6 +20,13 @@ public class MemoryShopRepository implements ShopRepository {
     }
 
     @Override
+    public Optional<ShopJpaEntity> findById(Long id) {
+        return shops.values().stream()
+            .filter(shop -> shop.getId().equals(id))
+            .findFirst();
+    }
+
+    @Override
     public Optional<ShopJpaEntity> findByName(String name) {
         return Optional.ofNullable(shops.get(name));
     }

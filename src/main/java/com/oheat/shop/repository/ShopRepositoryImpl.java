@@ -19,6 +19,11 @@ public class ShopRepositoryImpl implements ShopRepository {
     }
 
     @Override
+    public Optional<ShopJpaEntity> findById(Long id) {
+        return shopJpaRepository.findById(id);
+    }
+
+    @Override
     public Optional<ShopJpaEntity> findByName(String name) {
         return shopJpaRepository.findByName(name);
     }

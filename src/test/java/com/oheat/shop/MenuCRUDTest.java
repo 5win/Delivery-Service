@@ -1,16 +1,36 @@
 package com.oheat.shop;
 
+import com.oheat.shop.dto.MenuSaveRequest;
+import com.oheat.shop.exception.ShopNotExistsException;
+import com.oheat.shop.repository.MenuRepository;
+import com.oheat.shop.repository.ShopRepository;
+import com.oheat.shop.service.MenuService;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 public class MenuCRUDTest {
 
-    @Disabled
+    private MenuService menuService;
+    private final MenuRepository memoryMenuRepository = new MemoryMenuRepository();
+    private final ShopRepository memoryShopRepository = new MemoryShopRepository();
+
+    @BeforeEach
+    void setUp() {
+        menuService = new MenuService(memoryMenuRepository, memoryShopRepository);
+    }
+
     @Test
     @DisplayName("메뉴 등록 시, 매장id에 해당하는 매장이 없다면 메뉴 등록 실패")
     void givenMenuWithoutShopId_whenAddNewMenu_thenFail() {
-
+        Assertions.assertThrows(ShopNotExistsException.class, () -> {
+            menuService.save(MenuSaveRequest.builder()
+                .name("황금올리브")
+                .shopId(1L).
+                build());
+        });
     }
 
     @Disabled
