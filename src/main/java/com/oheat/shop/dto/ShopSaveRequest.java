@@ -16,13 +16,11 @@ public class ShopSaveRequest {
     private final String categoryName;
     private final int minimumOrderAmount;
 
-    public ShopJpaEntity toEntity() {
+    public ShopJpaEntity toEntity(CategoryJpaEntity category) {
         return ShopJpaEntity.builder()
             .name(this.shopName)
             .phone(this.phone)
-            .category(CategoryJpaEntity.builder()
-                .name(categoryName)
-                .build())
+            .category(category)
             .minimumOrderAmount(this.minimumOrderAmount)
             .build();
     }

@@ -3,6 +3,7 @@ package com.oheat.shop;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.oheat.shop.dto.ShopFindAllResponse;
 import com.oheat.shop.dto.ShopSaveRequest;
 import com.oheat.shop.entity.ShopJpaEntity;
 import com.oheat.shop.exception.CategoryNotExistsException;
@@ -11,6 +12,8 @@ import com.oheat.shop.repository.CategoryRepository;
 import com.oheat.shop.repository.ShopRepository;
 import com.oheat.shop.service.CategoryService;
 import com.oheat.shop.service.ShopService;
+import java.util.List;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
@@ -91,11 +94,21 @@ public class ShopCRUDTest {
 
     }
 
-    @Disabled
     @Test
     @DisplayName("치킨 매장 3개를 등록하고 치킨 카테고리에 해당하는 매장을 조회하면, 리스트 size가 3이어야 함")
-    void givenThreeChickenShops_whenFindAllChickenShop_thenListSizeThree() {
+    void givenThreeChickenShops_whenFindChickenShop_thenListSizeThree() {
+        categoryService.registerCategory("치킨");
 
+        for (int i = 0; i < 3; i++) {
+            shopService.registerShop(ShopSaveRequest.builder()
+                .shopName("bbq " + i + "호점")
+                .categoryName("치킨")
+                .build());
+        }
+
+        List<ShopFindAllResponse> result = shopService.findShopByCategory("치킨");
+
+        Assertions.assertThat(result.size()).isEqualTo(3);
     }
 
     @Disabled

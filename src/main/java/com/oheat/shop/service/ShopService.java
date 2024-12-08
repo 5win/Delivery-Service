@@ -1,10 +1,13 @@
 package com.oheat.shop.service;
 
+import com.oheat.shop.dto.ShopFindAllResponse;
 import com.oheat.shop.dto.ShopSaveRequest;
+import com.oheat.shop.entity.CategoryJpaEntity;
 import com.oheat.shop.exception.CategoryNotExistsException;
 import com.oheat.shop.exception.DuplicateShopNameException;
 import com.oheat.shop.repository.CategoryRepository;
 import com.oheat.shop.repository.ShopRepository;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -21,9 +24,19 @@ public class ShopService {
             .ifPresent((shop) -> {
                 throw new DuplicateShopNameException();
             });
-        categoryRepository.findByName(saveRequest.getCategoryName())
+        CategoryJpaEntity category = categoryRepository.findByName(
+                saveRequest.getCategoryName())
             .orElseThrow(CategoryNotExistsException::new);
 
-        shopRepository.save(saveRequest.toEntity());
+        shopRepository.save(saveRequest.toEntity(category));
+    }
+
+    public List<ShopFindAllResponse> findShopByCategory(String categoryName) {
+        CategoryJpaEntity category = categoryRepository.findByName(categoryName)
+            .orElseThrow(CategoryNotExistsException::new);
+
+        return shopRepository.findByCategory(category).stream()
+            .map(ShopFindAllResponse::from)
+            .toList();
     }
 }
