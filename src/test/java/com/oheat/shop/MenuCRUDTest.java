@@ -35,21 +35,35 @@ public class MenuCRUDTest {
 
     @Disabled
     @Test
-    @DisplayName("메뉴 저장 시, 옵션 그룹 정보가 없다면 메뉴 등록 실패")
+    @DisplayName("메뉴 등록 시, 매장이 존재하면 메뉴 등록 성공")
+    void givenMenuWithShopId_whenAddNewMenu_thenSuccess() {
+
+    }
+
+    @Disabled
+    @Test
+    @DisplayName("매장에 3개의 메뉴를 등록하면, 매장의 메뉴 조회 시 리스트 size가 3이어야 함")
+    void givenThreeMenu_whenAddNewMenu_thenListSizeThree() {
+
+    }
+
+    @Disabled
+    @Test
+    @DisplayName("메뉴 등록 시, 옵션 그룹 정보가 없다면 메뉴 등록 실패")
     void givenMenuWithoutOptionGroup_whenAddNewMenu_thenFail() {
 
     }
 
     @Disabled
     @Test
-    @DisplayName("메뉴 저장 시, 옵션이 존재하지 않는 옵션 그룹이 있다면 메뉴 등록 실패")
+    @DisplayName("메뉴 등록 시, 옵션이 존재하지 않는 옵션 그룹이 있다면 메뉴 등록 실패")
     void givenMenuWithEmptyOptionGroup_whenAddNewMenu_thenFail() {
 
     }
 
     @Disabled
     @Test
-    @DisplayName("메뉴 저장 시, 1개 이상의 옵션 그룹이 존재하고 각 옵션 그룹에 옵션이 1개 이상이라면 메뉴 등록 성공")
+    @DisplayName("메뉴 등록 시, 1개 이상의 옵션 그룹이 존재하고 각 옵션 그룹에 옵션이 1개 이상이라면 메뉴 등록 성공")
     void givenMenuWithNotEmptyOptionGroup_whenAddNewMenu_thenSuccess() {
 
     }
