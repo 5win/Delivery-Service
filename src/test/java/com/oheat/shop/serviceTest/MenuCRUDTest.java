@@ -46,8 +46,43 @@ public class MenuCRUDTest {
     }
 
     @Test
-    @DisplayName("메뉴 등록 시, 매장이 존재하면 메뉴 등록 성공")
-    void givenMenuWithShopId_whenAddNewMenu_thenSuccess() {
+    @DisplayName("메뉴 등록 시, 옵션 그룹 정보가 없다면 메뉴 등록 실패")
+    void givenMenuWithoutOptionGroup_whenAddNewMenu_thenFail() {
+        memoryShopRepository.save(ShopJpaEntity.builder().name("bbq").build());
+
+        Assertions.assertThrows(NoOptionGroupException.class, () -> {
+            menuService.save(MenuSaveRequest.builder()
+                .name("황올")
+                .shopId(1L)
+                .optionGroups(List.of())
+                .build());
+        });
+    }
+
+    @Test
+    @DisplayName("메뉴 등록 시, 옵션이 존재하지 않는 옵션 그룹이 있다면 메뉴 등록 실패")
+    void givenMenuWithEmptyOptionGroup_whenAddNewMenu_thenFail() {
+        memoryShopRepository.save(ShopJpaEntity.builder().name("bbq").build());
+        OptionGroupSaveRequest optionGroup = OptionGroupSaveRequest.builder()
+            .name("부분육 선택")
+            .menuId(1L)
+            .required(true)
+            .maxNumOfSelect(1)
+            .options(List.of())
+            .build();
+
+        Assertions.assertThrows(NoOptionException.class, () -> {
+            menuService.save(MenuSaveRequest.builder()
+                .name("황올")
+                .shopId(1L)
+                .optionGroups(List.of(optionGroup))
+                .build());
+        });
+    }
+
+    @Test
+    @DisplayName("메뉴 등록 시, 1개 이상의 옵션 그룹이 존재하고 각 옵션 그룹에 옵션이 1개 이상이라면 메뉴 등록 성공")
+    void givenMenuWithNotEmptyOptionGroup_whenAddNewMenu_thenSuccess() {
         memoryShopRepository.save(ShopJpaEntity.builder().name("bbq").build());
 
         OptionGroupSaveRequest optionGroup = OptionGroupSaveRequest.builder()
@@ -116,48 +151,6 @@ public class MenuCRUDTest {
         List<MenuFindByShopIdResponse> result = menuService.findByShopId(1L);
 
         assertThat(result.size()).isEqualTo(3);
-    }
-
-    @Test
-    @DisplayName("메뉴 등록 시, 옵션 그룹 정보가 없다면 메뉴 등록 실패")
-    void givenMenuWithoutOptionGroup_whenAddNewMenu_thenFail() {
-        memoryShopRepository.save(ShopJpaEntity.builder().name("bbq").build());
-
-        Assertions.assertThrows(NoOptionGroupException.class, () -> {
-            menuService.save(MenuSaveRequest.builder()
-                .name("황올")
-                .shopId(1L)
-                .optionGroups(List.of())
-                .build());
-        });
-    }
-
-    @Test
-    @DisplayName("메뉴 등록 시, 옵션이 존재하지 않는 옵션 그룹이 있다면 메뉴 등록 실패")
-    void givenMenuWithEmptyOptionGroup_whenAddNewMenu_thenFail() {
-        memoryShopRepository.save(ShopJpaEntity.builder().name("bbq").build());
-        OptionGroupSaveRequest optionGroup = OptionGroupSaveRequest.builder()
-            .name("부분육 선택")
-            .menuId(1L)
-            .required(true)
-            .maxNumOfSelect(1)
-            .options(List.of())
-            .build();
-
-        Assertions.assertThrows(NoOptionException.class, () -> {
-            menuService.save(MenuSaveRequest.builder()
-                .name("황올")
-                .shopId(1L)
-                .optionGroups(List.of(optionGroup))
-                .build());
-        });
-    }
-
-    @Disabled
-    @Test
-    @DisplayName("메뉴 등록 시, 1개 이상의 옵션 그룹이 존재하고 각 옵션 그룹에 옵션이 1개 이상이라면 메뉴 등록 성공")
-    void givenMenuWithNotEmptyOptionGroup_whenAddNewMenu_thenSuccess() {
-
     }
 
     @Disabled
