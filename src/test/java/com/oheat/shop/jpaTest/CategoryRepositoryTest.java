@@ -1,4 +1,4 @@
-package com.oheat.shop;
+package com.oheat.shop.jpaTest;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 

@@ -1,4 +1,4 @@
-package com.oheat.shop;
+package com.oheat.shop.serviceTest;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -8,6 +8,8 @@ import com.oheat.shop.dto.ShopSaveRequest;
 import com.oheat.shop.entity.ShopJpaEntity;
 import com.oheat.shop.exception.CategoryNotExistsException;
 import com.oheat.shop.exception.DuplicateShopNameException;
+import com.oheat.shop.fake.MemoryCategoryRepository;
+import com.oheat.shop.fake.MemoryShopRepository;
 import com.oheat.shop.repository.CategoryRepository;
 import com.oheat.shop.repository.ShopRepository;
 import com.oheat.shop.service.CategoryService;

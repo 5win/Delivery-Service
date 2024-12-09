@@ -1,4 +1,4 @@
-package com.oheat.shop;
+package com.oheat.shop.fake;
 
 import com.oheat.shop.entity.MenuJpaEntity;
 import com.oheat.shop.repository.MenuRepository;

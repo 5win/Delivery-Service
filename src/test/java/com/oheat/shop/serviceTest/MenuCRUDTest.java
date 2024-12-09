@@ -1,4 +1,4 @@
-package com.oheat.shop;
+package com.oheat.shop.serviceTest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -7,6 +7,8 @@ import com.oheat.shop.dto.MenuSaveRequest;
 import com.oheat.shop.entity.MenuJpaEntity;
 import com.oheat.shop.entity.ShopJpaEntity;
 import com.oheat.shop.exception.ShopNotExistsException;
+import com.oheat.shop.fake.MemoryMenuRepository;
+import com.oheat.shop.fake.MemoryShopRepository;
 import com.oheat.shop.repository.MenuRepository;
 import com.oheat.shop.repository.ShopRepository;
 import com.oheat.shop.service.MenuService;
