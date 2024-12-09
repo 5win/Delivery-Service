@@ -1,10 +1,16 @@
 package com.oheat.shop;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import com.oheat.shop.dto.MenuFindByShopIdResponse;
 import com.oheat.shop.dto.MenuSaveRequest;
+import com.oheat.shop.entity.MenuJpaEntity;
+import com.oheat.shop.entity.ShopJpaEntity;
 import com.oheat.shop.exception.ShopNotExistsException;
 import com.oheat.shop.repository.MenuRepository;
 import com.oheat.shop.repository.ShopRepository;
 import com.oheat.shop.service.MenuService;
+import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -33,18 +39,51 @@ public class MenuCRUDTest {
         });
     }
 
-    @Disabled
     @Test
     @DisplayName("메뉴 등록 시, 매장이 존재하면 메뉴 등록 성공")
     void givenMenuWithShopId_whenAddNewMenu_thenSuccess() {
+        memoryShopRepository.save(ShopJpaEntity.builder().name("bbq").build());
 
+        Assertions.assertDoesNotThrow(() -> {
+            menuService.save(MenuSaveRequest.builder()
+                .name("황금올리브")
+                .shopId(1L).
+                build());
+        });
     }
 
-    @Disabled
     @Test
-    @DisplayName("매장에 3개의 메뉴를 등록하면, 매장의 메뉴 조회 시 리스트 size가 3이어야 함")
+    @DisplayName("매장에 3개의 메뉴를 등록하면, 메뉴 DB의 size가 3이어야 함")
     void givenThreeMenu_whenAddNewMenu_thenListSizeThree() {
+        memoryShopRepository.save(ShopJpaEntity.builder().name("bbq").build());
 
+        for (int i = 0; i < 3; i++) {
+            menuService.save(MenuSaveRequest.builder()
+                .name("황올 세트 " + i + "번")
+                .shopId(1L)
+                .build());
+        }
+
+        List<MenuJpaEntity> result = ((MemoryMenuRepository) memoryMenuRepository).findAll();
+
+        assertThat(result.size()).isEqualTo(3);
+    }
+
+    @Test
+    @DisplayName("매장에 3개의 메뉴를 등록한 뒤 매장 엔티티를 조회하면, 매장 엔티티의 메뉴 리스트 사이즈가 3이어야 함")
+    void givenThreeMenu_whenAddNewMenuAndFindShopById_thenMenuListAtShopIsSizeThree() {
+        ShopJpaEntity shop = ShopJpaEntity.builder().name("bbq").build();
+        for (int i = 0; i < 3; i++) {
+            shop.getMenuList().add(MenuJpaEntity.builder()
+                .name("황올 세트 " + i + "번")
+                .shopId(1L)
+                .build());
+        }
+        memoryShopRepository.save(shop);
+
+        List<MenuFindByShopIdResponse> result = menuService.findByShopId(1L);
+
+        assertThat(result.size()).isEqualTo(3);
     }
 
     @Disabled

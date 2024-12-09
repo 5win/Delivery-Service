@@ -6,29 +6,34 @@ import com.oheat.shop.repository.ShopRepository;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 import lombok.Getter;
 
 @Getter
 public class MemoryShopRepository implements ShopRepository {
 
-    private final Map<String, ShopJpaEntity> shops = new HashMap<>();
+    private final Map<Long, ShopJpaEntity> shops = new HashMap<>();
+    private Long autoId = 1L;
 
     @Override
     public void save(ShopJpaEntity shopJpaEntity) {
-        shops.put(shopJpaEntity.getName(), shopJpaEntity);
+        shops.put(autoId++, shopJpaEntity);
     }
 
     @Override
     public Optional<ShopJpaEntity> findById(Long id) {
-        return shops.values().stream()
-            .filter(shop -> shop.getId().equals(id))
+        return shops.entrySet().stream()
+            .filter(entry -> entry.getKey().equals(id))
+            .map(Entry::getValue)
             .findFirst();
     }
 
     @Override
     public Optional<ShopJpaEntity> findByName(String name) {
-        return Optional.ofNullable(shops.get(name));
+        return shops.values().stream()
+            .filter(shop -> shop.getName().equals(name))
+            .findFirst();
     }
 
     @Override

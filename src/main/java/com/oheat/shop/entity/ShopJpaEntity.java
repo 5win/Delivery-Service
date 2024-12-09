@@ -3,9 +3,13 @@ package com.oheat.shop.entity;
 import com.oheat.common.BaseTimeEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -27,4 +31,8 @@ public class ShopJpaEntity extends BaseTimeEntity {
 
     @Column(name = "minimum_order_amount", nullable = false)
     private int minimumOrderAmount;
+
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "shop_id")
+    private final List<MenuJpaEntity> menuList = new ArrayList<>();
 }
