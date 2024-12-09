@@ -11,6 +11,7 @@ import com.oheat.shop.repository.ShopJpaRepository;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -75,5 +76,33 @@ public class MenuRepositoryTest {
         ShopJpaEntity shop = shopJpaRepository.findById(1L).get();
 
         assertThat(shop.getMenuList().size()).isEqualTo(3);
+    }
+
+    @Disabled
+    @Test
+    @DisplayName("존재하지 않는 메뉴에 옵션 그룹을 추가하면 실패")
+    void givenOptionGroupWithWrongMenuId_whenAddNewOptionGroup_thenFail() {
+
+    }
+
+    @Disabled
+    @Test
+    @DisplayName("존재하지 않는 옵션 그룹에 옵션을 추가하면 실패")
+    void givenOptionWithWrongOptionGroupId_whenAddNewOption_thenFail() {
+
+    }
+
+    @Disabled
+    @Test
+    @DisplayName("매장, 메뉴, 옵션 그룹, 옵션을 차례로 알맞게 저장하면 모두 저장 성공")
+    void givenShopAndMenuAndOptionGroupAndOption_whenAddNewMenu_thenSuccess() {
+
+    }
+
+    @Disabled
+    @Test
+    @DisplayName("각각 옵션이 2개인 옵션 그룹을 2개 가진 메뉴를 조회하면 총 옵션 개수는 4개임")
+    void givenTwoOptionGroupsWithTwoOptions_whenFindMenu_thenTotalOptionFour() {
+
     }
 }
