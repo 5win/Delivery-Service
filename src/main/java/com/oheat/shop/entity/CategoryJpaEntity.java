@@ -11,7 +11,7 @@ import lombok.Getter;
 @Getter
 @Builder
 @Entity
-@Table(name = "categories")
+@Table(name = "category")
 public class CategoryJpaEntity extends BaseTimeEntity {
 
     @Column(name = "name", nullable = false, unique = true)

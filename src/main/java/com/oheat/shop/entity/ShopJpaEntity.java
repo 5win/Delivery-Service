@@ -16,7 +16,7 @@ import lombok.Getter;
 @Getter
 @Builder
 @Entity
-@Table(name = "shops")
+@Table(name = "shop")
 public class ShopJpaEntity extends BaseTimeEntity {
 
     @Column(name = "name", nullable = false, unique = true)
