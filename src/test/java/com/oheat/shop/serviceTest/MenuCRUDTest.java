@@ -4,8 +4,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.oheat.shop.dto.MenuFindByShopIdResponse;
 import com.oheat.shop.dto.MenuSaveRequest;
+import com.oheat.shop.dto.OptionGroupSaveRequest;
 import com.oheat.shop.entity.MenuJpaEntity;
 import com.oheat.shop.entity.ShopJpaEntity;
+import com.oheat.shop.exception.NoOptionGroupException;
 import com.oheat.shop.exception.ShopNotExistsException;
 import com.oheat.shop.fake.MemoryMenuRepository;
 import com.oheat.shop.fake.MemoryShopRepository;
@@ -46,11 +48,19 @@ public class MenuCRUDTest {
     void givenMenuWithShopId_whenAddNewMenu_thenSuccess() {
         memoryShopRepository.save(ShopJpaEntity.builder().name("bbq").build());
 
+        OptionGroupSaveRequest optionGroup = OptionGroupSaveRequest.builder()
+            .name("부분육 선택")
+            .menuId(1L)
+            .required(true)
+            .maxNumOfSelect(1)
+            .build();
+
         Assertions.assertDoesNotThrow(() -> {
             menuService.save(MenuSaveRequest.builder()
                 .name("황금올리브")
-                .shopId(1L).
-                build());
+                .shopId(1L)
+                .optionGroups(List.of(optionGroup))
+                .build());
         });
     }
 
@@ -59,10 +69,18 @@ public class MenuCRUDTest {
     void givenThreeMenu_whenAddNewMenu_thenListSizeThree() {
         memoryShopRepository.save(ShopJpaEntity.builder().name("bbq").build());
 
+        OptionGroupSaveRequest optionGroup = OptionGroupSaveRequest.builder()
+            .name("부분육 선택")
+            .menuId(1L)
+            .required(true)
+            .maxNumOfSelect(1)
+            .build();
+
         for (int i = 0; i < 3; i++) {
             menuService.save(MenuSaveRequest.builder()
                 .name("황올 세트 " + i + "번")
                 .shopId(1L)
+                .optionGroups(List.of(optionGroup))
                 .build());
         }
 
@@ -88,11 +106,18 @@ public class MenuCRUDTest {
         assertThat(result.size()).isEqualTo(3);
     }
 
-    @Disabled
     @Test
     @DisplayName("메뉴 등록 시, 옵션 그룹 정보가 없다면 메뉴 등록 실패")
     void givenMenuWithoutOptionGroup_whenAddNewMenu_thenFail() {
+        memoryShopRepository.save(ShopJpaEntity.builder().name("bbq").build());
 
+        Assertions.assertThrows(NoOptionGroupException.class, () -> {
+            menuService.save(MenuSaveRequest.builder()
+                .name("황올")
+                .shopId(1L)
+                .optionGroups(List.of())
+                .build());
+        });
     }
 
     @Disabled
