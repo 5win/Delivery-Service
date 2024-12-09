@@ -25,6 +25,9 @@ public class MenuJpaEntity extends BaseTimeEntity {
     @Column(name = "name", nullable = false, unique = true)
     private String name;
 
+    @Column(name = "price", nullable = false)
+    private int price;
+
     @Column(name = "shop_id", nullable = false)
     private Long shopId;
 
