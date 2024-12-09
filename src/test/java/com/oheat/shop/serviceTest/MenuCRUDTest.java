@@ -5,8 +5,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.oheat.shop.dto.MenuFindByShopIdResponse;
 import com.oheat.shop.dto.MenuSaveRequest;
 import com.oheat.shop.dto.OptionGroupSaveRequest;
+import com.oheat.shop.dto.OptionSaveRequest;
 import com.oheat.shop.entity.MenuJpaEntity;
 import com.oheat.shop.entity.ShopJpaEntity;
+import com.oheat.shop.exception.NoOptionException;
 import com.oheat.shop.exception.NoOptionGroupException;
 import com.oheat.shop.exception.ShopNotExistsException;
 import com.oheat.shop.fake.MemoryMenuRepository;
@@ -53,6 +55,11 @@ public class MenuCRUDTest {
             .menuId(1L)
             .required(true)
             .maxNumOfSelect(1)
+            .options(List.of(OptionSaveRequest.builder()
+                .name("순살")
+                .price(2_000)
+                .optionGroupId(1L)
+                .build()))
             .build();
 
         Assertions.assertDoesNotThrow(() -> {
@@ -74,6 +81,11 @@ public class MenuCRUDTest {
             .menuId(1L)
             .required(true)
             .maxNumOfSelect(1)
+            .options(List.of(OptionSaveRequest.builder()
+                .name("순살")
+                .price(2_000)
+                .optionGroupId(1L)
+                .build()))
             .build();
 
         for (int i = 0; i < 3; i++) {
@@ -120,11 +132,25 @@ public class MenuCRUDTest {
         });
     }
 
-    @Disabled
     @Test
     @DisplayName("메뉴 등록 시, 옵션이 존재하지 않는 옵션 그룹이 있다면 메뉴 등록 실패")
     void givenMenuWithEmptyOptionGroup_whenAddNewMenu_thenFail() {
+        memoryShopRepository.save(ShopJpaEntity.builder().name("bbq").build());
+        OptionGroupSaveRequest optionGroup = OptionGroupSaveRequest.builder()
+            .name("부분육 선택")
+            .menuId(1L)
+            .required(true)
+            .maxNumOfSelect(1)
+            .options(List.of())
+            .build();
 
+        Assertions.assertThrows(NoOptionException.class, () -> {
+            menuService.save(MenuSaveRequest.builder()
+                .name("황올")
+                .shopId(1L)
+                .optionGroups(List.of(optionGroup))
+                .build());
+        });
     }
 
     @Disabled

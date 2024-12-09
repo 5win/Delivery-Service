@@ -3,7 +3,11 @@ package com.oheat.shop.entity;
 import com.oheat.common.BaseTimeEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -29,4 +33,12 @@ public class OptionGroupJpaEntity extends BaseTimeEntity {
 
     @Column(name = "max_num_of_select")
     private int maxNumOfSelect;
+
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "option_group_id")
+    private List<OptionJpaEntity> options;
+
+    public boolean isOptionsEmpty() {
+        return options.isEmpty();
+    }
 }

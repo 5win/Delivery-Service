@@ -4,6 +4,7 @@ import com.oheat.shop.dto.MenuFindByShopIdResponse;
 import com.oheat.shop.dto.MenuSaveRequest;
 import com.oheat.shop.entity.MenuJpaEntity;
 import com.oheat.shop.entity.ShopJpaEntity;
+import com.oheat.shop.exception.NoOptionException;
 import com.oheat.shop.exception.NoOptionGroupException;
 import com.oheat.shop.exception.ShopNotExistsException;
 import com.oheat.shop.repository.MenuRepository;
@@ -26,6 +27,9 @@ public class MenuService {
         MenuJpaEntity menu = saveRequest.toEntity();
         if (menu.isOptionGroupsEmpty()) {
             throw new NoOptionGroupException();
+        }
+        if (menu.isEmptyOptionGroupExists()) {
+            throw new NoOptionException();
         }
         menuRepository.save(menu);
     }

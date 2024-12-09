@@ -35,4 +35,13 @@ public class MenuJpaEntity extends BaseTimeEntity {
     public boolean isOptionGroupsEmpty() {
         return optionGroups.isEmpty();
     }
+
+    public boolean isEmptyOptionGroupExists() {
+        for (OptionGroupJpaEntity optionGroup : optionGroups) {
+            if (optionGroup.isOptionsEmpty()) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
