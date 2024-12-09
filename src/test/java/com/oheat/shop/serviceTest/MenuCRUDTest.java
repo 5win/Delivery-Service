@@ -155,14 +155,21 @@ public class MenuCRUDTest {
 
     @Disabled
     @Test
-    @DisplayName("메뉴를 메뉴 그룹에 추가 시, 메뉴가 해당 매장에 속하지 않으면 추가 실패")
+    @DisplayName("메뉴 그룹에 메뉴 추가 시, 메뉴가 해당 매장에 속하지 않으면 추가 실패")
     void givenShopIdAndWrongMenuId_whenAddToMenuGroup_thenFail() {
 
     }
 
     @Disabled
     @Test
-    @DisplayName("메뉴를 메뉴 그룹에 추가 시, 메뉴가 해당 매장에 속하면 추가 성공")
+    @DisplayName("메뉴 그룹에 이미 추가된 메뉴이면, 메뉴 그룹에 메뉴 추가 실패")
+    void givenShopIdAndDuplicateMenu_whenAddToMenuGroup_thenFail() {
+
+    }
+
+    @Disabled
+    @Test
+    @DisplayName("메뉴 그룹에 메뉴 추가 시, 메뉴가 해당 매장에 속하면서 중복되지 않으면 추가 성공")
     void givenShopIdAndMenuId_whenAddToMenuGroup_thenSuccess() {
 
     }
