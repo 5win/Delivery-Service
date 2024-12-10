@@ -5,6 +5,7 @@ import com.oheat.shop.repository.MenuRepository;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public class MemoryMenuRepository implements MenuRepository {
 
@@ -14,6 +15,18 @@ public class MemoryMenuRepository implements MenuRepository {
     @Override
     public void save(MenuJpaEntity menuJpaEntity) {
         menus.put(autoId++, menuJpaEntity);
+    }
+
+    @Override
+    public Optional<MenuJpaEntity> findById(Long menuId) {
+        return Optional.ofNullable(menus.get(menuId));
+    }
+
+    @Override
+    public Optional<MenuJpaEntity> findByName(String name) {
+        return menus.values().stream()
+            .filter(menu -> menu.getName().equals(name))
+            .findFirst();
     }
 
     public List<MenuJpaEntity> findAll() {

@@ -4,6 +4,7 @@ import com.oheat.shop.dto.MenuFindByShopIdResponse;
 import com.oheat.shop.dto.MenuSaveRequest;
 import com.oheat.shop.entity.MenuJpaEntity;
 import com.oheat.shop.entity.ShopJpaEntity;
+import com.oheat.shop.exception.DuplicateMenuException;
 import com.oheat.shop.exception.NoOptionException;
 import com.oheat.shop.exception.NoOptionGroupException;
 import com.oheat.shop.exception.ShopNotExistsException;
@@ -23,6 +24,10 @@ public class MenuService {
     public void save(MenuSaveRequest saveRequest) {
         shopRepository.findById(saveRequest.getShopId())
             .orElseThrow(ShopNotExistsException::new);
+        menuRepository.findByName(saveRequest.getName())
+            .ifPresent(menu -> {
+                throw new DuplicateMenuException();
+            });
 
         MenuJpaEntity menu = saveRequest.toEntity();
         if (menu.isOptionGroupsEmpty()) {
@@ -38,7 +43,7 @@ public class MenuService {
         ShopJpaEntity shop = shopRepository.findById(shopId)
             .orElseThrow(ShopNotExistsException::new);
 
-        return shop.getMenuList().stream()
+        return shop.getMenuSet().stream()
             .map(MenuFindByShopIdResponse::from)
             .toList();
     }

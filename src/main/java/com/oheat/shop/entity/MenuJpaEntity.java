@@ -3,6 +3,7 @@ package com.oheat.shop.entity;
 import com.oheat.common.BaseTimeEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
@@ -31,7 +32,11 @@ public class MenuJpaEntity extends BaseTimeEntity {
     @Column(name = "shop_id", nullable = false)
     private Long shopId;
 
-    @OneToMany
+    @Column(name = "menu_group_id")
+    private Long menuGroupId;
+
+    @Builder.Default
+    @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "menu_id")
     private List<OptionGroupJpaEntity> optionGroups = new ArrayList<>();
 

@@ -7,8 +7,8 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -20,27 +20,22 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Entity
-@Table(name = "option_group")
-public class OptionGroupJpaEntity extends BaseTimeEntity {
+@Table(name = "menu_group")
+public class MenuGroupJpaEntity extends BaseTimeEntity {
 
-    @Column(name = "name", nullable = false, unique = true)
+    @Column(name = "name", nullable = false)
     private String name;
-
-    @Column(name = "menu_id", nullable = false)
-    private Long menuId;
-
-    @Column(name = "required")
-    private boolean required;
-
-    @Column(name = "max_num_of_select")
-    private int maxNumOfSelect;
 
     @Builder.Default
     @OneToMany(fetch = FetchType.LAZY)
-    @JoinColumn(name = "option_group_id")
-    private List<OptionJpaEntity> options = new ArrayList<>();
+    @JoinColumn(name = "menu_group_id")
+    private Set<MenuJpaEntity> menus = new HashSet<>();
 
-    public boolean isOptionsEmpty() {
-        return options.isEmpty();
+    public void addMenu(MenuJpaEntity menu) {
+        this.menus.add(menu);
+    }
+
+    public boolean containsMenu(MenuJpaEntity menu) {
+        return menus.contains(menu);
     }
 }

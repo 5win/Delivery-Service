@@ -9,7 +9,9 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -37,7 +39,17 @@ public class ShopJpaEntity extends BaseTimeEntity {
     @Column(name = "minimum_order_amount", nullable = false)
     private int minimumOrderAmount;
 
+    @Builder.Default
     @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "shop_id")
-    private final List<MenuJpaEntity> menuList = new ArrayList<>();
+    private Set<MenuJpaEntity> menuSet = new HashSet<>();
+
+    @Builder.Default
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "shop_id")
+    private List<MenuGroupJpaEntity> menuGroups = new ArrayList<>();
+
+    public boolean containsMenu(MenuJpaEntity menu) {
+        return menuSet.contains(menu);
+    }
 }

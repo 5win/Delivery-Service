@@ -8,6 +8,7 @@ import com.oheat.shop.dto.OptionGroupSaveRequest;
 import com.oheat.shop.dto.OptionSaveRequest;
 import com.oheat.shop.entity.MenuJpaEntity;
 import com.oheat.shop.entity.ShopJpaEntity;
+import com.oheat.shop.exception.DuplicateMenuException;
 import com.oheat.shop.exception.NoOptionException;
 import com.oheat.shop.exception.NoOptionGroupException;
 import com.oheat.shop.exception.ShopNotExistsException;
@@ -19,7 +20,6 @@ import com.oheat.shop.service.MenuService;
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -107,6 +107,29 @@ public class MenuCRUDTest {
     }
 
     @Test
+    @DisplayName("메뉴 등록 시, 이미 메뉴가 있다면 메뉴 등록 실패")
+    void givenDuplicateMenu_whenAddNewMenu_thenFail() {
+        memoryShopRepository.save(ShopJpaEntity.builder().name("bbq").build());
+        OptionGroupSaveRequest optionGroup = OptionGroupSaveRequest.builder()
+            .name("부분육 선택")
+            .menuId(1L)
+            .required(true)
+            .maxNumOfSelect(1)
+            .options(List.of(OptionSaveRequest.builder()
+                .name("순살")
+                .price(2_000)
+                .optionGroupId(1L)
+                .build()))
+            .build();
+        menuService.save(MenuSaveRequest.builder()
+            .name("황금올리브").shopId(1L).optionGroups(List.of(optionGroup)).build());
+
+        Assertions.assertThrows(DuplicateMenuException.class, () -> {
+            menuService.save(MenuSaveRequest.builder().name("황금올리브").shopId(1L).build());
+        });
+    }
+
+    @Test
     @DisplayName("매장에 3개의 메뉴를 등록하면, 메뉴 DB의 size가 3이어야 함")
     void givenThreeMenu_whenAddNewMenu_thenListSizeThree() {
         memoryShopRepository.save(ShopJpaEntity.builder().name("bbq").build());
@@ -141,7 +164,7 @@ public class MenuCRUDTest {
     void givenThreeMenu_whenAddNewMenuAndFindShopById_thenMenuListAtShopIsSizeThree() {
         ShopJpaEntity shop = ShopJpaEntity.builder().name("bbq").build();
         for (int i = 0; i < 3; i++) {
-            shop.getMenuList().add(MenuJpaEntity.builder()
+            shop.getMenuSet().add(MenuJpaEntity.builder()
                 .name("황올 세트 " + i + "번")
                 .shopId(1L)
                 .build());
@@ -151,26 +174,5 @@ public class MenuCRUDTest {
         List<MenuFindByShopIdResponse> result = menuService.findByShopId(1L);
 
         assertThat(result.size()).isEqualTo(3);
-    }
-
-    @Disabled
-    @Test
-    @DisplayName("메뉴 그룹에 메뉴 추가 시, 메뉴가 해당 매장에 속하지 않으면 추가 실패")
-    void givenShopIdAndWrongMenuId_whenAddToMenuGroup_thenFail() {
-
-    }
-
-    @Disabled
-    @Test
-    @DisplayName("메뉴 그룹에 이미 추가된 메뉴이면, 메뉴 그룹에 메뉴 추가 실패")
-    void givenShopIdAndDuplicateMenu_whenAddToMenuGroup_thenFail() {
-
-    }
-
-    @Disabled
-    @Test
-    @DisplayName("메뉴 그룹에 메뉴 추가 시, 메뉴가 해당 매장에 속하면서 중복되지 않으면 추가 성공")
-    void givenShopIdAndMenuId_whenAddToMenuGroup_thenSuccess() {
-
     }
 }

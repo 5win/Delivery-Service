@@ -87,7 +87,7 @@ public class MenuRepositoryTest {
 
         ShopJpaEntity shop = shopJpaRepository.findById(1L).get();
 
-        assertThat(shop.getMenuList().size()).isEqualTo(3);
+        assertThat(shop.getMenuSet().size()).isEqualTo(3);
     }
 
     @Test
