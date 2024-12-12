@@ -32,8 +32,8 @@ public class MenuJpaEntity extends BaseTimeEntity {
     @Column(name = "shop_id", nullable = false)
     private Long shopId;
 
-    @Column(name = "menu_group_id")
-    private Long menuGroupId;
+    @Column(name = "menu_group_mapping_id")
+    private Long menuGroupMappingId;
 
     @Builder.Default
     @OneToMany(fetch = FetchType.LAZY)

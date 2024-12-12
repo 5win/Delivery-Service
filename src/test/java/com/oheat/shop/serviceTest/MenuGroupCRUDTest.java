@@ -1,20 +1,24 @@
 package com.oheat.shop.serviceTest;
 
 import com.oheat.shop.dto.MenuGroupSaveRequest;
+import com.oheat.shop.dto.MenuSaveToMenuGroupRequest;
+import com.oheat.shop.entity.MenuGroupJpaEntity;
 import com.oheat.shop.entity.MenuJpaEntity;
 import com.oheat.shop.entity.ShopJpaEntity;
 import com.oheat.shop.exception.DuplicateMenuException;
+import com.oheat.shop.exception.MenuGroupNotExistsException;
 import com.oheat.shop.exception.MenuNotExistsException;
 import com.oheat.shop.exception.ShopNotExistsException;
+import com.oheat.shop.fake.MemoryMenuGroupMappingRepository;
 import com.oheat.shop.fake.MemoryMenuGroupRepository;
 import com.oheat.shop.fake.MemoryMenuRepository;
 import com.oheat.shop.fake.MemoryShopRepository;
+import com.oheat.shop.repository.MenuGroupMappingRepository;
 import com.oheat.shop.repository.MenuGroupRepository;
 import com.oheat.shop.repository.MenuRepository;
 import com.oheat.shop.repository.ShopRepository;
 import com.oheat.shop.service.MenuGroupService;
 import java.util.List;
-import java.util.Set;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -25,68 +29,79 @@ public class MenuGroupCRUDTest {
     private MenuGroupService menuGroupService;
     private final ShopRepository memoryShopRepository = new MemoryShopRepository();
     private final MenuRepository memoryMenuRepository = new MemoryMenuRepository();
+    private final MenuGroupMappingRepository memoryMenuGroupMappingRepository = new MemoryMenuGroupMappingRepository();
     private final MenuGroupRepository memoryMenuGroupRepository = new MemoryMenuGroupRepository();
 
     @BeforeEach
     void setup() {
         menuGroupService = new MenuGroupService(memoryShopRepository, memoryMenuRepository,
-            memoryMenuGroupRepository);
+            memoryMenuGroupMappingRepository, memoryMenuGroupRepository);
     }
 
     @Test
-    @DisplayName("존재하지 않는 매장에 메뉴 그룹 추가하면 실패")
-    void givenWrongShopId_whenAddToMenuGroup_thenFail() {
+    @DisplayName("매장이 존재하지 않으면, 매장에 새 메뉴 그룹 추가 실패")
+    void givenMenuGroupWithWrongShop_whenRegisterMenuGroup_thenFail() {
         Assertions.assertThrows(ShopNotExistsException.class, () -> {
-            menuGroupService.save(MenuGroupSaveRequest.builder()
-                .name("후라이드").shopId(1L).menuList(List.of(1L, 2L)).build());
+            menuGroupService.registerMenuGroup(MenuGroupSaveRequest.builder()
+                .name("후라이드").shopId(1L).build());
         });
     }
 
     @Test
-    @DisplayName("메뉴 그룹에 메뉴 추가 시, 메뉴가 해당 매장에 속하지 않으면 추가 실패")
-    void givenShopIdAndWrongMenuId_whenAddToMenuGroup_thenFail() {
-        MenuJpaEntity menu = MenuJpaEntity.builder().name("뿌링클").shopId(2L).build();
+    @DisplayName("매장이 존재하면, 매장에 새 메뉴 그룹 추가 성공")
+    void givenMenuGroup_whenRegisterMenuGroup_thenSuccess() {
         memoryShopRepository.save(ShopJpaEntity.builder().name("bbq").build());
-        memoryShopRepository.save(
-            ShopJpaEntity.builder().name("bhc").menuSet(Set.of(menu)).build());
-        memoryMenuRepository.save(menu);
+
+        Assertions.assertDoesNotThrow(() -> {
+            menuGroupService.registerMenuGroup(MenuGroupSaveRequest.builder()
+                .name("후라이드").shopId(1L).build());
+        });
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 메뉴 그룹에 메뉴 추가하면 실패")
+    void givenMenuWithWrongMenuGroup_whenAddToMenuGroup_thenFail() {
+        Assertions.assertThrows(MenuGroupNotExistsException.class, () -> {
+            menuGroupService.registerMenuToMenuGroup(MenuSaveToMenuGroupRequest.builder()
+                .menuGroupId(1L).menuList(List.of(1L)).build());
+        });
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 메뉴이면, 메뉴 그룹에 추가 실패")
+    void givenWrongMenu_whenAddToMenuGroup_thenFail() {
+        memoryMenuGroupRepository.save(MenuGroupJpaEntity.builder()
+            .name("후라이드").shopId(1L).build());
 
         Assertions.assertThrows(MenuNotExistsException.class, () -> {
-            menuGroupService.save(MenuGroupSaveRequest.builder()
-                .name("후라이드").shopId(1L).menuList(List.of(1L)).build());
-        });
-
-        Assertions.assertDoesNotThrow(() -> {
-            menuGroupService.save(MenuGroupSaveRequest.builder()
-                .name("후라이드").shopId(2L).menuList(List.of(1L)).build());
+            menuGroupService.registerMenuToMenuGroup(MenuSaveToMenuGroupRequest.builder()
+                .menuGroupId(1L).menuList(List.of(1L)).build());
         });
     }
 
     @Test
-    @DisplayName("메뉴 그룹에 메뉴 추가 시, 메뉴가 해당 매장에 속하면서 중복되지 않으면 추가 성공")
-    void givenShopIdAndMenuId_whenAddToMenuGroup_thenSuccess() {
-        MenuJpaEntity menu = MenuJpaEntity.builder().name("황올").shopId(1L).build();
-        memoryShopRepository.save(ShopJpaEntity.builder()
-            .name("bbq").menuSet(Set.of(menu)).build());
-        memoryMenuRepository.save(menu);
+    @DisplayName("메뉴 그룹이 존재하면서 메뉴가 이미 추가되어있지 않으면, 메뉴 그룹에 추가 성공")
+    void givenNotDuplicateMenuAndMenuGroup_whenAddToMenuGroup_thenSuccess() {
+        memoryMenuGroupRepository.save(MenuGroupJpaEntity.builder()
+            .name("후라이드").shopId(1L).build());
+        memoryMenuRepository.save(MenuJpaEntity.builder().name("황올").shopId(1L).build());
 
         Assertions.assertDoesNotThrow(() -> {
-            menuGroupService.save(MenuGroupSaveRequest.builder()
-                .name("후라이드").shopId(1L).menuList(List.of(1L)).build());
+            menuGroupService.registerMenuToMenuGroup(MenuSaveToMenuGroupRequest.builder()
+                .menuGroupId(1L).menuList(List.of(1L)).build());
         });
     }
 
     @Test
-    @DisplayName("메뉴 그룹에 이미 추가된 메뉴이면, 메뉴 그룹에 메뉴 추가 실패")
-    void givenShopIdAndDuplicateMenu_whenAddToMenuGroup_thenFail() {
-        MenuJpaEntity menu = MenuJpaEntity.builder().name("황올").shopId(1L).build();
-        memoryShopRepository.save(ShopJpaEntity.builder()
-            .name("bbq").menuSet(Set.of(menu)).build());
-        memoryMenuRepository.save(menu);
+    @DisplayName("메뉴 그룹에 메뉴가 이미 존재하면, 메뉴 그룹에 추가 실패")
+    void givenAlreadyExistsMenuInGroup_whenAddToMenuGroup_thenFail() {
+        memoryMenuGroupRepository.save(MenuGroupJpaEntity
+            .builder().name("후라이드").shopId(1L).build());
+        memoryMenuRepository.save(MenuJpaEntity.builder().name("황올").build());
 
         Assertions.assertThrows(DuplicateMenuException.class, () -> {
-            menuGroupService.save(MenuGroupSaveRequest.builder()
-                .name("후라이드").shopId(1L).menuList(List.of(1L, 1L)).build());
+            menuGroupService.registerMenuToMenuGroup(MenuSaveToMenuGroupRequest.builder()
+                .menuGroupId(1L).menuList(List.of(1L, 1L)).build());
         });
     }
 }

@@ -4,7 +4,6 @@ import com.oheat.common.BaseTimeEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
-import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.util.HashSet;
@@ -26,16 +25,18 @@ public class MenuGroupJpaEntity extends BaseTimeEntity {
     @Column(name = "name", nullable = false)
     private String name;
 
-    @Builder.Default
-    @OneToMany(fetch = FetchType.LAZY)
-    @JoinColumn(name = "menu_group_id")
-    private Set<MenuJpaEntity> menus = new HashSet<>();
+    @Column(name = "shop_id", nullable = false)
+    private Long shopId;
 
-    public void addMenu(MenuJpaEntity menu) {
-        this.menus.add(menu);
+    @Builder.Default
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "menuGroup")
+    private Set<MenuGroupMappingJpaEntity> menuGroupMappingSet = new HashSet<>();
+
+    public void addMenuMapping(MenuGroupMappingJpaEntity menuGroupMapping) {
+        this.menuGroupMappingSet.add(menuGroupMapping);
     }
 
-    public boolean containsMenu(MenuJpaEntity menu) {
-        return menus.contains(menu);
+    public boolean containsMenu(MenuGroupMappingJpaEntity menuGroupMapping) {
+        return menuGroupMappingSet.contains(menuGroupMapping);
     }
 }

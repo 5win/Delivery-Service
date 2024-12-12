@@ -4,6 +4,7 @@ import com.oheat.shop.entity.MenuGroupJpaEntity;
 import com.oheat.shop.repository.MenuGroupRepository;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 public class MemoryMenuGroupRepository implements MenuGroupRepository {
 
@@ -13,5 +14,10 @@ public class MemoryMenuGroupRepository implements MenuGroupRepository {
     @Override
     public void save(MenuGroupJpaEntity menuGroup) {
         menuGroups.put(autoId++, menuGroup);
+    }
+
+    @Override
+    public Optional<MenuGroupJpaEntity> findById(Long menuGroupId) {
+        return Optional.ofNullable(menuGroups.get(menuGroupId));
     }
 }
