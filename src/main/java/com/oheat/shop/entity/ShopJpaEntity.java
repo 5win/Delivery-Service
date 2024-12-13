@@ -1,6 +1,7 @@
 package com.oheat.shop.entity;
 
 import com.oheat.common.BaseTimeEntity;
+import com.oheat.shop.dto.ShopUpdateRequest;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -60,4 +61,11 @@ public class ShopJpaEntity extends BaseTimeEntity {
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "shop")
     private final List<MenuGroupJpaEntity> menuGroups = new ArrayList<>();
+
+    public void updateShopInfo(ShopUpdateRequest updateRequest, CategoryJpaEntity category) {
+        this.name = updateRequest.getShopName();
+        this.phone = updateRequest.getPhone();
+        this.category = category;
+        this.minimumOrderAmount = updateRequest.getMinimumOrderAmount();
+    }
 }
