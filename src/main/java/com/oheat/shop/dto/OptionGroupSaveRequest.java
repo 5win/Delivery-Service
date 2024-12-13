@@ -20,7 +20,6 @@ public class OptionGroupSaveRequest {
     public OptionGroupJpaEntity toEntity() {
         OptionGroupJpaEntity optionGroup = OptionGroupJpaEntity.builder()
             .name(this.name)
-            .menuId(this.menuId)
             .required(this.required)
             .maxNumOfSelect(this.maxNumOfSelect)
             .build();

@@ -43,16 +43,11 @@ public class MenuJpaEntity extends BaseTimeEntity {
     @Column(name = "price", nullable = false)
     private int price;
 
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "shop_id", nullable = false)
     private ShopJpaEntity shop;
 
-    @Column(name = "menu_group_mapping_id")
-    private Long menuGroupMappingId;
-
-    @OneToMany(fetch = FetchType.LAZY)
-    @JoinColumn(name = "menu_id")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "menu")
     private final List<OptionGroupJpaEntity> optionGroups = new ArrayList<>();
 
     public void addOptionGroup(OptionGroupJpaEntity optionGroup) {

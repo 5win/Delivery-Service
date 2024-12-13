@@ -95,10 +95,20 @@ public class MenuRepositoryTest {
     @Test
     @DisplayName("존재하지 않는 메뉴에 옵션 그룹을 추가하면 실패")
     void givenOptionGroupWithWrongMenuId_whenAddNewOptionGroup_thenFail() {
+        CategoryJpaEntity category = CategoryJpaEntity.builder().name("치킨").build();
+        ShopJpaEntity shop = ShopJpaEntity.builder().name("bbq").category(category).build();
+        MenuJpaEntity menu = MenuJpaEntity.builder().name("황올").shop(shop).build();
+
+        categoryJpaRepository.save(category);
+        shopJpaRepository.save(shop);
+        menuJpaRepository.save(menu);
+        menuJpaRepository.deleteAll();
+        entityManager.flush();
+
         Assertions.assertThrows(DataIntegrityViolationException.class, () -> {
             optionGroupJpaRepository.save(OptionGroupJpaEntity.builder()
                 .name("부분육 선택")
-                .menuId(1L)
+                .menu(menu)
                 .build());
         });
         entityManager.clear();
@@ -107,10 +117,23 @@ public class MenuRepositoryTest {
     @Test
     @DisplayName("존재하지 않는 옵션 그룹에 옵션을 추가하면 실패")
     void givenOptionWithWrongOptionGroupId_whenAddNewOption_thenFail() {
+        CategoryJpaEntity category = CategoryJpaEntity.builder().name("치킨").build();
+        ShopJpaEntity shop = ShopJpaEntity.builder().name("bbq").category(category).build();
+        MenuJpaEntity menu = MenuJpaEntity.builder().name("황올").shop(shop).build();
+        OptionGroupJpaEntity optionGroup = OptionGroupJpaEntity.builder()
+            .name("부분육 선택").menu(menu).build();
+
+        categoryJpaRepository.save(category);
+        shopJpaRepository.save(shop);
+        menuJpaRepository.save(menu);
+        optionGroupJpaRepository.save(optionGroup);
+        optionGroupJpaRepository.deleteAll();
+        entityManager.flush();
+
         Assertions.assertThrows(DataIntegrityViolationException.class, () -> {
             optionJpaRepository.save(OptionJpaEntity.builder()
                 .name("순살")
-                .optionGroupId(1L)
+                .optionGroup(optionGroup)
                 .build());
         });
         entityManager.clear();
@@ -121,14 +144,18 @@ public class MenuRepositoryTest {
     void givenShopAndMenuAndOptionGroupAndOption_whenAddNewMenu_thenSuccess() {
         CategoryJpaEntity category = CategoryJpaEntity.builder().name("치킨").build();
         ShopJpaEntity shop = ShopJpaEntity.builder().name("bbq").category(category).build();
+        MenuJpaEntity menu = MenuJpaEntity.builder().name("황올").shop(shop).build();
+        OptionGroupJpaEntity optionGroup = OptionGroupJpaEntity.builder()
+            .name("부분육 선택").menu(menu).build();
+
+        categoryJpaRepository.save(category);
+        shopJpaRepository.save(shop);
+        menuJpaRepository.save(menu);
+        optionGroupJpaRepository.save(optionGroup);
+
         Assertions.assertDoesNotThrow(() -> {
-            categoryJpaRepository.save(category);
-            shopJpaRepository.save(shop);
-            menuJpaRepository.save(MenuJpaEntity.builder().name("황올").shop(shop).build());
-            optionGroupJpaRepository.save(
-                OptionGroupJpaEntity.builder().name("부분육 선택").menuId(1L).build());
             optionJpaRepository.save(
-                OptionJpaEntity.builder().name("순살").optionGroupId(1L).build());
+                OptionJpaEntity.builder().name("순살").optionGroup(optionGroup).build());
         });
     }
 
@@ -137,25 +164,33 @@ public class MenuRepositoryTest {
     void givenTwoOptionGroupsWithTwoOptions_whenFindMenu_thenTotalOptionFour() {
         CategoryJpaEntity category = CategoryJpaEntity.builder().name("치킨").build();
         ShopJpaEntity shop = ShopJpaEntity.builder().name("bbq").category(category).build();
+        MenuJpaEntity menu = MenuJpaEntity.builder().name("황올").shop(shop).build();
+        OptionGroupJpaEntity optionGroup1 = OptionGroupJpaEntity.builder()
+            .name("부분육 선택").menu(menu).build();
+        OptionGroupJpaEntity optionGroup2 = OptionGroupJpaEntity.builder()
+            .name("음료 추가 선택").menu(menu).build();
+        OptionJpaEntity option1 = OptionJpaEntity.builder()
+            .name("순살").optionGroup(optionGroup1).build();
+        OptionJpaEntity option2 = OptionJpaEntity.builder()
+            .name("콤보 변경").optionGroup(optionGroup1).build();
+        OptionJpaEntity option3 = OptionJpaEntity.builder()
+            .name("콜라").optionGroup(optionGroup2).build();
+        OptionJpaEntity option4 = OptionJpaEntity.builder()
+            .name("스프라이트").optionGroup(optionGroup2).build();
+
         categoryJpaRepository.save(category);
         shopJpaRepository.save(shop);
-        menuJpaRepository.save(MenuJpaEntity.builder().name("황올").shop(shop).build());
+        menuJpaRepository.save(menu);
         // 옵션 그룹 2개
-        optionGroupJpaRepository.save(
-            OptionGroupJpaEntity.builder().name("부분육 선택").menuId(1L).build());
-        optionGroupJpaRepository.save(
-            OptionGroupJpaEntity.builder().name("음료 추가 선택").menuId(1L).build());
+        optionGroupJpaRepository.save(optionGroup1);
+        optionGroupJpaRepository.save(optionGroup2);
         // 각 옵션 그룹마다 옵션 2개씩
-        optionJpaRepository.save(
-            OptionJpaEntity.builder().name("순살").optionGroupId(1L).build());
-        optionJpaRepository.save(
-            OptionJpaEntity.builder().name("콤보 변경").optionGroupId(1L).build());
-        optionJpaRepository.save(
-            OptionJpaEntity.builder().name("콜라").optionGroupId(2L).build());
-        optionJpaRepository.save(
-            OptionJpaEntity.builder().name("스프라이트").optionGroupId(2L).build());
-
+        optionJpaRepository.save(option1);
+        optionJpaRepository.save(option2);
+        optionJpaRepository.save(option3);
+        optionJpaRepository.save(option4);
         entityManager.clear();
+
         List<OptionGroupJpaEntity> result = menuJpaRepository.findById(1L).get()
             .getOptionGroups();
 

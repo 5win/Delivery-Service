@@ -18,7 +18,6 @@ public class OptionSaveRequest {
         return OptionJpaEntity.builder()
             .name(this.name)
             .price(this.price)
-            .optionGroupId(this.optionGroupId)
             .build();
     }
 }
