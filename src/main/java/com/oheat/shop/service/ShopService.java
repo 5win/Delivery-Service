@@ -1,6 +1,6 @@
 package com.oheat.shop.service;
 
-import com.oheat.shop.dto.ShopFindAllResponse;
+import com.oheat.shop.dto.ShopFindByCategoryResponse;
 import com.oheat.shop.dto.ShopSaveRequest;
 import com.oheat.shop.entity.CategoryJpaEntity;
 import com.oheat.shop.exception.CategoryNotExistsException;
@@ -31,12 +31,12 @@ public class ShopService {
         shopRepository.save(saveRequest.toEntity(category));
     }
 
-    public List<ShopFindAllResponse> findShopByCategory(String categoryName) {
+    public List<ShopFindByCategoryResponse> findShopByCategory(String categoryName) {
         CategoryJpaEntity category = categoryRepository.findByName(categoryName)
             .orElseThrow(CategoryNotExistsException::new);
 
         return shopRepository.findByCategory(category).stream()
-            .map(ShopFindAllResponse::from)
+            .map(ShopFindByCategoryResponse::from)
             .toList();
     }
 }
