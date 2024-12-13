@@ -11,4 +11,6 @@ public interface ShopJpaRepository extends JpaRepository<ShopJpaEntity, Long> {
     Optional<ShopJpaEntity> findByName(String name);
 
     List<ShopJpaEntity> findByCategory(CategoryJpaEntity category);
+
+    void deleteByName(String name);
 }

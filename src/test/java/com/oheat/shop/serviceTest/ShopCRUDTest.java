@@ -5,9 +5,12 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.oheat.shop.dto.ShopFindByCategoryResponse;
 import com.oheat.shop.dto.ShopSaveRequest;
+import com.oheat.shop.dto.ShopUpdateRequest;
+import com.oheat.shop.entity.CategoryJpaEntity;
 import com.oheat.shop.entity.ShopJpaEntity;
 import com.oheat.shop.exception.CategoryNotExistsException;
 import com.oheat.shop.exception.DuplicateShopNameException;
+import com.oheat.shop.exception.ShopNotExistsException;
 import com.oheat.shop.fake.MemoryCategoryRepository;
 import com.oheat.shop.fake.MemoryShopRepository;
 import com.oheat.shop.repository.CategoryRepository;
@@ -167,5 +170,61 @@ public class ShopCRUDTest {
     @DisplayName("매장 상세 조회 시, 상호명, 최소주문 금액, 전화번호, 배달팁, 메뉴명, 메뉴 설명, 메뉴 가격 조회")
     void whenFindShop_thenReturnDetailInfo() {
 
+    }
+
+    @Test
+    @DisplayName("매장이 존재하지 않으면, 매장 수정 실패")
+    void givenWrongShop_whenUpdateShop_thenFail() {
+        ShopUpdateRequest updateRequest = ShopUpdateRequest.builder().shopName("bbq").build();
+
+        assertThrows(ShopNotExistsException.class, () -> {
+            shopService.updateShop(updateRequest);
+        });
+    }
+
+    @Test
+    @DisplayName("매장이 존재하지만 카테고리 존재하지 않으면, 매장 수정 실패")
+    void givenShopWithWrongCategory_whenUpdateShop_thenFail() {
+        ShopJpaEntity shop = ShopJpaEntity.builder().name("bbq").build();
+        memoryShopRepository.save(shop);
+
+        assertThrows(CategoryNotExistsException.class, () -> {
+            shopService.updateShop(ShopUpdateRequest.builder()
+                .shopName("bbq").categoryName("치킨").build());
+        });
+    }
+
+    @Test
+    @DisplayName("매장과 카테고리가 존재하면, 매장 수정 성공")
+    void whenUpdateShop_thenSuccess() {
+        CategoryJpaEntity category = CategoryJpaEntity.builder().name("치킨").build();
+        ShopJpaEntity shop = ShopJpaEntity.builder().name("bbq").build();
+
+        memoryCategoryRepository.save(category);
+        memoryShopRepository.save(shop);
+
+        assertDoesNotThrow(() -> {
+            shopService.updateShop(ShopUpdateRequest.builder()
+                .shopName("bbq").categoryName("치킨").build());
+        });
+    }
+
+    @Test
+    @DisplayName("매장이 존재하지 않으면, 매장 삭제 실패")
+    void givenWrongShop_whenDeleteShop_thenFail() {
+        assertThrows(ShopNotExistsException.class, () -> {
+            shopService.deleteShop("bbq");
+        });
+    }
+
+    @Test
+    @DisplayName("매장이 존재하면, 매장 삭제 성공")
+    void whenDeleteShop_thenSuccess() {
+        ShopJpaEntity shop = ShopJpaEntity.builder().name("bbq").build();
+        memoryShopRepository.save(shop);
+
+        assertDoesNotThrow(() -> {
+            shopService.deleteShop("bbq");
+        });
     }
 }

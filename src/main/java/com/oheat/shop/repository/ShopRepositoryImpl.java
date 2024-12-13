@@ -32,4 +32,9 @@ public class ShopRepositoryImpl implements ShopRepository {
     public List<ShopJpaEntity> findByCategory(CategoryJpaEntity category) {
         return shopJpaRepository.findByCategory(category);
     }
+
+    @Override
+    public void deleteByName(String name) {
+        shopJpaRepository.deleteByName(name);
+    }
 }

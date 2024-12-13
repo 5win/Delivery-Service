@@ -2,9 +2,11 @@ package com.oheat.shop.service;
 
 import com.oheat.shop.dto.ShopFindByCategoryResponse;
 import com.oheat.shop.dto.ShopSaveRequest;
+import com.oheat.shop.dto.ShopUpdateRequest;
 import com.oheat.shop.entity.CategoryJpaEntity;
 import com.oheat.shop.exception.CategoryNotExistsException;
 import com.oheat.shop.exception.DuplicateShopNameException;
+import com.oheat.shop.exception.ShopNotExistsException;
 import com.oheat.shop.repository.CategoryRepository;
 import com.oheat.shop.repository.ShopRepository;
 import java.util.List;
@@ -38,5 +40,22 @@ public class ShopService {
         return shopRepository.findByCategory(category).stream()
             .map(ShopFindByCategoryResponse::from)
             .toList();
+    }
+
+    public void updateShop(ShopUpdateRequest updateRequest) {
+        shopRepository.findByName(updateRequest.getShopName())
+            .orElseThrow(ShopNotExistsException::new);
+        CategoryJpaEntity category = categoryRepository.findByName(
+                updateRequest.getCategoryName())
+            .orElseThrow(CategoryNotExistsException::new);
+
+        shopRepository.save(updateRequest.toEntity(category));
+    }
+
+    public void deleteShop(String name) {
+        shopRepository.findByName(name)
+            .orElseThrow(ShopNotExistsException::new);
+
+        shopRepository.deleteByName(name);
     }
 }

@@ -42,4 +42,13 @@ public class MemoryShopRepository implements ShopRepository {
             .filter(shop -> shop.getCategory().equals(category))
             .toList();
     }
+
+    @Override
+    public void deleteByName(String name) {
+        Entry<Long, ShopJpaEntity> target = shops.entrySet().stream()
+            .filter(entry -> entry.getValue().getName().equals(name))
+            .findFirst().get();
+
+        shops.remove(target.getKey());
+    }
 }
