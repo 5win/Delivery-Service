@@ -1,6 +1,7 @@
 package com.oheat.shop.entity;
 
 import com.oheat.common.BaseTimeEntity;
+import com.oheat.shop.exception.DuplicateMenuException;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -44,10 +45,13 @@ public class MenuGroupJpaEntity extends BaseTimeEntity {
     private final Set<MenuGroupMappingJpaEntity> menuGroupMappingSet = new HashSet<>();
 
     public void addMenuMapping(MenuGroupMappingJpaEntity menuGroupMapping) {
+        if (containsMenu(menuGroupMapping)) {
+            throw new DuplicateMenuException();
+        }
         this.menuGroupMappingSet.add(menuGroupMapping);
     }
 
-    public boolean containsMenu(MenuGroupMappingJpaEntity menuGroupMapping) {
+    private boolean containsMenu(MenuGroupMappingJpaEntity menuGroupMapping) {
         return menuGroupMappingSet.contains(menuGroupMapping);
     }
 }

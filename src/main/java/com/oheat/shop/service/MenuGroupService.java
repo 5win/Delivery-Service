@@ -5,7 +5,6 @@ import com.oheat.shop.dto.MenuSaveToMenuGroupRequest;
 import com.oheat.shop.entity.MenuGroupJpaEntity;
 import com.oheat.shop.entity.MenuGroupMappingJpaEntity;
 import com.oheat.shop.entity.MenuJpaEntity;
-import com.oheat.shop.exception.DuplicateMenuException;
 import com.oheat.shop.exception.MenuGroupNotExistsException;
 import com.oheat.shop.exception.MenuNotExistsException;
 import com.oheat.shop.exception.ShopNotExistsException;
@@ -33,8 +32,7 @@ public class MenuGroupService {
     }
 
     public void registerMenuToMenuGroup(MenuSaveToMenuGroupRequest saveRequest) {
-        MenuGroupJpaEntity menuGroup = menuGroupRepository.findById(
-                saveRequest.getMenuGroupId())
+        MenuGroupJpaEntity menuGroup = menuGroupRepository.findById(saveRequest.getMenuGroupId())
             .orElseThrow(MenuGroupNotExistsException::new);
 
         saveRequest.getMenuList().forEach(menuId -> {
@@ -46,9 +44,6 @@ public class MenuGroupService {
                 .menu(menu)
                 .build();
 
-            if (menuGroup.containsMenu(menuGroupMapping)) {
-                throw new DuplicateMenuException();
-            }
             menuGroup.addMenuMapping(menuGroupMapping);
             menuGroupMappingRepository.save(menuGroupMapping);
         });
