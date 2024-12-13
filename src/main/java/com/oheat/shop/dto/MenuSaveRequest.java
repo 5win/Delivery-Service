@@ -17,13 +17,16 @@ public class MenuSaveRequest {
     private final List<OptionGroupSaveRequest> optionGroups;
 
     public MenuJpaEntity toEntity() {
-        return MenuJpaEntity.builder()
+        MenuJpaEntity menu = MenuJpaEntity.builder()
             .name(this.name)
             .price(this.price)
             .shopId(this.shopId)
-            .optionGroups(this.optionGroups.stream()
-                .map(OptionGroupSaveRequest::toEntity)
-                .toList())
             .build();
+
+        optionGroups.forEach(optionGroupSaveRequest -> {
+            menu.addOptionGroup(optionGroupSaveRequest.toEntity());
+        });
+
+        return menu;
     }
 }

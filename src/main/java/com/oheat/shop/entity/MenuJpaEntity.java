@@ -4,26 +4,40 @@ import com.oheat.common.BaseTimeEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
-@Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
+@EqualsAndHashCode(exclude = {"price", "menuGroupMappingId", "optionGroups"}, callSuper = false)
 @Entity
 @Table(name = "menu")
 public class MenuJpaEntity extends BaseTimeEntity {
 
-    @Column(name = "name", nullable = false, unique = true)
+    @Builder
+    public MenuJpaEntity(String name, int price, Long shopId, Long menuGroupMappingId) {
+        this.name = name;
+        this.price = price;
+        this.shopId = shopId;
+        this.menuGroupMappingId = menuGroupMappingId;
+    }
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(name = "name", nullable = false)
     private String name;
 
     @Column(name = "price", nullable = false)
@@ -35,10 +49,13 @@ public class MenuJpaEntity extends BaseTimeEntity {
     @Column(name = "menu_group_mapping_id")
     private Long menuGroupMappingId;
 
-    @Builder.Default
     @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "menu_id")
-    private List<OptionGroupJpaEntity> optionGroups = new ArrayList<>();
+    private final List<OptionGroupJpaEntity> optionGroups = new ArrayList<>();
+
+    public void addOptionGroup(OptionGroupJpaEntity optionGroup) {
+        optionGroups.add(optionGroup);
+    }
 
     public boolean isOptionGroupsEmpty() {
         return optionGroups.isEmpty();

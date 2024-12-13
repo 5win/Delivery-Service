@@ -18,14 +18,17 @@ public class OptionGroupSaveRequest {
     private final List<OptionSaveRequest> options;
 
     public OptionGroupJpaEntity toEntity() {
-        return OptionGroupJpaEntity.builder()
+        OptionGroupJpaEntity optionGroup = OptionGroupJpaEntity.builder()
             .name(this.name)
             .menuId(this.menuId)
             .required(this.required)
             .maxNumOfSelect(this.maxNumOfSelect)
-            .options(this.options.stream()
-                .map(OptionSaveRequest::toEntity)
-                .toList())
             .build();
+
+        options.forEach(optionSaveRequest -> {
+            optionGroup.addOption(optionSaveRequest.toEntity());
+        });
+
+        return optionGroup;
     }
 }
