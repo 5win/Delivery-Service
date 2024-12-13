@@ -71,7 +71,7 @@ public class MenuGroupCRUDTest {
     @DisplayName("존재하지 않는 메뉴이면, 메뉴 그룹에 추가 실패")
     void givenWrongMenu_whenAddToMenuGroup_thenFail() {
         memoryMenuGroupRepository.save(MenuGroupJpaEntity.builder()
-            .name("후라이드").shopId(1L).build());
+            .name("후라이드").build());
 
         Assertions.assertThrows(MenuNotExistsException.class, () -> {
             menuGroupService.registerMenuToMenuGroup(MenuSaveToMenuGroupRequest.builder()
@@ -83,7 +83,7 @@ public class MenuGroupCRUDTest {
     @DisplayName("메뉴 그룹이 존재하면서 메뉴가 이미 추가되어있지 않으면, 메뉴 그룹에 추가 성공")
     void givenNotDuplicateMenuAndMenuGroup_whenAddToMenuGroup_thenSuccess() {
         memoryMenuGroupRepository.save(MenuGroupJpaEntity.builder()
-            .name("후라이드").shopId(1L).build());
+            .name("후라이드").build());
         memoryMenuRepository.save(MenuJpaEntity.builder().name("황올").build());
 
         Assertions.assertDoesNotThrow(() -> {
@@ -96,7 +96,7 @@ public class MenuGroupCRUDTest {
     @DisplayName("메뉴 그룹에 메뉴가 이미 존재하면, 메뉴 그룹에 추가 실패")
     void givenAlreadyExistsMenuInGroup_whenAddToMenuGroup_thenFail() {
         memoryMenuGroupRepository.save(MenuGroupJpaEntity
-            .builder().name("후라이드").shopId(1L).build());
+            .builder().name("후라이드").build());
         memoryMenuRepository.save(MenuJpaEntity.builder().name("황올").build());
 
         Assertions.assertThrows(DuplicateMenuException.class, () -> {

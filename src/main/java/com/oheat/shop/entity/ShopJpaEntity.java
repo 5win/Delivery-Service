@@ -58,7 +58,6 @@ public class ShopJpaEntity extends BaseTimeEntity {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "shop")
     private final Set<MenuJpaEntity> menuSet = new HashSet<>();
 
-    @OneToMany(fetch = FetchType.LAZY)
-    @JoinColumn(name = "shop_id")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "shop")
     private final List<MenuGroupJpaEntity> menuGroups = new ArrayList<>();
 }

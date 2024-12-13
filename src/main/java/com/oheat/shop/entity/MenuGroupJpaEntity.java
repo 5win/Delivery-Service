@@ -8,6 +8,8 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.util.HashSet;
@@ -26,9 +28,9 @@ import lombok.NoArgsConstructor;
 public class MenuGroupJpaEntity extends BaseTimeEntity {
 
     @Builder
-    public MenuGroupJpaEntity(String name, Long shopId) {
+    public MenuGroupJpaEntity(String name, ShopJpaEntity shop) {
         this.name = name;
-        this.shopId = shopId;
+        this.shop = shop;
     }
 
     @Id
@@ -38,8 +40,9 @@ public class MenuGroupJpaEntity extends BaseTimeEntity {
     @Column(name = "name", nullable = false)
     private String name;
 
-    @Column(name = "shop_id", nullable = false)
-    private Long shopId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "shop", nullable = false)
+    private ShopJpaEntity shop;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "menuGroup")
     private final Set<MenuGroupMappingJpaEntity> menuGroupMappingSet = new HashSet<>();
