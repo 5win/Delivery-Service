@@ -1,4 +1,4 @@
-package com.oheat.shop;
+package com.oheat.shop.jpaTest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -9,7 +9,6 @@ import com.oheat.shop.entity.ShopJpaEntity;
 import com.oheat.shop.repository.CategoryJpaRepository;
 import com.oheat.shop.repository.ShopJpaRepository;
 import java.util.List;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -98,12 +97,5 @@ public class ShopRepositoryTest {
         List<ShopJpaEntity> result = shopJpaRepository.findByCategory(category);
 
         assertThat(result.size()).isEqualTo(3);
-    }
-
-    @Disabled
-    @Test
-    @DisplayName("JPA 영속성 컨테스트에 shop 엔티티 객체 정보가 없더라도, equals 비교 연산이 성공해야 함")
-    void givenPersistenceContextIsEmpty_whenShopEqualsOperation_thenSuccess() {
-
     }
 }

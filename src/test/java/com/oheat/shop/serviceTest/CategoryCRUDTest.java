@@ -1,10 +1,11 @@
-package com.oheat.shop;
+package com.oheat.shop.serviceTest;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.oheat.shop.entity.CategoryJpaEntity;
 import com.oheat.shop.exception.DuplicateCategoryException;
+import com.oheat.shop.fake.MemoryCategoryRepository;
 import com.oheat.shop.repository.CategoryRepository;
 import com.oheat.shop.service.CategoryService;
 import java.util.List;

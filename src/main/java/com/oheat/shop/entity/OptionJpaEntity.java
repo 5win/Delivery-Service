@@ -13,23 +13,30 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@EqualsAndHashCode(callSuper = false)
+@EqualsAndHashCode(exclude = {"price"}, callSuper = false)
 @Entity
-@Table(name = "category")
-public class CategoryJpaEntity extends BaseTimeEntity {
+@Table(name = "option")
+public class OptionJpaEntity extends BaseTimeEntity {
 
     @Builder
-    public CategoryJpaEntity(String name) {
+    public OptionJpaEntity(String name, int price, Long optionGroupId) {
         this.name = name;
+        this.price = price;
+        this.optionGroupId = optionGroupId;
     }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "name", nullable = false, unique = true)
+    @Column(name = "name", nullable = false)
     private String name;
+
+    @Column(name = "price", nullable = false)
+    private int price;
+
+    @Column(name = "option_group_id", nullable = false)
+    private Long optionGroupId;
 }

@@ -8,7 +8,7 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @Builder
 @RequiredArgsConstructor
-public class ShopFindAllResponse {
+public class ShopFindByCategoryResponse {
 
     private final Long id;
     private final String name;
@@ -16,8 +16,8 @@ public class ShopFindAllResponse {
     private final String category;
     private final int minimumOrderAmount;
 
-    public static ShopFindAllResponse from(ShopJpaEntity shopJpaEntity) {
-        return ShopFindAllResponse.builder()
+    public static ShopFindByCategoryResponse from(ShopJpaEntity shopJpaEntity) {
+        return ShopFindByCategoryResponse.builder()
             .id(shopJpaEntity.getId())
             .name(shopJpaEntity.getName())
             .phone(shopJpaEntity.getPhone())
