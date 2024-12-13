@@ -26,4 +26,9 @@ public class CategoryRepositoryImpl implements CategoryRepository {
     public List<CategoryJpaEntity> findAll() {
         return categoryJpaRepository.findAll();
     }
+
+    @Override
+    public void deleteByName(String categoryName) {
+        categoryJpaRepository.deleteByName(categoryName);
+    }
 }
