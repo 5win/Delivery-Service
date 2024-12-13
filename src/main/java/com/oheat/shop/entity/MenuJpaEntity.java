@@ -8,6 +8,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.util.ArrayList;
@@ -26,11 +27,10 @@ import lombok.NoArgsConstructor;
 public class MenuJpaEntity extends BaseTimeEntity {
 
     @Builder
-    public MenuJpaEntity(String name, int price, Long shopId, Long menuGroupMappingId) {
+    public MenuJpaEntity(String name, int price, ShopJpaEntity shop) {
         this.name = name;
         this.price = price;
-        this.shopId = shopId;
-        this.menuGroupMappingId = menuGroupMappingId;
+        this.shop = shop;
     }
 
     @Id
@@ -43,8 +43,10 @@ public class MenuJpaEntity extends BaseTimeEntity {
     @Column(name = "price", nullable = false)
     private int price;
 
-    @Column(name = "shop_id", nullable = false)
-    private Long shopId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "shop_id", nullable = false)
+    private ShopJpaEntity shop;
 
     @Column(name = "menu_group_mapping_id")
     private Long menuGroupMappingId;

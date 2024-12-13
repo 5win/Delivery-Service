@@ -84,7 +84,7 @@ public class MenuGroupCRUDTest {
     void givenNotDuplicateMenuAndMenuGroup_whenAddToMenuGroup_thenSuccess() {
         memoryMenuGroupRepository.save(MenuGroupJpaEntity.builder()
             .name("후라이드").shopId(1L).build());
-        memoryMenuRepository.save(MenuJpaEntity.builder().name("황올").shopId(1L).build());
+        memoryMenuRepository.save(MenuJpaEntity.builder().name("황올").build());
 
         Assertions.assertDoesNotThrow(() -> {
             menuGroupService.registerMenuToMenuGroup(MenuSaveToMenuGroupRequest.builder()

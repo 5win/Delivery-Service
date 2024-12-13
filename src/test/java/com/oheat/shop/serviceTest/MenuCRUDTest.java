@@ -166,7 +166,7 @@ public class MenuCRUDTest {
         for (int i = 0; i < 3; i++) {
             shop.getMenuSet().add(MenuJpaEntity.builder()
                 .name("황올 세트 " + i + "번")
-                .shopId(1L)
+                .shop(shop)
                 .build());
         }
         memoryShopRepository.save(shop);

@@ -1,6 +1,7 @@
 package com.oheat.shop.dto;
 
 import com.oheat.shop.entity.MenuJpaEntity;
+import com.oheat.shop.entity.ShopJpaEntity;
 import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
@@ -16,11 +17,11 @@ public class MenuSaveRequest {
     private final Long shopId;
     private final List<OptionGroupSaveRequest> optionGroups;
 
-    public MenuJpaEntity toEntity() {
+    public MenuJpaEntity toEntity(ShopJpaEntity shop) {
         MenuJpaEntity menu = MenuJpaEntity.builder()
             .name(this.name)
             .price(this.price)
-            .shopId(this.shopId)
+            .shop(shop)
             .build();
 
         optionGroups.forEach(optionGroupSaveRequest -> {

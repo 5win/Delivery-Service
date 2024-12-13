@@ -22,14 +22,14 @@ public class MenuService {
     private final ShopRepository shopRepository;
 
     public void save(MenuSaveRequest saveRequest) {
-        shopRepository.findById(saveRequest.getShopId())
+        ShopJpaEntity shop = shopRepository.findById(saveRequest.getShopId())
             .orElseThrow(ShopNotExistsException::new);
         menuRepository.findByName(saveRequest.getName())
             .ifPresent(menu -> {
                 throw new DuplicateMenuException();
             });
 
-        MenuJpaEntity menu = saveRequest.toEntity();
+        MenuJpaEntity menu = saveRequest.toEntity(shop);
         if (menu.isOptionGroupsEmpty()) {
             throw new NoOptionGroupException();
         }

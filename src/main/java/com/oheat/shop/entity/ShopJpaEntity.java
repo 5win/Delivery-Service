@@ -55,8 +55,7 @@ public class ShopJpaEntity extends BaseTimeEntity {
     @Column(name = "minimum_order_amount", nullable = false)
     private int minimumOrderAmount;
 
-    @OneToMany(fetch = FetchType.LAZY)
-    @JoinColumn(name = "shop_id")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "shop")
     private final Set<MenuJpaEntity> menuSet = new HashSet<>();
 
     @OneToMany(fetch = FetchType.LAZY)

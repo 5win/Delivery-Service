@@ -15,12 +15,12 @@ public class MenuFindByShopIdResponse {
     private final int price;
     private final Long shopId;
 
-    public static MenuFindByShopIdResponse from(MenuJpaEntity entity) {
+    public static MenuFindByShopIdResponse from(MenuJpaEntity menu) {
         return MenuFindByShopIdResponse.builder()
-            .id(entity.getId())
-            .name(entity.getName())
-            .price(entity.getPrice())
-            .shopId(entity.getShopId())
+            .id(menu.getId())
+            .name(menu.getName())
+            .price(menu.getPrice())
+            .shopId(menu.getShop().getId())
             .build();
     }
 }
