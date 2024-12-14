@@ -4,11 +4,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.oheat.shop.dto.MenuFindByShopIdResponse;
 import com.oheat.shop.dto.MenuSaveRequest;
+import com.oheat.shop.dto.MenuUpdateRequest;
 import com.oheat.shop.dto.OptionGroupSaveRequest;
+import com.oheat.shop.dto.OptionGroupUpdateRequest;
 import com.oheat.shop.dto.OptionSaveRequest;
+import com.oheat.shop.dto.OptionUpdateRequest;
 import com.oheat.shop.entity.MenuJpaEntity;
 import com.oheat.shop.entity.ShopJpaEntity;
 import com.oheat.shop.exception.DuplicateMenuException;
+import com.oheat.shop.exception.MenuNotExistsException;
 import com.oheat.shop.exception.NoOptionException;
 import com.oheat.shop.exception.NoOptionGroupException;
 import com.oheat.shop.exception.ShopNotExistsException;
@@ -174,5 +178,77 @@ public class MenuCRUDTest {
         List<MenuFindByShopIdResponse> result = menuService.findByShopId(1L);
 
         assertThat(result.size()).isEqualTo(3);
+    }
+
+    @Test
+    @DisplayName("해당 매장이 존재하지 않으면, 메뉴 수정 실패")
+    void givenWrongShopId_whenUpdateMenu_thenFail() {
+        Assertions.assertThrows(ShopNotExistsException.class, () -> {
+            menuService.updateMenu(MenuUpdateRequest.builder()
+                .menuId(1L)
+                .name("황금올리브")
+                .shopId(1L)
+                .build());
+        });
+    }
+
+    @Test
+    @DisplayName("옵션 그룹과 옵션 값이 존재하면, 기존 메뉴 삭제 후 수정된 메뉴로 저장")
+    void givenMenuWithNotEmptyOptionGroup_whenUpdateMenu_thenSuccess() {
+        ShopJpaEntity shop = ShopJpaEntity.builder().name("bbq").build();
+        MenuJpaEntity menu = MenuJpaEntity.builder().name("황금올리브").build();
+
+        memoryShopRepository.save(shop);
+        memoryMenuRepository.save(menu);
+
+        // update
+        OptionGroupUpdateRequest optionGroupUpdateRequest = OptionGroupUpdateRequest.builder()
+            .name("부분육 선택")
+            .menuId(1L)
+            .required(true)
+            .maxNumOfSelect(3)
+            .options(List.of(OptionUpdateRequest.builder()
+                .name("닭다리")
+                .price(99_000)
+                .optionGroupId(1L)
+                .build()))
+            .build();
+
+        Assertions.assertDoesNotThrow(() -> {
+            menuService.updateMenu(MenuUpdateRequest.builder()
+                .menuId(1L)
+                .name("양념치킨")
+                .shopId(1L)
+                .optionGroups(List.of(optionGroupUpdateRequest))
+                .build());
+        });
+        assertThat(memoryMenuRepository.findById(1L).get().getName())
+            .isEqualTo("양념치킨");
+    }
+
+    @Test
+    @DisplayName("메뉴가 존재하지 않으면, 메뉴 삭제 실패")
+    void givenMenuNotExists_whenDeleteMenu_thenFail() {
+        ShopJpaEntity shop = ShopJpaEntity.builder().name("bbq").build();
+
+        memoryShopRepository.save(shop);
+
+        Assertions.assertThrows(MenuNotExistsException.class, () -> {
+            menuService.deleteById(1L);
+        });
+    }
+
+    @Test
+    @DisplayName("메뉴가 존재하면, 메뉴 삭제 성공")
+    void givenMenu_whenDeleteMenu_thenSuccess() {
+        ShopJpaEntity shop = ShopJpaEntity.builder().name("bbq").build();
+        MenuJpaEntity menu = MenuJpaEntity.builder().name("황금올리브").build();
+
+        memoryShopRepository.save(shop);
+        memoryMenuRepository.save(menu);
+
+        Assertions.assertDoesNotThrow(() -> {
+            menuService.deleteById(1L);
+        });
     }
 }

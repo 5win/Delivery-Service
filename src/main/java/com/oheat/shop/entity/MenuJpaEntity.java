@@ -21,7 +21,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@EqualsAndHashCode(exclude = {"price", "menuGroupMappingId", "optionGroups"}, callSuper = false)
+@EqualsAndHashCode(exclude = {"price", "optionGroups"}, callSuper = false)
 @Entity
 @Table(name = "menu")
 public class MenuJpaEntity extends BaseTimeEntity {
@@ -48,7 +48,7 @@ public class MenuJpaEntity extends BaseTimeEntity {
     private ShopJpaEntity shop;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "menu")
-    private final List<OptionGroupJpaEntity> optionGroups = new ArrayList<>();
+    private List<OptionGroupJpaEntity> optionGroups = new ArrayList<>();
 
     public void addOptionGroup(OptionGroupJpaEntity optionGroup) {
         optionGroups.add(optionGroup);
@@ -65,5 +65,11 @@ public class MenuJpaEntity extends BaseTimeEntity {
             }
         }
         return false;
+    }
+
+    public void updateMenu(MenuJpaEntity updatedMenu) {
+        this.name = updatedMenu.getName();
+        this.price = updatedMenu.getPrice();
+        this.optionGroups = updatedMenu.getOptionGroups();
     }
 }
