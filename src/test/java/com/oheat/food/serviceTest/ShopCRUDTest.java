@@ -40,7 +40,8 @@ public class ShopCRUDTest {
     @Test
     @DisplayName("매장 이름 중복되지 않으면 매장 등록 성공")
     void shopNameNotDuplicate_thenSuccess() {
-        categoryService.registerCategory("치킨");
+        CategoryJpaEntity category = CategoryJpaEntity.builder().name("치킨").build();
+        memoryCategoryRepository.save(category);
 
         assertDoesNotThrow(() -> {
             shopService.registerShop(
@@ -102,7 +103,8 @@ public class ShopCRUDTest {
     @Test
     @DisplayName("치킨 매장 3개를 등록하고 치킨 카테고리에 해당하는 매장을 조회하면, 리스트 size가 3이어야 함")
     void givenThreeChickenShops_whenFindChickenShop_thenListSizeThree() {
-        categoryService.registerCategory("치킨");
+        CategoryJpaEntity category = CategoryJpaEntity.builder().name("치킨").build();
+        memoryCategoryRepository.save(category);
 
         for (int i = 0; i < 3; i++) {
             shopService.registerShop(ShopSaveRequest.builder()

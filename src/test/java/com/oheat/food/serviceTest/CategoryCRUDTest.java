@@ -3,6 +3,8 @@ package com.oheat.food.serviceTest;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.oheat.food.dto.CategorySaveRequest;
+import com.oheat.food.dto.CategoryUpdateRequest;
 import com.oheat.food.entity.CategoryJpaEntity;
 import com.oheat.food.exception.CategoryNotExistsException;
 import com.oheat.food.exception.DuplicateCategoryException;
@@ -29,7 +31,7 @@ public class CategoryCRUDTest {
     @DisplayName("카테고리명이 중복되지 않으면 카테고리 추가 성공")
     void categoryNameNotDuplicate_thenSuccess() {
         assertDoesNotThrow(() -> {
-            categoryService.registerCategory("치킨");
+            categoryService.registerCategory(CategorySaveRequest.builder().name("치킨").build());
         });
     }
 
@@ -41,7 +43,7 @@ public class CategoryCRUDTest {
             .build());
 
         assertThrows(DuplicateCategoryException.class, () -> {
-            categoryService.registerCategory("치킨");
+            categoryService.registerCategory(CategorySaveRequest.builder().name("치킨").build());
         });
     }
 
@@ -52,7 +54,7 @@ public class CategoryCRUDTest {
         memoryCategoryRepository.save(CategoryJpaEntity.builder().name("피자").build());
         memoryCategoryRepository.save(CategoryJpaEntity.builder().name("야식").build());
 
-        List<String> result = categoryService.findAllCategory();
+        List<CategoryJpaEntity> result = categoryService.findAllCategory();
 
         Assertions.assertThat(result.size()).isEqualTo(3);
     }
@@ -60,19 +62,25 @@ public class CategoryCRUDTest {
     @Test
     @DisplayName("이름에 해당하는 카테고리가 없으면, 카테고리 수정 실패")
     void givenWrongPrevCategoryName_whenUpdateCategory_thenFail() {
+        CategoryUpdateRequest updateRequest = CategoryUpdateRequest.builder()
+            .prevName("치킨").newName("중식").build();
+
         assertThrows(CategoryNotExistsException.class, () -> {
-            categoryService.updateCategory("치킨", "중식");
+            categoryService.updateCategory(updateRequest);
         });
     }
 
     @Test
     @DisplayName("이름에 해당하는 카테고리가 존재하면, 카테고리 수정 성공")
     void whenUpdateCategory_thenSuccess() {
+        CategoryUpdateRequest updateRequest = CategoryUpdateRequest.builder()
+            .prevName("치킨").newName("중식").build();
         CategoryJpaEntity category = CategoryJpaEntity.builder().name("치킨").build();
+
         memoryCategoryRepository.save(category);
 
         assertDoesNotThrow(() -> {
-            categoryService.updateCategory("치킨", "중식");
+            categoryService.updateCategory(updateRequest);
         });
     }
 
