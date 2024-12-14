@@ -1,6 +1,5 @@
 package com.oheat.food.service;
 
-import com.oheat.food.dto.ShopFindByCategoryResponse;
 import com.oheat.food.dto.ShopSaveRequest;
 import com.oheat.food.dto.ShopUpdateRequest;
 import com.oheat.food.entity.CategoryJpaEntity;
@@ -24,40 +23,38 @@ public class ShopService {
 
     public void registerShop(ShopSaveRequest saveRequest) {
 
-        shopRepository.findByName(saveRequest.getShopName())
+        shopRepository.findByName(saveRequest.getName())
             .ifPresent((shop) -> {
                 throw new DuplicateShopNameException();
             });
         CategoryJpaEntity category = categoryRepository.findByName(
-                saveRequest.getCategoryName())
+                saveRequest.getCategory())
             .orElseThrow(CategoryNotExistsException::new);
 
         shopRepository.save(saveRequest.toEntity(category));
     }
 
-    public List<ShopFindByCategoryResponse> findShopByCategory(String categoryName) {
+    public List<ShopJpaEntity> findShopByCategory(String categoryName) {
         CategoryJpaEntity category = categoryRepository.findByName(categoryName)
             .orElseThrow(CategoryNotExistsException::new);
 
-        return shopRepository.findByCategory(category).stream()
-            .map(ShopFindByCategoryResponse::from)
-            .toList();
+        return shopRepository.findByCategory(category);
     }
 
     @Transactional
     public void updateShop(ShopUpdateRequest updateRequest) {
-        ShopJpaEntity shop = shopRepository.findByName(updateRequest.getShopName())
+        ShopJpaEntity shop = shopRepository.findById(updateRequest.getId())
             .orElseThrow(ShopNotExistsException::new);
-        CategoryJpaEntity category = categoryRepository.findByName(updateRequest.getCategoryName())
+        CategoryJpaEntity category = categoryRepository.findByName(updateRequest.getCategory())
             .orElseThrow(CategoryNotExistsException::new);
 
         shop.updateShopInfo(updateRequest, category);
     }
 
-    public void deleteShop(String name) {
-        shopRepository.findByName(name)
+    public void deleteShop(Long shopId) {
+        shopRepository.findById(shopId)
             .orElseThrow(ShopNotExistsException::new);
 
-        shopRepository.deleteByName(name);
+        shopRepository.deleteById(shopId);
     }
 }

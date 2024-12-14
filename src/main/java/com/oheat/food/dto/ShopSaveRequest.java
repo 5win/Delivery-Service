@@ -11,14 +11,14 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ShopSaveRequest {
 
-    private final String shopName;
+    private final String name;
     private final String phone;
-    private final String categoryName;
+    private final String category;
     private final int minimumOrderAmount;
 
     public ShopJpaEntity toEntity(CategoryJpaEntity category) {
         return ShopJpaEntity.builder()
-            .name(this.shopName)
+            .name(this.name)
             .phone(this.phone)
             .category(category)
             .minimumOrderAmount(this.minimumOrderAmount)

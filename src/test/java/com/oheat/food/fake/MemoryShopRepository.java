@@ -6,7 +6,6 @@ import com.oheat.food.repository.ShopRepository;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Optional;
 import lombok.Getter;
 
@@ -41,11 +40,7 @@ public class MemoryShopRepository implements ShopRepository {
     }
 
     @Override
-    public void deleteByName(String name) {
-        Entry<Long, ShopJpaEntity> target = shops.entrySet().stream()
-            .filter(entry -> entry.getValue().getName().equals(name))
-            .findFirst().get();
-
-        shops.remove(target.getKey());
+    public void deleteById(Long shopId) {
+        shops.remove(shopId);
     }
 }

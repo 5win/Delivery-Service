@@ -3,7 +3,6 @@ package com.oheat.food.serviceTest;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import com.oheat.food.dto.ShopFindByCategoryResponse;
 import com.oheat.food.dto.ShopSaveRequest;
 import com.oheat.food.dto.ShopUpdateRequest;
 import com.oheat.food.entity.CategoryJpaEntity;
@@ -46,8 +45,8 @@ public class ShopCRUDTest {
         assertDoesNotThrow(() -> {
             shopService.registerShop(
                 ShopSaveRequest.builder()
-                    .shopName("bbq")
-                    .categoryName("치킨")
+                    .name("bbq")
+                    .category("치킨")
                     .build()
             );
         });
@@ -64,7 +63,7 @@ public class ShopCRUDTest {
         assertThrows(DuplicateShopNameException.class, () -> {
             shopService.registerShop(
                 ShopSaveRequest.builder()
-                    .shopName("오잇")
+                    .name("오잇")
                     .build());
         });
     }
@@ -74,8 +73,8 @@ public class ShopCRUDTest {
     void whenCategoryIsNull_thenFail() {
         assertThrows(RuntimeException.class, () -> {
             shopService.registerShop(ShopSaveRequest.builder()
-                .shopName("bbq")
-                .categoryName(null)
+                .name("bbq")
+                .category(null)
                 .minimumOrderAmount(14_000)
                 .build());
         });
@@ -86,8 +85,8 @@ public class ShopCRUDTest {
     void whenCategoryNotExists_thenFail() {
         assertThrows(CategoryNotExistsException.class, () -> {
             shopService.registerShop(ShopSaveRequest.builder()
-                .shopName("bbq")
-                .categoryName("치킨")
+                .name("bbq")
+                .category("치킨")
                 .minimumOrderAmount(14_000)
                 .build());
         });
@@ -108,12 +107,12 @@ public class ShopCRUDTest {
 
         for (int i = 0; i < 3; i++) {
             shopService.registerShop(ShopSaveRequest.builder()
-                .shopName("bbq " + i + "호점")
-                .categoryName("치킨")
+                .name("bbq " + i + "호점")
+                .category("치킨")
                 .build());
         }
 
-        List<ShopFindByCategoryResponse> result = shopService.findShopByCategory("치킨");
+        List<ShopJpaEntity> result = shopService.findShopByCategory("치킨");
 
         Assertions.assertThat(result.size()).isEqualTo(3);
     }
@@ -177,7 +176,7 @@ public class ShopCRUDTest {
     @Test
     @DisplayName("매장이 존재하지 않으면, 매장 수정 실패")
     void givenWrongShop_whenUpdateShop_thenFail() {
-        ShopUpdateRequest updateRequest = ShopUpdateRequest.builder().shopName("bbq").build();
+        ShopUpdateRequest updateRequest = ShopUpdateRequest.builder().name("bbq").build();
 
         assertThrows(ShopNotExistsException.class, () -> {
             shopService.updateShop(updateRequest);
@@ -192,7 +191,7 @@ public class ShopCRUDTest {
 
         assertThrows(CategoryNotExistsException.class, () -> {
             shopService.updateShop(ShopUpdateRequest.builder()
-                .shopName("bbq").categoryName("치킨").build());
+                .id(1L).name("bbq").category("치킨").build());
         });
     }
 
@@ -207,7 +206,7 @@ public class ShopCRUDTest {
 
         assertDoesNotThrow(() -> {
             shopService.updateShop(ShopUpdateRequest.builder()
-                .shopName("bbq").categoryName("치킨").build());
+                .id(1L).name("bbq").category("치킨").build());
         });
     }
 
@@ -215,7 +214,7 @@ public class ShopCRUDTest {
     @DisplayName("매장이 존재하지 않으면, 매장 삭제 실패")
     void givenWrongShop_whenDeleteShop_thenFail() {
         assertThrows(ShopNotExistsException.class, () -> {
-            shopService.deleteShop("bbq");
+            shopService.deleteShop(1L);
         });
     }
 
@@ -226,7 +225,7 @@ public class ShopCRUDTest {
         memoryShopRepository.save(shop);
 
         assertDoesNotThrow(() -> {
-            shopService.deleteShop("bbq");
+            shopService.deleteShop(1L);
         });
     }
 }

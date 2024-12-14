@@ -34,7 +34,7 @@ public class ShopRepositoryImpl implements ShopRepository {
     }
 
     @Override
-    public void deleteByName(String name) {
-        shopJpaRepository.deleteByName(name);
+    public void deleteById(Long shopId) {
+        shopJpaRepository.deleteById(shopId);
     }
 }

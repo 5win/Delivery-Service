@@ -63,7 +63,7 @@ public class ShopJpaEntity extends BaseTimeEntity {
     private final List<MenuGroupJpaEntity> menuGroups = new ArrayList<>();
 
     public void updateShopInfo(ShopUpdateRequest updateRequest, CategoryJpaEntity category) {
-        this.name = updateRequest.getShopName();
+        this.name = updateRequest.getName();
         this.phone = updateRequest.getPhone();
         this.category = category;
         this.minimumOrderAmount = updateRequest.getMinimumOrderAmount();

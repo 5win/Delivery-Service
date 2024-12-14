@@ -15,5 +15,5 @@ public interface ShopRepository {
 
     List<ShopJpaEntity> findByCategory(CategoryJpaEntity category);
 
-    void deleteByName(String name);
+    void deleteById(Long shopId);
 }
