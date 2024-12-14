@@ -54,18 +54,16 @@ public class MenuGroupService {
         MenuGroupJpaEntity menuGroup = menuGroupRepository.findById(saveRequest.getMenuGroupId())
             .orElseThrow(MenuGroupNotExistsException::new);
 
-        saveRequest.getMenuList().forEach(menuId -> {
-            MenuJpaEntity menu = menuRepository.findById(menuId)
-                .orElseThrow(MenuNotExistsException::new);
+        MenuJpaEntity menu = menuRepository.findById(saveRequest.getMenuId())
+            .orElseThrow(MenuNotExistsException::new);
 
-            MenuGroupMappingJpaEntity menuGroupMapping = MenuGroupMappingJpaEntity.builder()
-                .menuGroup(menuGroup)
-                .menu(menu)
-                .build();
+        MenuGroupMappingJpaEntity menuGroupMapping = MenuGroupMappingJpaEntity.builder()
+            .menuGroup(menuGroup)
+            .menu(menu)
+            .build();
 
-            menuGroup.addMenuMapping(menuGroupMapping);
-            menuGroupMappingRepository.save(menuGroupMapping);
-        });
+        menuGroup.addMenuMapping(menuGroupMapping);
+        menuGroupMappingRepository.save(menuGroupMapping);
     }
 
     public void deleteMenuFromMenuGroup(Long menuGroupMappingId) {

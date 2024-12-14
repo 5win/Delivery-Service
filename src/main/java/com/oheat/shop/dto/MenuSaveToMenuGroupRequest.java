@@ -1,6 +1,5 @@
 package com.oheat.shop.dto;
 
-import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -11,5 +10,5 @@ import lombok.RequiredArgsConstructor;
 public class MenuSaveToMenuGroupRequest {
 
     private final Long menuGroupId;
-    private final List<Long> menuList;
+    private final Long menuId;
 }

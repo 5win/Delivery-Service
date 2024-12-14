@@ -23,7 +23,6 @@ import com.oheat.shop.repository.MenuGroupRepository;
 import com.oheat.shop.repository.MenuRepository;
 import com.oheat.shop.repository.ShopRepository;
 import com.oheat.shop.service.MenuGroupService;
-import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -125,7 +124,7 @@ public class MenuGroupCRUDTest {
     void givenMenuWithWrongMenuGroup_whenAddToMenuGroup_thenFail() {
         Assertions.assertThrows(MenuGroupNotExistsException.class, () -> {
             menuGroupService.registerMenuToMenuGroup(MenuSaveToMenuGroupRequest.builder()
-                .menuGroupId(1L).menuList(List.of(1L)).build());
+                .menuGroupId(1L).menuId(1L).build());
         });
     }
 
@@ -137,7 +136,7 @@ public class MenuGroupCRUDTest {
 
         Assertions.assertThrows(MenuNotExistsException.class, () -> {
             menuGroupService.registerMenuToMenuGroup(MenuSaveToMenuGroupRequest.builder()
-                .menuGroupId(1L).menuList(List.of(1L)).build());
+                .menuGroupId(1L).menuId(1L).build());
         });
     }
 
@@ -150,7 +149,7 @@ public class MenuGroupCRUDTest {
 
         Assertions.assertDoesNotThrow(() -> {
             menuGroupService.registerMenuToMenuGroup(MenuSaveToMenuGroupRequest.builder()
-                .menuGroupId(1L).menuList(List.of(1L)).build());
+                .menuGroupId(1L).menuId(1L).build());
         });
     }
 
@@ -161,9 +160,12 @@ public class MenuGroupCRUDTest {
             .builder().name("후라이드").build());
         memoryMenuRepository.save(MenuJpaEntity.builder().name("황올").build());
 
+        menuGroupService.registerMenuToMenuGroup(MenuSaveToMenuGroupRequest.builder()
+            .menuGroupId(1L).menuId(1L).build());
+
         Assertions.assertThrows(DuplicateMenuException.class, () -> {
             menuGroupService.registerMenuToMenuGroup(MenuSaveToMenuGroupRequest.builder()
-                .menuGroupId(1L).menuList(List.of(1L, 1L)).build());
+                .menuGroupId(1L).menuId(1L).build());
         });
     }
 
