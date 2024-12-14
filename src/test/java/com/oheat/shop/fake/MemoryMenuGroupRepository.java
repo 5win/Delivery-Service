@@ -20,4 +20,9 @@ public class MemoryMenuGroupRepository implements MenuGroupRepository {
     public Optional<MenuGroupJpaEntity> findById(Long menuGroupId) {
         return Optional.ofNullable(menuGroups.get(menuGroupId));
     }
+
+    @Override
+    public void deleteById(Long menuGroupId) {
+        menuGroups.remove(menuGroupId);
+    }
 }

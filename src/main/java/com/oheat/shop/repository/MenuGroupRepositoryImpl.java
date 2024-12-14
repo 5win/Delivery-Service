@@ -20,4 +20,9 @@ public class MenuGroupRepositoryImpl implements MenuGroupRepository {
     public Optional<MenuGroupJpaEntity> findById(Long menuGroupId) {
         return menuGroupJpaRepository.findById(menuGroupId);
     }
+
+    @Override
+    public void deleteById(Long menuGroupId) {
+        menuGroupJpaRepository.deleteById(menuGroupId);
+    }
 }
