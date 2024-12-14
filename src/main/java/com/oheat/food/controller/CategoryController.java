@@ -25,27 +25,27 @@ public class CategoryController {
     private final CategoryService categoryService;
 
     @PostMapping
-    ResponseEntity<?> registerCategory(@RequestBody CategorySaveRequest saveRequest) {
+    public ResponseEntity<?> registerCategory(@RequestBody CategorySaveRequest saveRequest) {
         System.out.println(saveRequest.getName());
         categoryService.registerCategory(saveRequest);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @GetMapping
-    List<CategoryFindAllResponse> findAll() {
+    public List<CategoryFindAllResponse> findAll() {
         return categoryService.findAllCategory().stream()
             .map(CategoryFindAllResponse::from)
             .toList();
     }
 
     @PutMapping
-    ResponseEntity<?> updateCategory(@RequestBody CategoryUpdateRequest updateRequest) {
+    public ResponseEntity<?> updateCategory(@RequestBody CategoryUpdateRequest updateRequest) {
         categoryService.updateCategory(updateRequest);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @DeleteMapping
-    ResponseEntity<?> deleteCategory(@RequestParam String name) {
+    public ResponseEntity<?> deleteCategory(@RequestParam String name) {
         categoryService.deleteCategory(name);
         return new ResponseEntity<>(HttpStatus.OK);
     }
