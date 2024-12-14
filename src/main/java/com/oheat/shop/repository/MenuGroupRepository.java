@@ -8,4 +8,6 @@ public interface MenuGroupRepository {
     void save(MenuGroupJpaEntity menuGroup);
 
     Optional<MenuGroupJpaEntity> findById(Long menuGroupId);
+
+    void deleteById(Long menuGroupId);
 }

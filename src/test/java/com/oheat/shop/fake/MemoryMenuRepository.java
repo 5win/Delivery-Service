@@ -32,4 +32,9 @@ public class MemoryMenuRepository implements MenuRepository {
     public List<MenuJpaEntity> findAll() {
         return menus.values().stream().toList();
     }
+
+    @Override
+    public void deleteById(Long menuId) {
+        menus.remove(menuId);
+    }
 }

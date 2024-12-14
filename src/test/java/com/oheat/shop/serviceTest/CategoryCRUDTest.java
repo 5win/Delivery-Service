@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.oheat.shop.entity.CategoryJpaEntity;
+import com.oheat.shop.exception.CategoryNotExistsException;
 import com.oheat.shop.exception.DuplicateCategoryException;
 import com.oheat.shop.fake.MemoryCategoryRepository;
 import com.oheat.shop.repository.CategoryRepository;
@@ -56,4 +57,41 @@ public class CategoryCRUDTest {
         Assertions.assertThat(result.size()).isEqualTo(3);
     }
 
+    @Test
+    @DisplayName("이름에 해당하는 카테고리가 없으면, 카테고리 수정 실패")
+    void givenWrongPrevCategoryName_whenUpdateCategory_thenFail() {
+        assertThrows(CategoryNotExistsException.class, () -> {
+            categoryService.updateCategory("치킨", "중식");
+        });
+    }
+
+    @Test
+    @DisplayName("이름에 해당하는 카테고리가 존재하면, 카테고리 수정 성공")
+    void whenUpdateCategory_thenSuccess() {
+        CategoryJpaEntity category = CategoryJpaEntity.builder().name("치킨").build();
+        memoryCategoryRepository.save(category);
+
+        assertDoesNotThrow(() -> {
+            categoryService.updateCategory("치킨", "중식");
+        });
+    }
+
+    @Test
+    @DisplayName("이름에 해당하는 카테고리가 없으면, 카테고리 삭제 실패")
+    void givenWrongCategoryName_whenDeleteCategory_thenFail() {
+        assertThrows(CategoryNotExistsException.class, () -> {
+            categoryService.deleteCategory("치킨");
+        });
+    }
+
+    @Test
+    @DisplayName("이름에 해당하는 카테고리가 존재하면, 카테고리 삭제 성공")
+    void whenDeleteCategory_thenSuccess() {
+        CategoryJpaEntity category = CategoryJpaEntity.builder().name("치킨").build();
+        memoryCategoryRepository.save(category);
+
+        assertDoesNotThrow(() -> {
+            categoryService.deleteCategory("치킨");
+        });
+    }
 }

@@ -21,7 +21,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@EqualsAndHashCode(exclude = {"price", "menuGroupMappingId", "optionGroups"}, callSuper = false)
+@EqualsAndHashCode(exclude = {"price", "optionGroups"}, callSuper = false)
 @Entity
 @Table(name = "menu")
 public class MenuJpaEntity extends BaseTimeEntity {
@@ -43,17 +43,12 @@ public class MenuJpaEntity extends BaseTimeEntity {
     @Column(name = "price", nullable = false)
     private int price;
 
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "shop_id", nullable = false)
     private ShopJpaEntity shop;
 
-    @Column(name = "menu_group_mapping_id")
-    private Long menuGroupMappingId;
-
-    @OneToMany(fetch = FetchType.LAZY)
-    @JoinColumn(name = "menu_id")
-    private final List<OptionGroupJpaEntity> optionGroups = new ArrayList<>();
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "menu")
+    private List<OptionGroupJpaEntity> optionGroups = new ArrayList<>();
 
     public void addOptionGroup(OptionGroupJpaEntity optionGroup) {
         optionGroups.add(optionGroup);
@@ -70,5 +65,11 @@ public class MenuJpaEntity extends BaseTimeEntity {
             }
         }
         return false;
+    }
+
+    public void updateMenu(MenuJpaEntity updatedMenu) {
+        this.name = updatedMenu.getName();
+        this.price = updatedMenu.getPrice();
+        this.optionGroups = updatedMenu.getOptionGroups();
     }
 }

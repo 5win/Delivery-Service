@@ -25,4 +25,9 @@ public class MemoryCategoryRepository implements CategoryRepository {
     public List<CategoryJpaEntity> findAll() {
         return categories.values().stream().toList();
     }
+
+    @Override
+    public void deleteByName(String categoryName) {
+        categories.remove(categoryName);
+    }
 }

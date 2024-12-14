@@ -25,4 +25,9 @@ public class MenuRepositoryImpl implements MenuRepository {
     public Optional<MenuJpaEntity> findByName(String name) {
         return menuJpaRepository.findByName(name);
     }
+
+    @Override
+    public void deleteById(Long menuId) {
+        menuJpaRepository.deleteById(menuId);
+    }
 }

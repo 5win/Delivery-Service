@@ -1,6 +1,7 @@
 package com.oheat.shop.entity;
 
 import com.oheat.common.BaseTimeEntity;
+import com.oheat.shop.dto.MenuGroupUpdateRequest;
 import com.oheat.shop.exception.DuplicateMenuException;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -56,5 +57,9 @@ public class MenuGroupJpaEntity extends BaseTimeEntity {
 
     private boolean containsMenu(MenuGroupMappingJpaEntity menuGroupMapping) {
         return menuGroupMappingSet.contains(menuGroupMapping);
+    }
+
+    public void updateMenuGroup(MenuGroupUpdateRequest updateRequest) {
+        this.name = updateRequest.getName();
     }
 }

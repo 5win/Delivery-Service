@@ -8,7 +8,7 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @Builder
 @RequiredArgsConstructor
-public class OptionSaveRequest {
+public class OptionUpdateRequest {
 
     private final String name;
     private final int price;

@@ -32,4 +32,8 @@ public class CategoryJpaEntity extends BaseTimeEntity {
 
     @Column(name = "name", nullable = false, unique = true)
     private String name;
+
+    public void changeName(String newName) {
+        this.name = newName;
+    }
 }

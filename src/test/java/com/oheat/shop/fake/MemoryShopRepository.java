@@ -23,10 +23,7 @@ public class MemoryShopRepository implements ShopRepository {
 
     @Override
     public Optional<ShopJpaEntity> findById(Long id) {
-        return shops.entrySet().stream()
-            .filter(entry -> entry.getKey().equals(id))
-            .map(Entry::getValue)
-            .findFirst();
+        return Optional.ofNullable(shops.get(id));
     }
 
     @Override
@@ -41,5 +38,14 @@ public class MemoryShopRepository implements ShopRepository {
         return shops.values().stream()
             .filter(shop -> shop.getCategory().equals(category))
             .toList();
+    }
+
+    @Override
+    public void deleteByName(String name) {
+        Entry<Long, ShopJpaEntity> target = shops.entrySet().stream()
+            .filter(entry -> entry.getValue().getName().equals(name))
+            .findFirst().get();
+
+        shops.remove(target.getKey());
     }
 }

@@ -8,6 +8,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.util.ArrayList;
@@ -26,9 +27,10 @@ import lombok.NoArgsConstructor;
 public class OptionGroupJpaEntity extends BaseTimeEntity {
 
     @Builder
-    public OptionGroupJpaEntity(String name, Long menuId, boolean required, int maxNumOfSelect) {
+    public OptionGroupJpaEntity(String name, MenuJpaEntity menu, boolean required,
+        int maxNumOfSelect) {
         this.name = name;
-        this.menuId = menuId;
+        this.menu = menu;
         this.required = required;
         this.maxNumOfSelect = maxNumOfSelect;
     }
@@ -40,17 +42,17 @@ public class OptionGroupJpaEntity extends BaseTimeEntity {
     @Column(name = "name", nullable = false)
     private String name;
 
-    @Column(name = "menu_id", nullable = false)
-    private Long menuId;
-
     @Column(name = "required")
     private boolean required;
 
     @Column(name = "max_num_of_select")
     private int maxNumOfSelect;
 
-    @OneToMany(fetch = FetchType.LAZY)
-    @JoinColumn(name = "option_group_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "menu_id", nullable = false)
+    private MenuJpaEntity menu;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "optionGroup")
     private final List<OptionJpaEntity> options = new ArrayList<>();
 
     public void addOption(OptionJpaEntity option) {

@@ -7,8 +7,8 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @Builder
 @RequiredArgsConstructor
-public class MenuSaveToMenuGroupRequest {
+public class MenuGroupUpdateRequest {
 
     private final Long menuGroupId;
-    private final Long menuId;
+    private final String name;
 }

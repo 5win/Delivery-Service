@@ -9,13 +9,13 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @Builder
 @RequiredArgsConstructor
-public class OptionGroupSaveRequest {
+public class OptionGroupUpdateRequest {
 
     private final String name;
     private final Long menuId;
     private final boolean required;
     private final int maxNumOfSelect;
-    private final List<OptionSaveRequest> options;
+    private final List<OptionUpdateRequest> options;
 
     public OptionGroupJpaEntity toEntity() {
         OptionGroupJpaEntity optionGroup = OptionGroupJpaEntity.builder()

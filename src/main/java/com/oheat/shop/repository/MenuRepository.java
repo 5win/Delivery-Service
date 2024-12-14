@@ -10,4 +10,6 @@ public interface MenuRepository {
     Optional<MenuJpaEntity> findById(Long menuId);
 
     Optional<MenuJpaEntity> findByName(String name);
+
+    void deleteById(Long menuId);
 }
