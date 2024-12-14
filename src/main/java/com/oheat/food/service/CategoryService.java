@@ -38,11 +38,10 @@ public class CategoryService {
         category.changeName(updateRequest.getNewName());
     }
 
-    @Transactional
     public void deleteCategory(String categoryName) {
         CategoryJpaEntity category = categoryRepository.findByName(categoryName)
             .orElseThrow(CategoryNotExistsException::new);
 
-        categoryRepository.deleteByName(categoryName);
+        categoryRepository.delete(category);
     }
 }

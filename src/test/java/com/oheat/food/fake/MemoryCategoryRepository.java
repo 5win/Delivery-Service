@@ -5,6 +5,7 @@ import com.oheat.food.repository.CategoryRepository;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 
 public class MemoryCategoryRepository implements CategoryRepository {
@@ -27,7 +28,13 @@ public class MemoryCategoryRepository implements CategoryRepository {
     }
 
     @Override
-    public void deleteByName(String categoryName) {
-        categories.remove(categoryName);
+    public void delete(CategoryJpaEntity category) {
+        Entry<String, CategoryJpaEntity> target = categories.entrySet()
+            .stream()
+            .filter(entry -> entry.getValue().getName().equals(category.getName()))
+            .findFirst()
+            .get();
+
+        categories.remove(target.getKey());
     }
 }

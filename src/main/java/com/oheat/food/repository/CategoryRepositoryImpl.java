@@ -28,7 +28,7 @@ public class CategoryRepositoryImpl implements CategoryRepository {
     }
 
     @Override
-    public void deleteByName(String categoryName) {
-        categoryJpaRepository.deleteByName(categoryName);
+    public void delete(CategoryJpaEntity category) {
+        categoryJpaRepository.delete(category);
     }
 }

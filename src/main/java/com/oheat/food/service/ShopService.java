@@ -52,7 +52,7 @@ public class ShopService {
     }
 
     public void deleteShop(Long shopId) {
-        shopRepository.findById(shopId)
+        ShopJpaEntity shop = shopRepository.findById(shopId)
             .orElseThrow(ShopNotExistsException::new);
 
         shopRepository.deleteById(shopId);

@@ -12,5 +12,5 @@ public interface CategoryRepository {
 
     List<CategoryJpaEntity> findAll();
 
-    void deleteByName(String categoryName);
+    void delete(CategoryJpaEntity category);
 }
