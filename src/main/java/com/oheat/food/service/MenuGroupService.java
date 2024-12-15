@@ -6,6 +6,7 @@ import com.oheat.food.dto.MenuSaveToMenuGroupRequest;
 import com.oheat.food.entity.MenuGroupJpaEntity;
 import com.oheat.food.entity.MenuGroupMappingJpaEntity;
 import com.oheat.food.entity.MenuJpaEntity;
+import com.oheat.food.entity.ShopJpaEntity;
 import com.oheat.food.exception.MenuGroupNotExistsException;
 import com.oheat.food.exception.MenuNotExistsException;
 import com.oheat.food.exception.ShopNotExistsException;
@@ -28,10 +29,10 @@ public class MenuGroupService {
 
     // 메뉴 그룹 CRUD
     public void registerMenuGroup(MenuGroupSaveRequest saveRequest) {
-        shopRepository.findById(saveRequest.getShopId())
+        ShopJpaEntity shop = shopRepository.findById(saveRequest.getShopId())
             .orElseThrow(ShopNotExistsException::new);
 
-        menuGroupRepository.save(saveRequest.toEntity());
+        menuGroupRepository.save(saveRequest.toEntity(shop));
     }
 
     @Transactional
