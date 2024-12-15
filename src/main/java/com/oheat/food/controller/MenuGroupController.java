@@ -1,13 +1,16 @@
 package com.oheat.food.controller;
 
+import com.oheat.food.dto.MenuGroupFindResponse;
 import com.oheat.food.dto.MenuGroupSaveRequest;
 import com.oheat.food.dto.MenuGroupUpdateRequest;
 import com.oheat.food.dto.MenuSaveToMenuGroupRequest;
 import com.oheat.food.service.MenuGroupService;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -26,6 +29,14 @@ public class MenuGroupController {
     public ResponseEntity<?> registerMenuGroup(@RequestBody MenuGroupSaveRequest saveRequest) {
         menuGroupService.registerMenuGroup(saveRequest);
         return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
+    @GetMapping("/{id}")
+    public List<MenuGroupFindResponse> findMenuGroupByShopId(
+        @PathVariable(name = "id") Long shopId) {
+        return menuGroupService.findMenuGroupByShopId(shopId).stream()
+            .map(MenuGroupFindResponse::from)
+            .toList();
     }
 
     @PutMapping

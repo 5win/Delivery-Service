@@ -14,6 +14,7 @@ import com.oheat.food.repository.MenuGroupMappingRepository;
 import com.oheat.food.repository.MenuGroupRepository;
 import com.oheat.food.repository.MenuRepository;
 import com.oheat.food.repository.ShopRepository;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,6 +34,12 @@ public class MenuGroupService {
             .orElseThrow(ShopNotExistsException::new);
 
         menuGroupRepository.save(saveRequest.toEntity(shop));
+    }
+
+    public List<MenuGroupJpaEntity> findMenuGroupByShopId(Long shopId) {
+        ShopJpaEntity shop = shopRepository.findById(shopId)
+            .orElseThrow(ShopNotExistsException::new);
+        return shop.getMenuGroups();
     }
 
     @Transactional
