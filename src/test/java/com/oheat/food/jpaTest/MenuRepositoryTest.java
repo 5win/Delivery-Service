@@ -46,6 +46,8 @@ public class MenuRepositoryTest {
             .executeUpdate();
         entityManager.createNativeQuery("ALTER TABLE option_group ALTER COLUMN id RESTART WITH 1")
             .executeUpdate();
+        entityManager.createNativeQuery("ALTER TABLE option ALTER COLUMN id RESTART WITH 1")
+            .executeUpdate();
     }
 
     @Test
@@ -147,16 +149,24 @@ public class MenuRepositoryTest {
         MenuJpaEntity menu = MenuJpaEntity.builder().name("황올").shop(shop).build();
         OptionGroupJpaEntity optionGroup = OptionGroupJpaEntity.builder()
             .name("부분육 선택").menu(menu).build();
+        OptionJpaEntity option = OptionJpaEntity.builder()
+            .name("순살").optionGroup(optionGroup).build();
 
         categoryJpaRepository.save(category);
         shopJpaRepository.save(shop);
-        menuJpaRepository.save(menu);
-        optionGroupJpaRepository.save(optionGroup);
 
+        // 저장 과정에서 예외 발생 X
         Assertions.assertDoesNotThrow(() -> {
-            optionJpaRepository.save(
-                OptionJpaEntity.builder().name("순살").optionGroup(optionGroup).build());
+            optionGroup.addOption(option);
+            menu.addOptionGroup(optionGroup);
+            menuJpaRepository.save(menu);
         });
+
+        // 옵션 그룹과 옵션 저장 확인
+        OptionGroupJpaEntity optionGroupResult = optionGroupJpaRepository.findById(1L).get();
+        OptionJpaEntity optionResult = optionJpaRepository.findById(1L).get();
+        assertThat(optionGroupResult.getName()).isEqualTo("부분육 선택");
+        assertThat(optionResult.getName()).isEqualTo("순살");
     }
 
     @Test
@@ -180,15 +190,17 @@ public class MenuRepositoryTest {
 
         categoryJpaRepository.save(category);
         shopJpaRepository.save(shop);
-        menuJpaRepository.save(menu);
-        // 옵션 그룹 2개
-        optionGroupJpaRepository.save(optionGroup1);
-        optionGroupJpaRepository.save(optionGroup2);
+
         // 각 옵션 그룹마다 옵션 2개씩
-        optionJpaRepository.save(option1);
-        optionJpaRepository.save(option2);
-        optionJpaRepository.save(option3);
-        optionJpaRepository.save(option4);
+        optionGroup1.addOption(option1);
+        optionGroup1.addOption(option2);
+        optionGroup2.addOption(option3);
+        optionGroup2.addOption(option4);
+        // 옵션 그룹 2개
+        menu.addOptionGroup(optionGroup1);
+        menu.addOptionGroup(optionGroup2);
+
+        menuJpaRepository.save(menu);
         entityManager.clear();
 
         List<OptionGroupJpaEntity> result = menuJpaRepository.findById(1L).get()
@@ -197,5 +209,77 @@ public class MenuRepositoryTest {
         assertThat(result.size()).isEqualTo(2);
         assertThat(result.get(0).getOptions().size() + result.get(1).getOptions().size())
             .isEqualTo(4);
+    }
+
+    @Test
+    @DisplayName("메뉴를 삭제하면, 옵션 그룹과 옵션도 삭제됨")
+    void whenDeleteMenu_thenDeleteOptionGroupAndOption() {
+        CategoryJpaEntity category = CategoryJpaEntity.builder().name("치킨").build();
+        ShopJpaEntity shop = ShopJpaEntity.builder().name("bbq").category(category).build();
+        MenuJpaEntity menu = MenuJpaEntity.builder().name("황올").shop(shop).build();
+        OptionGroupJpaEntity optionGroup = OptionGroupJpaEntity.builder()
+            .name("부분육 선택").menu(menu).build();
+        OptionJpaEntity option = OptionJpaEntity.builder()
+            .name("순살").optionGroup(optionGroup).build();
+
+        categoryJpaRepository.save(category);
+        shopJpaRepository.save(shop);
+
+        optionGroup.addOption(option);
+        menu.addOptionGroup(optionGroup);
+        menuJpaRepository.save(menu);
+        menuJpaRepository.delete(menu);
+
+        List<MenuJpaEntity> menuResult = menuJpaRepository.findAll();
+        List<OptionGroupJpaEntity> optionGroupResult = optionGroupJpaRepository.findAll();
+        List<OptionJpaEntity> optionResult = optionJpaRepository.findAll();
+
+        assertThat(menuResult.size()).isZero();
+        assertThat(optionGroupResult.size()).isZero();
+        assertThat(optionResult.size()).isZero();
+    }
+
+    @Test
+    @DisplayName("메뉴의 옵션 그룹을 바꾸면, 기존 옵션 그룹은 삭제되고 새로운 옵션 그룹이 추가됨")
+    void whenUpdateOptionGroup_thenDeletePrevOptionGroupAndAddNewOptionGroup() {
+        CategoryJpaEntity category = CategoryJpaEntity.builder().name("치킨").build();
+        ShopJpaEntity shop = ShopJpaEntity.builder().name("bbq").category(category).build();
+        MenuJpaEntity menu1 = MenuJpaEntity.builder().name("황올").shop(shop).build();
+        OptionGroupJpaEntity optionGroup1 = OptionGroupJpaEntity.builder()
+            .name("부분육 선택").menu(menu1).build();
+        OptionJpaEntity option1 = OptionJpaEntity.builder()
+            .name("순살").optionGroup(optionGroup1).build();
+
+        categoryJpaRepository.save(category);
+        shopJpaRepository.save(shop);
+
+        // 처음 옵션으로 저장
+        optionGroup1.addOption(option1);
+        menu1.addOptionGroup(optionGroup1);
+        menuJpaRepository.save(menu1);
+        entityManager.clear();
+
+        // 수정된 옵션으로 저장
+        OptionGroupJpaEntity optionGroup2 = OptionGroupJpaEntity.builder()
+            .name("음료 선택").menu(menu1).build();
+        OptionJpaEntity option2 = OptionJpaEntity.builder()
+            .name("콜라").optionGroup(optionGroup2).build();
+        MenuJpaEntity menu2 = MenuJpaEntity.builder().name("황올").shop(shop).build();
+
+        optionGroup2.addOption(option2);
+        menu2.addOptionGroup(optionGroup2);
+        menu1.updateMenu(menu2);
+        menuJpaRepository.save(menu1);
+        entityManager.flush();      // 더티 체킹을 위해 flush
+
+        // 수정 이전의 내용이 삭제되었는지 확인
+        assertThat(optionGroupJpaRepository.findAll().size()).isEqualTo(1);
+        assertThat(optionJpaRepository.findAll().size()).isEqualTo(1);
+        // 수정 내용이 반영되었는지 확인
+        OptionGroupJpaEntity optionGroupResult = menuJpaRepository.findById(1L).get()
+            .getOptionGroups().getFirst();
+        OptionJpaEntity optionResult = optionGroupResult.getOptions().getFirst();
+        assertThat(optionGroupResult.getName()).isEqualTo("음료 선택");
+        assertThat(optionResult.getName()).isEqualTo("콜라");
     }
 }

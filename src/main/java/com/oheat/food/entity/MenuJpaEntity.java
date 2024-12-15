@@ -1,6 +1,7 @@
 package com.oheat.food.entity;
 
 import com.oheat.common.BaseTimeEntity;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -47,7 +48,7 @@ public class MenuJpaEntity extends BaseTimeEntity {
     @JoinColumn(name = "shop_id", nullable = false)
     private ShopJpaEntity shop;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "menu")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "menu", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OptionGroupJpaEntity> optionGroups = new ArrayList<>();
 
     public void addOptionGroup(OptionGroupJpaEntity optionGroup) {
