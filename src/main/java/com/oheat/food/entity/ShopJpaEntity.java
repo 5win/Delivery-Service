@@ -2,6 +2,7 @@ package com.oheat.food.entity;
 
 import com.oheat.common.BaseTimeEntity;
 import com.oheat.food.dto.ShopUpdateRequest;
+import com.oheat.food.exception.DuplicateMenuException;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -15,6 +16,7 @@ import jakarta.persistence.Table;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -67,5 +69,19 @@ public class ShopJpaEntity extends BaseTimeEntity {
         this.phone = updateRequest.getPhone();
         this.category = category;
         this.minimumOrderAmount = updateRequest.getMinimumOrderAmount();
+    }
+
+    public void addMenu(MenuJpaEntity menu) {
+        if (isDuplicateMenuName(menu)) {
+            throw new DuplicateMenuException();
+        }
+        menuSet.add(menu);
+    }
+
+    private boolean isDuplicateMenuName(MenuJpaEntity menu) {
+        Optional<MenuJpaEntity> target = menuSet.stream()
+            .filter(menuJpaEntity -> menuJpaEntity.getName().equals(menu.getName()))
+            .findFirst();
+        return target.isPresent();
     }
 }

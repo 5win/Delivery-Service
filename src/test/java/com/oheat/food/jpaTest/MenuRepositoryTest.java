@@ -2,6 +2,9 @@ package com.oheat.food.jpaTest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.oheat.food.dto.MenuUpdateRequest;
+import com.oheat.food.dto.OptionGroupUpdateRequest;
+import com.oheat.food.dto.OptionUpdateRequest;
 import com.oheat.food.entity.CategoryJpaEntity;
 import com.oheat.food.entity.MenuJpaEntity;
 import com.oheat.food.entity.OptionGroupJpaEntity;
@@ -260,15 +263,22 @@ public class MenuRepositoryTest {
         entityManager.clear();
 
         // 수정된 옵션으로 저장
-        OptionGroupJpaEntity optionGroup2 = OptionGroupJpaEntity.builder()
-            .name("음료 선택").menu(menu1).build();
-        OptionJpaEntity option2 = OptionJpaEntity.builder()
-            .name("콜라").optionGroup(optionGroup2).build();
-        MenuJpaEntity menu2 = MenuJpaEntity.builder().name("황올").shop(shop).build();
+        OptionGroupUpdateRequest optionGroupUpdateRequest = OptionGroupUpdateRequest.builder()
+            .name("음료 선택")
+            .required(true)
+            .maxNumOfSelect(3)
+            .options(List.of(OptionUpdateRequest.builder()
+                .name("콜라")
+                .price(99_000)
+                .build()))
+            .build();
+        MenuUpdateRequest updateRequest = MenuUpdateRequest.builder()
+            .menuId(1L)
+            .name("양념치킨")
+            .optionGroups(List.of(optionGroupUpdateRequest))
+            .build();
 
-        optionGroup2.addOption(option2);
-        menu2.addOptionGroup(optionGroup2);
-        menu1.updateMenu(menu2);
+        menu1.updateMenu(updateRequest);
         menuJpaRepository.save(menu1);
         entityManager.flush();      // 더티 체킹을 위해 flush
 

@@ -25,7 +25,7 @@ public class MenuSaveRequest {
             .build();
 
         optionGroups.forEach(optionGroupSaveRequest -> {
-            menu.addOptionGroup(optionGroupSaveRequest.toEntity());
+            menu.addOptionGroup(optionGroupSaveRequest.toEntity(menu));
         });
 
         return menu;

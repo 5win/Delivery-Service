@@ -1,11 +1,9 @@
 package com.oheat.food.service;
 
-import com.oheat.food.dto.MenuFindByShopIdResponse;
 import com.oheat.food.dto.MenuSaveRequest;
 import com.oheat.food.dto.MenuUpdateRequest;
 import com.oheat.food.entity.MenuJpaEntity;
 import com.oheat.food.entity.ShopJpaEntity;
-import com.oheat.food.exception.DuplicateMenuException;
 import com.oheat.food.exception.MenuNotExistsException;
 import com.oheat.food.exception.NoOptionException;
 import com.oheat.food.exception.NoOptionGroupException;
@@ -24,15 +22,12 @@ public class MenuService {
     private final MenuRepository menuRepository;
     private final ShopRepository shopRepository;
 
-    public void save(MenuSaveRequest saveRequest) {
+    public void registerMenu(MenuSaveRequest saveRequest) {
         ShopJpaEntity shop = shopRepository.findById(saveRequest.getShopId())
             .orElseThrow(ShopNotExistsException::new);
-        menuRepository.findByName(saveRequest.getName())
-            .ifPresent(menu -> {
-                throw new DuplicateMenuException();
-            });
 
         MenuJpaEntity menu = saveRequest.toEntity(shop);
+        shop.addMenu(menu);
         if (menu.isOptionGroupsEmpty()) {
             throw new NoOptionGroupException();
         }
@@ -42,31 +37,21 @@ public class MenuService {
         menuRepository.save(menu);
     }
 
-    public List<MenuFindByShopIdResponse> findByShopId(Long shopId) {
+    public List<MenuJpaEntity> findByShopId(Long shopId) {
         ShopJpaEntity shop = shopRepository.findById(shopId)
             .orElseThrow(ShopNotExistsException::new);
 
-        return shop.getMenuSet().stream()
-            .map(MenuFindByShopIdResponse::from)
-            .toList();
+        return shop.getMenuSet().stream().toList();
     }
 
     @Transactional
     public void updateMenu(MenuUpdateRequest updateRequest) {
-        ShopJpaEntity shop = shopRepository.findById(updateRequest.getShopId())
+        shopRepository.findById(updateRequest.getShopId())
             .orElseThrow(ShopNotExistsException::new);
         MenuJpaEntity menu = menuRepository.findById(updateRequest.getMenuId())
             .orElseThrow(MenuNotExistsException::new);
 
-        MenuJpaEntity updatedMenu = updateRequest.toEntity(shop);
-
-        if (updatedMenu.isOptionGroupsEmpty()) {
-            throw new NoOptionGroupException();
-        }
-        if (updatedMenu.isEmptyOptionGroupExists()) {
-            throw new NoOptionException();
-        }
-        menu.updateMenu(updatedMenu);
+        menu.updateMenu(updateRequest);
     }
 
     public void deleteById(Long menuId) {

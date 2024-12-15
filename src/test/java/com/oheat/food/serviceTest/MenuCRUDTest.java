@@ -2,7 +2,6 @@ package com.oheat.food.serviceTest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.oheat.food.dto.MenuFindByShopIdResponse;
 import com.oheat.food.dto.MenuSaveRequest;
 import com.oheat.food.dto.MenuUpdateRequest;
 import com.oheat.food.dto.OptionGroupSaveRequest;
@@ -42,7 +41,7 @@ public class MenuCRUDTest {
     @DisplayName("메뉴 등록 시, 매장id에 해당하는 매장이 없다면 메뉴 등록 실패")
     void givenMenuWithoutShopId_whenAddNewMenu_thenFail() {
         Assertions.assertThrows(ShopNotExistsException.class, () -> {
-            menuService.save(MenuSaveRequest.builder()
+            menuService.registerMenu(MenuSaveRequest.builder()
                 .name("황금올리브")
                 .shopId(1L).
                 build());
@@ -55,7 +54,7 @@ public class MenuCRUDTest {
         memoryShopRepository.save(ShopJpaEntity.builder().name("bbq").build());
 
         Assertions.assertThrows(NoOptionGroupException.class, () -> {
-            menuService.save(MenuSaveRequest.builder()
+            menuService.registerMenu(MenuSaveRequest.builder()
                 .name("황올")
                 .shopId(1L)
                 .optionGroups(List.of())
@@ -69,14 +68,13 @@ public class MenuCRUDTest {
         memoryShopRepository.save(ShopJpaEntity.builder().name("bbq").build());
         OptionGroupSaveRequest optionGroup = OptionGroupSaveRequest.builder()
             .name("부분육 선택")
-            .menuId(1L)
             .required(true)
             .maxNumOfSelect(1)
             .options(List.of())
             .build();
 
         Assertions.assertThrows(NoOptionException.class, () -> {
-            menuService.save(MenuSaveRequest.builder()
+            menuService.registerMenu(MenuSaveRequest.builder()
                 .name("황올")
                 .shopId(1L)
                 .optionGroups(List.of(optionGroup))
@@ -91,18 +89,16 @@ public class MenuCRUDTest {
 
         OptionGroupSaveRequest optionGroup = OptionGroupSaveRequest.builder()
             .name("부분육 선택")
-            .menuId(1L)
             .required(true)
             .maxNumOfSelect(1)
             .options(List.of(OptionSaveRequest.builder()
                 .name("순살")
                 .price(2_000)
-                .optionGroupId(1L)
                 .build()))
             .build();
 
         Assertions.assertDoesNotThrow(() -> {
-            menuService.save(MenuSaveRequest.builder()
+            menuService.registerMenu(MenuSaveRequest.builder()
                 .name("황금올리브")
                 .shopId(1L)
                 .optionGroups(List.of(optionGroup))
@@ -114,22 +110,22 @@ public class MenuCRUDTest {
     @DisplayName("메뉴 등록 시, 이미 메뉴가 있다면 메뉴 등록 실패")
     void givenDuplicateMenu_whenAddNewMenu_thenFail() {
         memoryShopRepository.save(ShopJpaEntity.builder().name("bbq").build());
+
         OptionGroupSaveRequest optionGroup = OptionGroupSaveRequest.builder()
             .name("부분육 선택")
-            .menuId(1L)
             .required(true)
             .maxNumOfSelect(1)
             .options(List.of(OptionSaveRequest.builder()
                 .name("순살")
                 .price(2_000)
-                .optionGroupId(1L)
                 .build()))
             .build();
-        menuService.save(MenuSaveRequest.builder()
+        menuService.registerMenu(MenuSaveRequest.builder()
             .name("황금올리브").shopId(1L).optionGroups(List.of(optionGroup)).build());
 
         Assertions.assertThrows(DuplicateMenuException.class, () -> {
-            menuService.save(MenuSaveRequest.builder().name("황금올리브").shopId(1L).build());
+            menuService.registerMenu(MenuSaveRequest.builder()
+                .name("황금올리브").shopId(1L).optionGroups(List.of(optionGroup)).build());
         });
     }
 
@@ -140,18 +136,16 @@ public class MenuCRUDTest {
 
         OptionGroupSaveRequest optionGroup = OptionGroupSaveRequest.builder()
             .name("부분육 선택")
-            .menuId(1L)
             .required(true)
             .maxNumOfSelect(1)
             .options(List.of(OptionSaveRequest.builder()
                 .name("순살")
                 .price(2_000)
-                .optionGroupId(1L)
                 .build()))
             .build();
 
         for (int i = 0; i < 3; i++) {
-            menuService.save(MenuSaveRequest.builder()
+            menuService.registerMenu(MenuSaveRequest.builder()
                 .name("황올 세트 " + i + "번")
                 .shopId(1L)
                 .optionGroups(List.of(optionGroup))
@@ -175,7 +169,7 @@ public class MenuCRUDTest {
         }
         memoryShopRepository.save(shop);
 
-        List<MenuFindByShopIdResponse> result = menuService.findByShopId(1L);
+        List<MenuJpaEntity> result = menuService.findByShopId(1L);
 
         assertThat(result.size()).isEqualTo(3);
     }
@@ -187,7 +181,6 @@ public class MenuCRUDTest {
             menuService.updateMenu(MenuUpdateRequest.builder()
                 .menuId(1L)
                 .name("황금올리브")
-                .shopId(1L)
                 .build());
         });
     }
@@ -204,21 +197,19 @@ public class MenuCRUDTest {
         // update
         OptionGroupUpdateRequest optionGroupUpdateRequest = OptionGroupUpdateRequest.builder()
             .name("부분육 선택")
-            .menuId(1L)
             .required(true)
             .maxNumOfSelect(3)
             .options(List.of(OptionUpdateRequest.builder()
                 .name("닭다리")
                 .price(99_000)
-                .optionGroupId(1L)
                 .build()))
             .build();
 
         Assertions.assertDoesNotThrow(() -> {
             menuService.updateMenu(MenuUpdateRequest.builder()
                 .menuId(1L)
-                .name("양념치킨")
                 .shopId(1L)
+                .name("양념치킨")
                 .optionGroups(List.of(optionGroupUpdateRequest))
                 .build());
         });
