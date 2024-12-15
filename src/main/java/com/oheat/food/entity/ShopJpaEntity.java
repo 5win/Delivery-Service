@@ -84,4 +84,8 @@ public class ShopJpaEntity extends BaseTimeEntity {
             .findFirst();
         return target.isPresent();
     }
+
+    public void addMenuGroup(MenuGroupJpaEntity menuGroup) {
+        menuGroups.add(menuGroup);
+    }
 }

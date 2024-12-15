@@ -23,6 +23,7 @@ import com.oheat.food.repository.MenuGroupRepository;
 import com.oheat.food.repository.MenuRepository;
 import com.oheat.food.repository.ShopRepository;
 import com.oheat.food.service.MenuGroupService;
+import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -167,6 +168,57 @@ public class MenuGroupCRUDTest {
             menuGroupService.registerMenuToMenuGroup(MenuSaveToMenuGroupRequest.builder()
                 .menuGroupId(1L).menuId(1L).build());
         });
+    }
+
+    @Test
+    @DisplayName("매장이 존재하지 않으면, 메뉴 그룹 조회 실패")
+    void givenWrongShopId_whenFindMenuGroupByShopId_thenFail() {
+        Assertions.assertThrows(ShopNotExistsException.class, () -> {
+            menuGroupService.findMenuGroupByShopId(1L);
+        });
+    }
+
+    @Test
+    @DisplayName("메뉴 그룹이 2개 있고 각 그룹에 메뉴가 2개씩 존재하면, 총 조회된 메뉴 개수는 4개")
+    void givenTwoMenuGroupAndFourMenu_whenFindMenuFromGroup_thenFour() {
+        // 메뉴와 메뉴 그룹 생성
+        MenuJpaEntity menu1 = MenuJpaEntity.builder().name("황올").build();
+        MenuJpaEntity menu2 = MenuJpaEntity.builder().name("자메이카").build();
+        MenuJpaEntity menu3 = MenuJpaEntity.builder().name("뿌링클").build();
+        MenuJpaEntity menu4 = MenuJpaEntity.builder().name("볼케이노").build();
+        MenuGroupJpaEntity menuGroup1 = MenuGroupJpaEntity.builder().name("후라이드").build();
+        MenuGroupJpaEntity menuGroup2 = MenuGroupJpaEntity.builder().name("양념").build();
+
+        // 메뉴와 메뉴 그룹 매핑 관계 설정
+        MenuGroupMappingJpaEntity mapping1 = MenuGroupMappingJpaEntity.builder()
+            .menuGroup(menuGroup1).menu(menu1).build();
+        MenuGroupMappingJpaEntity mapping2 = MenuGroupMappingJpaEntity.builder()
+            .menuGroup(menuGroup1).menu(menu2).build();
+        MenuGroupMappingJpaEntity mapping3 = MenuGroupMappingJpaEntity.builder()
+            .menuGroup(menuGroup2).menu(menu3).build();
+        MenuGroupMappingJpaEntity mapping4 = MenuGroupMappingJpaEntity.builder()
+            .menuGroup(menuGroup2).menu(menu4).build();
+
+        // 각 메뉴 그룹에 메뉴 2개씩 연관관계 매핑
+        menuGroup1.addMenuMapping(mapping1);
+        menuGroup1.addMenuMapping(mapping2);
+        menuGroup2.addMenuMapping(mapping3);
+        menuGroup2.addMenuMapping(mapping4);
+
+        ShopJpaEntity shop = ShopJpaEntity.builder().name("bbq").build();
+        shop.addMenuGroup(menuGroup1);
+        shop.addMenuGroup(menuGroup2);
+
+        memoryShopRepository.save(shop);
+
+        List<MenuGroupJpaEntity> groupResult = menuGroupService.findMenuGroupByShopId(1L);
+        int group1Size = groupResult.getFirst().getMenuGroupMappingSet().size();
+        int group2Size = groupResult.getLast().getMenuGroupMappingSet().size();
+
+        // 메뉴 그룹의 개수는 2개
+        assertThat(groupResult.size()).isEqualTo(2);
+        // 총 메뉴의 개수는 4개
+        assertThat(group1Size + group2Size).isEqualTo(4);
     }
 
     @Test
