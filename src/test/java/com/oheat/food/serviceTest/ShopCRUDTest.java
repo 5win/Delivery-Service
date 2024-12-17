@@ -126,48 +126,6 @@ public class ShopCRUDTest {
 
     @Disabled
     @Test
-    @DisplayName("카테고리로 매장 목록 조회 시 정렬 기준이 기본순이면, 최근 등록 순으로 조회")
-    void whenSortByDefault_thenRecentRegistrationOrder() {
-
-    }
-
-    @Disabled
-    @Test
-    @DisplayName("카테고리로 매장 목록 조회 시 정렬 기준이 배달팁 낮은 순이면, 배달팁 오름차순으로 조회")
-    void whenSortByDeliveryTip_thenDeliveryTipAscendingOrder() {
-
-    }
-
-    @Disabled
-    @Test
-    @DisplayName("카테고리로 매장 목록 조회 시 정렬 기준이 최소주문 금액 낮은 순이면, 최소주문 금액 오름차순으로 조회")
-    void whenSortByMinimumOrderAmount_thenMinimumOrderAmountAscendingOrder() {
-
-    }
-
-    @Disabled
-    @Test
-    @DisplayName("카테고리로 매장 목록 조회 시 정렬 기준이 가까운 순이면, 내 위치에서의 거리 오름차순으로 조회")
-    void whenSortByNearestOrder_thenDistanceInMyLocationAscendingOrder() {
-
-    }
-
-    @Disabled
-    @Test
-    @DisplayName("카테고리로 매장 목록 조회 시 정렬 기준이 주문 많은 순이면, 누적 주문 수 내림차순으로 조회")
-    void whenSortByOrderAmount_thenOrderAmountDescendingOrder() {
-
-    }
-
-    @Disabled
-    @Test
-    @DisplayName("카테고리로 매장 목록 조회 시 정렬 기준이 별점 높은 순이면, 별점 내림차순으로 조회")
-    void whenSortByReviewScore_thenReviewScoreDescendingOrder() {
-
-    }
-
-    @Disabled
-    @Test
     @DisplayName("매장 상세 조회 시, 상호명, 최소주문 금액, 전화번호, 배달팁, 메뉴명, 메뉴 설명, 메뉴 가격 조회")
     void whenFindShop_thenReturnDetailInfo() {
 
