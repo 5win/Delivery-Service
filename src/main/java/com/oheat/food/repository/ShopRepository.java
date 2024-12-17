@@ -2,8 +2,9 @@ package com.oheat.food.repository;
 
 import com.oheat.food.entity.CategoryJpaEntity;
 import com.oheat.food.entity.ShopJpaEntity;
-import java.util.List;
 import java.util.Optional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface ShopRepository {
 
@@ -13,7 +14,7 @@ public interface ShopRepository {
 
     Optional<ShopJpaEntity> findByName(String name);
 
-    List<ShopJpaEntity> findByCategory(CategoryJpaEntity category);
+    Page<ShopJpaEntity> findByCategory(CategoryJpaEntity category, Pageable pageable);
 
     void deleteById(Long shopId);
 }

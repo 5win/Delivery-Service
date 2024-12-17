@@ -4,18 +4,22 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.oheat.common.TestConfig;
 import com.oheat.food.entity.CategoryJpaEntity;
 import com.oheat.food.entity.ShopJpaEntity;
 import com.oheat.food.repository.CategoryJpaRepository;
 import com.oheat.food.repository.ShopJpaRepository;
-import java.util.List;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 
+@Import(TestConfig.class)
 @DataJpaTest
 public class ShopRepositoryTest {
 
@@ -95,15 +99,34 @@ public class ShopRepositoryTest {
                 .name("bbq " + i + "호점").category(category).build());
         }
 
-        List<ShopJpaEntity> result = shopJpaRepository.findByCategory(category);
+        PageRequest page0 = PageRequest.of(0, 5);
+        Page<ShopJpaEntity> result = shopJpaRepository.findShopByCategory(category, page0);
 
-        assertThat(result.size()).isEqualTo(3);
+        assertThat(result.getContent().size()).isEqualTo(3);
     }
 
     @Test
-    @DisplayName("치킨 매장이 7개이고 5개 단위로 페이징할 때, 조회 결과는 0번 페이지는 5개, 1번 페이지는 2개이다")
+    @DisplayName("치킨 매장이 7개이고 5개 단위로 페이징할 때, 조회 결과는 0번 페이지는 5개, 1번 페이지는 2개이며, 전체 집합 크기는 7개이다")
     void givenSevenShops_whenFindShopByCategory_thenPage0Return5AndPage1Return2() {
+        CategoryJpaEntity category = CategoryJpaEntity.builder().name("치킨").build();
+        categoryJpaRepository.save(category);
 
+        for (int i = 0; i < 7; i++) {
+            shopJpaRepository.save(ShopJpaEntity.builder()
+                .name("bbq " + i + "호점").category(category).build());
+        }
+
+        PageRequest page0 = PageRequest.of(0, 5);
+        PageRequest page1 = PageRequest.of(1, 5);
+        Page<ShopJpaEntity> result1 = shopJpaRepository
+            .findShopByCategory(category, page0);
+        Page<ShopJpaEntity> result2 = shopJpaRepository
+            .findShopByCategory(category, page1);
+
+        assertThat(result1.getContent().size()).isEqualTo(5);
+        assertThat(result2.getContent().size()).isEqualTo(2);
+        assertThat(result1.getTotalElements()).isEqualTo(7);
+        assertThat(result2.getTotalElements()).isEqualTo(7);
     }
 
     @Disabled

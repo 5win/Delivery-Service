@@ -16,12 +16,12 @@ import com.oheat.food.repository.CategoryRepository;
 import com.oheat.food.repository.ShopRepository;
 import com.oheat.food.service.CategoryService;
 import com.oheat.food.service.ShopService;
-import java.util.List;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.data.domain.Page;
 
 public class ShopCRUDTest {
 
@@ -112,9 +112,9 @@ public class ShopCRUDTest {
                 .build());
         }
 
-        List<ShopJpaEntity> result = shopService.findShopByCategory("치킨");
+        Page<ShopJpaEntity> result = shopService.findShopByCategory("치킨", null);
 
-        Assertions.assertThat(result.size()).isEqualTo(3);
+        Assertions.assertThat(result.getContent().size()).isEqualTo(3);
     }
 
     @Disabled
