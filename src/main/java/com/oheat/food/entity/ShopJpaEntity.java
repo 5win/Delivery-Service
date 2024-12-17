@@ -26,19 +26,20 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@EqualsAndHashCode(exclude = {"phone", "category", "minimumOrderAmount", "menuSet", "menuGroups"},
-    callSuper = false)
+@EqualsAndHashCode(exclude = {"phone", "minimumOrderAmount", "deliveryFee", "category", "menuSet",
+    "menuGroups"}, callSuper = false)
 @Entity
 @Table(name = "shop")
 public class ShopJpaEntity extends BaseTimeEntity {
 
     @Builder
     public ShopJpaEntity(String name, String phone, CategoryJpaEntity category,
-        int minimumOrderAmount) {
+        int minimumOrderAmount, int deliveryFee) {
         this.name = name;
         this.phone = phone;
         this.category = category;
         this.minimumOrderAmount = minimumOrderAmount;
+        this.deliveryFee = deliveryFee;
     }
 
     @Id
@@ -51,12 +52,15 @@ public class ShopJpaEntity extends BaseTimeEntity {
     @Column(name = "phone")
     private String phone;
 
+    @Column(name = "minimum_order_amount", nullable = false)
+    private int minimumOrderAmount;
+
+    @Column(name = "delivery_fee", nullable = false)
+    private int deliveryFee;
+
     @ManyToOne
     @JoinColumn(name = "category", referencedColumnName = "name", nullable = false)
     private CategoryJpaEntity category;
-
-    @Column(name = "minimum_order_amount", nullable = false)
-    private int minimumOrderAmount;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "shop")
     private final Set<MenuJpaEntity> menuSet = new HashSet<>();
@@ -69,6 +73,7 @@ public class ShopJpaEntity extends BaseTimeEntity {
         this.phone = updateRequest.getPhone();
         this.category = category;
         this.minimumOrderAmount = updateRequest.getMinimumOrderAmount();
+        this.deliveryFee = updateRequest.getDeliveryFee();
     }
 
     public void addMenu(MenuJpaEntity menu) {

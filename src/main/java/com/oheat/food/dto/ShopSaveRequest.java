@@ -15,6 +15,7 @@ public class ShopSaveRequest {
     private final String phone;
     private final String category;
     private final int minimumOrderAmount;
+    private final int deliveryFee;
 
     public ShopJpaEntity toEntity(CategoryJpaEntity category) {
         return ShopJpaEntity.builder()
@@ -22,6 +23,7 @@ public class ShopSaveRequest {
             .phone(this.phone)
             .category(category)
             .minimumOrderAmount(this.minimumOrderAmount)
+            .deliveryFee(this.deliveryFee)
             .build();
     }
 }

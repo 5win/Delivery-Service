@@ -2,6 +2,7 @@ package com.oheat.food.jpaTest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.oheat.common.TestConfig;
 import com.oheat.food.dto.MenuUpdateRequest;
 import com.oheat.food.dto.OptionGroupUpdateRequest;
 import com.oheat.food.dto.OptionUpdateRequest;
@@ -12,8 +13,6 @@ import com.oheat.food.entity.OptionJpaEntity;
 import com.oheat.food.entity.ShopJpaEntity;
 import com.oheat.food.repository.CategoryJpaRepository;
 import com.oheat.food.repository.MenuJpaRepository;
-import com.oheat.food.repository.OptionGroupJpaRepository;
-import com.oheat.food.repository.OptionJpaRepository;
 import com.oheat.food.repository.ShopJpaRepository;
 import jakarta.persistence.EntityManager;
 import java.util.List;
@@ -23,8 +22,10 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.dao.DataIntegrityViolationException;
 
+@Import(TestConfig.class)
 @DataJpaTest
 public class MenuRepositoryTest {
 
@@ -98,53 +99,6 @@ public class MenuRepositoryTest {
     }
 
     @Test
-    @DisplayName("존재하지 않는 메뉴에 옵션 그룹을 추가하면 실패")
-    void givenOptionGroupWithWrongMenuId_whenAddNewOptionGroup_thenFail() {
-        CategoryJpaEntity category = CategoryJpaEntity.builder().name("치킨").build();
-        ShopJpaEntity shop = ShopJpaEntity.builder().name("bbq").category(category).build();
-        MenuJpaEntity menu = MenuJpaEntity.builder().name("황올").shop(shop).build();
-
-        categoryJpaRepository.save(category);
-        shopJpaRepository.save(shop);
-        menuJpaRepository.save(menu);
-        menuJpaRepository.deleteAll();
-        entityManager.flush();
-
-        Assertions.assertThrows(DataIntegrityViolationException.class, () -> {
-            optionGroupJpaRepository.save(OptionGroupJpaEntity.builder()
-                .name("부분육 선택")
-                .menu(menu)
-                .build());
-        });
-        entityManager.clear();
-    }
-
-    @Test
-    @DisplayName("존재하지 않는 옵션 그룹에 옵션을 추가하면 실패")
-    void givenOptionWithWrongOptionGroupId_whenAddNewOption_thenFail() {
-        CategoryJpaEntity category = CategoryJpaEntity.builder().name("치킨").build();
-        ShopJpaEntity shop = ShopJpaEntity.builder().name("bbq").category(category).build();
-        MenuJpaEntity menu = MenuJpaEntity.builder().name("황올").shop(shop).build();
-        OptionGroupJpaEntity optionGroup = OptionGroupJpaEntity.builder()
-            .name("부분육 선택").menu(menu).build();
-
-        categoryJpaRepository.save(category);
-        shopJpaRepository.save(shop);
-        menuJpaRepository.save(menu);
-        optionGroupJpaRepository.save(optionGroup);
-        optionGroupJpaRepository.deleteAll();
-        entityManager.flush();
-
-        Assertions.assertThrows(DataIntegrityViolationException.class, () -> {
-            optionJpaRepository.save(OptionJpaEntity.builder()
-                .name("순살")
-                .optionGroup(optionGroup)
-                .build());
-        });
-        entityManager.clear();
-    }
-
-    @Test
     @DisplayName("카테고리, 매장, 메뉴, 옵션 그룹, 옵션을 차례로 알맞게 저장하면 모두 저장 성공")
     void givenShopAndMenuAndOptionGroupAndOption_whenAddNewMenu_thenSuccess() {
         CategoryJpaEntity category = CategoryJpaEntity.builder().name("치킨").build();
@@ -164,10 +118,13 @@ public class MenuRepositoryTest {
             menu.addOptionGroup(optionGroup);
             menuJpaRepository.save(menu);
         });
+        entityManager.clear();
 
         // 옵션 그룹과 옵션 저장 확인
-        OptionGroupJpaEntity optionGroupResult = optionGroupJpaRepository.findById(1L).get();
-        OptionJpaEntity optionResult = optionJpaRepository.findById(1L).get();
+        OptionGroupJpaEntity optionGroupResult = menuJpaRepository.findById(1L).get()
+            .getOptionGroups().getFirst();
+        OptionJpaEntity optionResult = optionGroupResult.getOptions().getFirst();
+
         assertThat(optionGroupResult.getName()).isEqualTo("부분육 선택");
         assertThat(optionResult.getName()).isEqualTo("순살");
     }

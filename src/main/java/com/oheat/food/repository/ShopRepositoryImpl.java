@@ -2,9 +2,10 @@ package com.oheat.food.repository;
 
 import com.oheat.food.entity.CategoryJpaEntity;
 import com.oheat.food.entity.ShopJpaEntity;
-import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 @RequiredArgsConstructor
@@ -29,8 +30,8 @@ public class ShopRepositoryImpl implements ShopRepository {
     }
 
     @Override
-    public List<ShopJpaEntity> findByCategory(CategoryJpaEntity category) {
-        return shopJpaRepository.findByCategory(category);
+    public Page<ShopJpaEntity> findByCategory(CategoryJpaEntity category, Pageable pageable) {
+        return shopJpaRepository.findShopByCategory(category, pageable);
     }
 
     @Override

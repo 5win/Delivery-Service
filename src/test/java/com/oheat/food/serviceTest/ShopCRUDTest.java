@@ -16,12 +16,12 @@ import com.oheat.food.repository.CategoryRepository;
 import com.oheat.food.repository.ShopRepository;
 import com.oheat.food.service.CategoryService;
 import com.oheat.food.service.ShopService;
-import java.util.List;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.data.domain.Page;
 
 public class ShopCRUDTest {
 
@@ -112,57 +112,15 @@ public class ShopCRUDTest {
                 .build());
         }
 
-        List<ShopJpaEntity> result = shopService.findShopByCategory("치킨");
+        Page<ShopJpaEntity> result = shopService.findShopByCategory("치킨", null);
 
-        Assertions.assertThat(result.size()).isEqualTo(3);
+        Assertions.assertThat(result.getContent().size()).isEqualTo(3);
     }
 
     @Disabled
     @Test
     @DisplayName("카테고리로 매장 목록 조회 시, 각 매장의 상호명, 배달팁, 최소주문금액 정보 표시")
     void whenFindChickenShop_thenReturnTitleAndDeliveryTipAndMinimumOrderAmount() {
-
-    }
-
-    @Disabled
-    @Test
-    @DisplayName("카테고리로 매장 목록 조회 시 정렬 기준이 기본순이면, 최근 등록 순으로 조회")
-    void whenSortByDefault_thenRecentRegistrationOrder() {
-
-    }
-
-    @Disabled
-    @Test
-    @DisplayName("카테고리로 매장 목록 조회 시 정렬 기준이 배달팁 낮은 순이면, 배달팁 오름차순으로 조회")
-    void whenSortByDeliveryTip_thenDeliveryTipAscendingOrder() {
-
-    }
-
-    @Disabled
-    @Test
-    @DisplayName("카테고리로 매장 목록 조회 시 정렬 기준이 최소주문 금액 낮은 순이면, 최소주문 금액 오름차순으로 조회")
-    void whenSortByMinimumOrderAmount_thenMinimumOrderAmountAscendingOrder() {
-
-    }
-
-    @Disabled
-    @Test
-    @DisplayName("카테고리로 매장 목록 조회 시 정렬 기준이 가까운 순이면, 내 위치에서의 거리 오름차순으로 조회")
-    void whenSortByNearestOrder_thenDistanceInMyLocationAscendingOrder() {
-
-    }
-
-    @Disabled
-    @Test
-    @DisplayName("카테고리로 매장 목록 조회 시 정렬 기준이 주문 많은 순이면, 누적 주문 수 내림차순으로 조회")
-    void whenSortByOrderAmount_thenOrderAmountDescendingOrder() {
-
-    }
-
-    @Disabled
-    @Test
-    @DisplayName("카테고리로 매장 목록 조회 시 정렬 기준이 별점 높은 순이면, 별점 내림차순으로 조회")
-    void whenSortByReviewScore_thenReviewScoreDescendingOrder() {
 
     }
 

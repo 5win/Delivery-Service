@@ -8,6 +8,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import lombok.Getter;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 
 @Getter
 public class MemoryShopRepository implements ShopRepository {
@@ -33,10 +36,11 @@ public class MemoryShopRepository implements ShopRepository {
     }
 
     @Override
-    public List<ShopJpaEntity> findByCategory(CategoryJpaEntity category) {
-        return shops.values().stream()
+    public Page<ShopJpaEntity> findByCategory(CategoryJpaEntity category, Pageable pageable) {
+        List<ShopJpaEntity> shopList = shops.values().stream()
             .filter(shop -> shop.getCategory().equals(category))
             .toList();
+        return new PageImpl<>(shopList);
     }
 
     @Override
