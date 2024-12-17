@@ -53,6 +53,8 @@ public class ShopCustomRepositoryImpl implements ShopCustomRepository {
                     orders.add(new OrderSpecifier(direction, shopJpaEntity.id));
                 case "minimumOrderAmount":
                     orders.add(new OrderSpecifier(direction, shopJpaEntity.minimumOrderAmount));
+                case "deliveryFee":
+                    orders.add(new OrderSpecifier(direction, shopJpaEntity.deliveryFee));
             }
         }
         return orders.toArray(OrderSpecifier[]::new);

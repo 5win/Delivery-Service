@@ -165,10 +165,26 @@ public class ShopRepositoryTest {
         assertThat(result.get(2).getId()).isEqualTo(1L);
     }
 
-    @Disabled
     @Test
     @DisplayName("카테고리로 매장 목록 조회 시 정렬 기준이 배달팁 낮은 순이면, 배달팁 오름차순으로 조회")
     void whenSortByDeliveryTip_thenDeliveryTipAscendingOrder() {
+        CategoryJpaEntity category = CategoryJpaEntity.builder().name("치킨").build();
+        categoryJpaRepository.save(category);
+
+        shopJpaRepository.save(ShopJpaEntity.builder()
+            .name("bbq 1호점").category(category).deliveryFee(2000).build());
+        shopJpaRepository.save(ShopJpaEntity.builder()
+            .name("bbq 2호점").category(category).deliveryFee(1000).build());
+        shopJpaRepository.save(ShopJpaEntity.builder()
+            .name("bbq 3호점").category(category).deliveryFee(5000).build());
+
+        PageRequest page0 = PageRequest.of(0, 5, Sort.by("deliveryFee").ascending());
+        List<ShopJpaEntity> result = shopJpaRepository.findShopByCategory(category, page0)
+            .getContent();
+
+        assertThat(result.get(0).getId()).isEqualTo(2L);
+        assertThat(result.get(1).getId()).isEqualTo(1L);
+        assertThat(result.get(2).getId()).isEqualTo(3L);
     }
 
     @Test
@@ -191,6 +207,29 @@ public class ShopRepositoryTest {
         assertThat(result.get(0).getId()).isEqualTo(2L);
         assertThat(result.get(1).getId()).isEqualTo(1L);
         assertThat(result.get(2).getId()).isEqualTo(3L);
+    }
+
+    @Test
+    @DisplayName("정렬 기준이 최소주문 금액 낮은 순이면, 같은 금액일 때 id 내림차순(최신 등록순)으로 정렬")
+    void whenSortByMinimumOrderAmountAndId_thenMinimumOrderAmountAscendingAndIdDescendingOrder() {
+        CategoryJpaEntity category = CategoryJpaEntity.builder().name("치킨").build();
+        categoryJpaRepository.save(category);
+
+        shopJpaRepository.save(ShopJpaEntity.builder()
+            .name("bbq 1호점").category(category).minimumOrderAmount(1000).build());
+        shopJpaRepository.save(ShopJpaEntity.builder()
+            .name("bbq 2호점").category(category).minimumOrderAmount(3000).build());
+        shopJpaRepository.save(ShopJpaEntity.builder()
+            .name("bbq 3호점").category(category).minimumOrderAmount(1000).build());
+
+        PageRequest page0 = PageRequest.of(0, 5, Sort.by("minimumOrderAmount").ascending()
+            .and(Sort.by("id").descending()));
+        List<ShopJpaEntity> result = shopJpaRepository.findShopByCategory(category, page0)
+            .getContent();
+
+        assertThat(result.get(0).getId()).isEqualTo(3L);
+        assertThat(result.get(1).getId()).isEqualTo(1L);
+        assertThat(result.get(2).getId()).isEqualTo(2L);
     }
 
     @Disabled
