@@ -1,4 +1,4 @@
-package com.oheat.food.repository;
+package com.oheat.food.jpaTest;
 
 import com.oheat.food.entity.OptionJpaEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
