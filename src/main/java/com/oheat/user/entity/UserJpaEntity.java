@@ -18,7 +18,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode(exclude = {"password", "address", "role"}, callSuper = true)
 @Entity
-@Table(name = "user")
+@Table(name = "users")
 public class UserJpaEntity extends BaseTimeEntity {
 
     @Id
