@@ -6,18 +6,19 @@ import com.oheat.food.dto.MenuSaveRequest;
 import com.oheat.food.dto.MenuUpdateRequest;
 import com.oheat.food.dto.OptionGroupSaveRequest;
 import com.oheat.food.dto.OptionGroupUpdateRequest;
-import com.oheat.food.dto.OptionSaveRequest;
-import com.oheat.food.dto.OptionUpdateRequest;
 import com.oheat.food.entity.MenuJpaEntity;
 import com.oheat.food.entity.ShopJpaEntity;
 import com.oheat.food.exception.DuplicateMenuException;
 import com.oheat.food.exception.MenuNotExistsException;
-import com.oheat.food.exception.NoOptionException;
 import com.oheat.food.exception.NoOptionGroupException;
 import com.oheat.food.exception.ShopNotExistsException;
 import com.oheat.food.fake.MemoryMenuRepository;
+import com.oheat.food.fake.MemoryOptionGroupRepository;
+import com.oheat.food.fake.MemoryOptionRepository;
 import com.oheat.food.fake.MemoryShopRepository;
 import com.oheat.food.repository.MenuRepository;
+import com.oheat.food.repository.OptionGroupRepository;
+import com.oheat.food.repository.OptionRepository;
 import com.oheat.food.repository.ShopRepository;
 import com.oheat.food.service.MenuService;
 import java.util.List;
@@ -29,12 +30,15 @@ import org.junit.jupiter.api.Test;
 public class MenuCRUDTest {
 
     private MenuService menuService;
-    private final MenuRepository memoryMenuRepository = new MemoryMenuRepository();
     private final ShopRepository memoryShopRepository = new MemoryShopRepository();
+    private final MenuRepository memoryMenuRepository = new MemoryMenuRepository();
+    private final OptionGroupRepository memoryOptionGroupRepository = new MemoryOptionGroupRepository();
+    private final OptionRepository memoryOptionRepository = new MemoryOptionRepository();
 
     @BeforeEach
     void setUp() {
-        menuService = new MenuService(memoryMenuRepository, memoryShopRepository);
+        menuService = new MenuService(memoryShopRepository, memoryMenuRepository,
+            memoryOptionGroupRepository, memoryOptionRepository);
     }
 
     @Test
@@ -63,26 +67,6 @@ public class MenuCRUDTest {
     }
 
     @Test
-    @DisplayName("메뉴 등록 시, 옵션이 존재하지 않는 옵션 그룹이 있다면 메뉴 등록 실패")
-    void givenMenuWithEmptyOptionGroup_whenAddNewMenu_thenFail() {
-        memoryShopRepository.save(ShopJpaEntity.builder().name("bbq").build());
-        OptionGroupSaveRequest optionGroup = OptionGroupSaveRequest.builder()
-            .name("부분육 선택")
-            .required(true)
-            .maxNumOfSelect(1)
-            .options(List.of())
-            .build();
-
-        Assertions.assertThrows(NoOptionException.class, () -> {
-            menuService.registerMenu(MenuSaveRequest.builder()
-                .name("황올")
-                .shopId(1L)
-                .optionGroups(List.of(optionGroup))
-                .build());
-        });
-    }
-
-    @Test
     @DisplayName("메뉴 등록 시, 1개 이상의 옵션 그룹이 존재하고 각 옵션 그룹에 옵션이 1개 이상이라면 메뉴 등록 성공")
     void givenMenuWithNotEmptyOptionGroup_whenAddNewMenu_thenSuccess() {
         memoryShopRepository.save(ShopJpaEntity.builder().name("bbq").build());
@@ -91,10 +75,6 @@ public class MenuCRUDTest {
             .name("부분육 선택")
             .required(true)
             .maxNumOfSelect(1)
-            .options(List.of(OptionSaveRequest.builder()
-                .name("순살")
-                .price(2_000)
-                .build()))
             .build();
 
         Assertions.assertDoesNotThrow(() -> {
@@ -115,10 +95,6 @@ public class MenuCRUDTest {
             .name("부분육 선택")
             .required(true)
             .maxNumOfSelect(1)
-            .options(List.of(OptionSaveRequest.builder()
-                .name("순살")
-                .price(2_000)
-                .build()))
             .build();
         menuService.registerMenu(MenuSaveRequest.builder()
             .name("황금올리브").shopId(1L).optionGroups(List.of(optionGroup)).build());
@@ -138,10 +114,6 @@ public class MenuCRUDTest {
             .name("부분육 선택")
             .required(true)
             .maxNumOfSelect(1)
-            .options(List.of(OptionSaveRequest.builder()
-                .name("순살")
-                .price(2_000)
-                .build()))
             .build();
 
         for (int i = 0; i < 3; i++) {
@@ -199,10 +171,6 @@ public class MenuCRUDTest {
             .name("부분육 선택")
             .required(true)
             .maxNumOfSelect(3)
-            .options(List.of(OptionUpdateRequest.builder()
-                .name("닭다리")
-                .price(99_000)
-                .build()))
             .build();
 
         Assertions.assertDoesNotThrow(() -> {

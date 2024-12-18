@@ -3,6 +3,8 @@ package com.oheat.food.controller;
 import com.oheat.food.dto.MenuFindByShopIdResponse;
 import com.oheat.food.dto.MenuSaveRequest;
 import com.oheat.food.dto.MenuUpdateRequest;
+import com.oheat.food.dto.OptionSaveRequest;
+import com.oheat.food.dto.OptionUpdateRequest;
 import com.oheat.food.service.MenuService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -46,6 +48,24 @@ public class MenuController {
     @DeleteMapping("{id}")
     public ResponseEntity<?> deleteMenu(@PathVariable(name = "id") Long menuId) {
         menuService.deleteById(menuId);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PostMapping("/options")
+    public ResponseEntity<?> registerOption(@RequestBody OptionSaveRequest saveRequest) {
+        menuService.registerOption(saveRequest);
+        return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
+    @PutMapping("/options")
+    public ResponseEntity<?> updateOption(@RequestBody OptionUpdateRequest updateRequest) {
+        menuService.updateOption(updateRequest);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @DeleteMapping("/options/{id}")
+    public ResponseEntity<?> deleteOption(@PathVariable(name = "id") Long optionId) {
+        menuService.deleteOption(optionId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }

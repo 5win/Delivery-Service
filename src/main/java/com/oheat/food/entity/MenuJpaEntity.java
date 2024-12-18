@@ -2,7 +2,6 @@ package com.oheat.food.entity;
 
 import com.oheat.common.BaseTimeEntity;
 import com.oheat.food.dto.MenuUpdateRequest;
-import com.oheat.food.exception.NoOptionException;
 import com.oheat.food.exception.NoOptionGroupException;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -69,21 +68,9 @@ public class MenuJpaEntity extends BaseTimeEntity {
         if (isOptionGroupsEmpty()) {
             throw new NoOptionGroupException();
         }
-        if (isEmptyOptionGroupExists()) {
-            throw new NoOptionException();
-        }
     }
 
     public boolean isOptionGroupsEmpty() {
         return optionGroups.isEmpty();
-    }
-
-    public boolean isEmptyOptionGroupExists() {
-        for (OptionGroupJpaEntity optionGroup : optionGroups) {
-            if (optionGroup.isOptionsEmpty()) {
-                return true;
-            }
-        }
-        return false;
     }
 }

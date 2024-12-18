@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class OptionSaveRequest {
 
+    private final Long optionGroupId;
     private final String name;
     private final int price;
 
