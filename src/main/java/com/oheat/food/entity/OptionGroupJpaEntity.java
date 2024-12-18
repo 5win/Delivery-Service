@@ -1,6 +1,8 @@
 package com.oheat.food.entity;
 
 import com.oheat.common.BaseTimeEntity;
+import com.oheat.food.dto.OptionGroupUpdateRequest;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -52,7 +54,7 @@ public class OptionGroupJpaEntity extends BaseTimeEntity {
     @JoinColumn(name = "menu_id", nullable = false)
     private MenuJpaEntity menu;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "optionGroup", orphanRemoval = true)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "optionGroup", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private final List<OptionJpaEntity> options = new ArrayList<>();
 
     public void addOption(OptionJpaEntity option) {
@@ -61,5 +63,11 @@ public class OptionGroupJpaEntity extends BaseTimeEntity {
 
     public boolean isOptionsEmpty() {
         return options.isEmpty();
+    }
+
+    public void updateOptionGroupInfo(OptionGroupUpdateRequest updateRequest) {
+        this.name = updateRequest.getName();
+        this.required = updateRequest.isRequired();
+        this.maxNumOfSelect = updateRequest.getMaxNumOfSelect();
     }
 }

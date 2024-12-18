@@ -5,5 +5,9 @@ import java.util.Optional;
 
 public interface OptionGroupRepository {
 
+    void save(OptionGroupJpaEntity optionGroup);
+
     Optional<OptionGroupJpaEntity> findById(Long optionGroupId);
+
+    void delete(OptionGroupJpaEntity optionGroup);
 }

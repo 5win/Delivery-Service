@@ -10,7 +10,6 @@ import com.oheat.food.entity.MenuJpaEntity;
 import com.oheat.food.entity.ShopJpaEntity;
 import com.oheat.food.exception.DuplicateMenuException;
 import com.oheat.food.exception.MenuNotExistsException;
-import com.oheat.food.exception.NoOptionGroupException;
 import com.oheat.food.exception.ShopNotExistsException;
 import com.oheat.food.fake.MemoryMenuRepository;
 import com.oheat.food.fake.MemoryOptionGroupRepository;
@@ -53,20 +52,6 @@ public class MenuCRUDTest {
     }
 
     @Test
-    @DisplayName("메뉴 등록 시, 옵션 그룹 정보가 없다면 메뉴 등록 실패")
-    void givenMenuWithoutOptionGroup_whenAddNewMenu_thenFail() {
-        memoryShopRepository.save(ShopJpaEntity.builder().name("bbq").build());
-
-        Assertions.assertThrows(NoOptionGroupException.class, () -> {
-            menuService.registerMenu(MenuSaveRequest.builder()
-                .name("황올")
-                .shopId(1L)
-                .optionGroups(List.of())
-                .build());
-        });
-    }
-
-    @Test
     @DisplayName("메뉴 등록 시, 1개 이상의 옵션 그룹이 존재하고 각 옵션 그룹에 옵션이 1개 이상이라면 메뉴 등록 성공")
     void givenMenuWithNotEmptyOptionGroup_whenAddNewMenu_thenSuccess() {
         memoryShopRepository.save(ShopJpaEntity.builder().name("bbq").build());
@@ -81,7 +66,6 @@ public class MenuCRUDTest {
             menuService.registerMenu(MenuSaveRequest.builder()
                 .name("황금올리브")
                 .shopId(1L)
-                .optionGroups(List.of(optionGroup))
                 .build());
         });
     }
@@ -97,11 +81,11 @@ public class MenuCRUDTest {
             .maxNumOfSelect(1)
             .build();
         menuService.registerMenu(MenuSaveRequest.builder()
-            .name("황금올리브").shopId(1L).optionGroups(List.of(optionGroup)).build());
+            .name("황금올리브").shopId(1L).build());
 
         Assertions.assertThrows(DuplicateMenuException.class, () -> {
             menuService.registerMenu(MenuSaveRequest.builder()
-                .name("황금올리브").shopId(1L).optionGroups(List.of(optionGroup)).build());
+                .name("황금올리브").shopId(1L).build());
         });
     }
 
@@ -120,7 +104,6 @@ public class MenuCRUDTest {
             menuService.registerMenu(MenuSaveRequest.builder()
                 .name("황올 세트 " + i + "번")
                 .shopId(1L)
-                .optionGroups(List.of(optionGroup))
                 .build());
         }
 
@@ -178,7 +161,6 @@ public class MenuCRUDTest {
                 .menuId(1L)
                 .shopId(1L)
                 .name("양념치킨")
-                .optionGroups(List.of(optionGroupUpdateRequest))
                 .build());
         });
         assertThat(memoryMenuRepository.findById(1L).get().getName())

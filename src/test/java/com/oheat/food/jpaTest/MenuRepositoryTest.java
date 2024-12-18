@@ -113,8 +113,8 @@ public class MenuRepositoryTest {
 
         // 저장 과정에서 예외 발생 X
         Assertions.assertDoesNotThrow(() -> {
-            menu.addOptionGroup(optionGroup);
             menuJpaRepository.save(menu);
+            optionGroupJpaRepository.save(optionGroup);
             optionJpaRepository.save(option);
         });
         entityManager.clear();
@@ -150,13 +150,11 @@ public class MenuRepositoryTest {
         categoryJpaRepository.save(category);
         shopJpaRepository.save(shop);
 
-        // 옵션 그룹 2개
-        menu.addOptionGroup(optionGroup1);
-        menu.addOptionGroup(optionGroup2);
-
         // 메뉴 저장
         menuJpaRepository.save(menu);
-
+        // 옵션 그룹 2개
+        optionGroupJpaRepository.save(optionGroup1);
+        optionGroupJpaRepository.save(optionGroup2);
         // 각 옵션 그룹마다 옵션 2개씩
         optionJpaRepository.save(option1);
         optionJpaRepository.save(option2);
@@ -185,13 +183,12 @@ public class MenuRepositoryTest {
 
         categoryJpaRepository.save(category);
         shopJpaRepository.save(shop);
-
-        optionGroup.addOption(option);
-        menu.addOptionGroup(optionGroup);
         menuJpaRepository.save(menu);
+        optionGroupJpaRepository.save(optionGroup);
         optionJpaRepository.save(option);
 
-        menuJpaRepository.delete(menu);
+        entityManager.clear();
+        menuJpaRepository.deleteById(1L);
 
         List<MenuJpaEntity> menuResult = menuJpaRepository.findAll();
         List<OptionGroupJpaEntity> optionGroupResult = optionGroupJpaRepository.findAll();

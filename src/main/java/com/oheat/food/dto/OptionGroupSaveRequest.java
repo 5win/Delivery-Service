@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class OptionGroupSaveRequest {
 
+    private final Long menuId;
     private final String name;
     private final boolean required;
     private final int maxNumOfSelect;

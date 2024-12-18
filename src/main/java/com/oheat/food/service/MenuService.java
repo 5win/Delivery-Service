@@ -2,6 +2,8 @@ package com.oheat.food.service;
 
 import com.oheat.food.dto.MenuSaveRequest;
 import com.oheat.food.dto.MenuUpdateRequest;
+import com.oheat.food.dto.OptionGroupSaveRequest;
+import com.oheat.food.dto.OptionGroupUpdateRequest;
 import com.oheat.food.dto.OptionSaveRequest;
 import com.oheat.food.dto.OptionUpdateRequest;
 import com.oheat.food.entity.MenuJpaEntity;
@@ -9,7 +11,6 @@ import com.oheat.food.entity.OptionGroupJpaEntity;
 import com.oheat.food.entity.OptionJpaEntity;
 import com.oheat.food.entity.ShopJpaEntity;
 import com.oheat.food.exception.MenuNotExistsException;
-import com.oheat.food.exception.NoOptionGroupException;
 import com.oheat.food.exception.OptionGroupNotExistsException;
 import com.oheat.food.exception.OptionNotExistsException;
 import com.oheat.food.exception.ShopNotExistsException;
@@ -38,9 +39,6 @@ public class MenuService {
 
         MenuJpaEntity menu = saveRequest.toEntity(shop);
         shop.addMenu(menu);
-        if (menu.isOptionGroupsEmpty()) {
-            throw new NoOptionGroupException();
-        }
         menuRepository.save(menu);
     }
 
@@ -65,6 +63,30 @@ public class MenuService {
         menuRepository.findById(menuId)
             .orElseThrow(MenuNotExistsException::new);
         menuRepository.deleteById(menuId);
+    }
+
+    // option group CRUD
+    public void registerOptionGroup(OptionGroupSaveRequest saveRequest) {
+        MenuJpaEntity menu = menuRepository.findById(saveRequest.getMenuId())
+            .orElseThrow(MenuNotExistsException::new);
+
+        optionGroupRepository.save(saveRequest.toEntity(menu));
+    }
+
+    @Transactional
+    public void updateOptionGroup(OptionGroupUpdateRequest updateRequest) {
+        OptionGroupJpaEntity optionGroup = optionGroupRepository.findById(
+                updateRequest.getOptionGroupId())
+            .orElseThrow(OptionGroupNotExistsException::new);
+
+        optionGroup.updateOptionGroupInfo(updateRequest);
+    }
+
+    public void deleteOptionGroup(Long optionGroupId) {
+        OptionGroupJpaEntity optionGroup = optionGroupRepository.findById(optionGroupId)
+            .orElseThrow(OptionGroupNotExistsException::new);
+
+        optionGroupRepository.delete(optionGroup);
     }
 
     // option CRUD
