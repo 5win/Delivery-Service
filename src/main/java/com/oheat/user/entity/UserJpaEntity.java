@@ -1,5 +1,6 @@
 package com.oheat.user.entity;
 
+import com.oheat.common.BaseTimeEntity;
 import com.oheat.user.constant.Role;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -15,10 +16,10 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@EqualsAndHashCode(exclude = {"password", "address", "role"})
+@EqualsAndHashCode(exclude = {"password", "address", "role"}, callSuper = true)
 @Entity
 @Table(name = "user")
-public class UserJpaEntity {
+public class UserJpaEntity extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
