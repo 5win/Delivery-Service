@@ -6,12 +6,16 @@ import com.oheat.food.dto.MenuSaveRequest;
 import com.oheat.food.dto.MenuUpdateRequest;
 import com.oheat.food.dto.OptionGroupSaveRequest;
 import com.oheat.food.dto.OptionGroupUpdateRequest;
+import com.oheat.food.dto.OptionSaveRequest;
+import com.oheat.food.dto.OptionUpdateRequest;
 import com.oheat.food.entity.MenuJpaEntity;
 import com.oheat.food.entity.OptionGroupJpaEntity;
+import com.oheat.food.entity.OptionJpaEntity;
 import com.oheat.food.entity.ShopJpaEntity;
 import com.oheat.food.exception.DuplicateMenuException;
 import com.oheat.food.exception.MenuNotExistsException;
 import com.oheat.food.exception.OptionGroupNotExistsException;
+import com.oheat.food.exception.OptionNotExistsException;
 import com.oheat.food.exception.ShopNotExistsException;
 import com.oheat.food.fake.MemoryMenuRepository;
 import com.oheat.food.fake.MemoryOptionGroupRepository;
@@ -260,4 +264,102 @@ public class MenuCRUDTest {
         });
     }
 
+    // Option CRUD Test
+    @Test
+    @DisplayName("옵션 생성 시 옵션그룹이 존재하지 않으면, OptionGroupNotExistsException")
+    void whenRegisterOptionWithWrongOptionGroupId_thenThrowOptionGroupNotExistsException() {
+        OptionSaveRequest saveRequest = OptionSaveRequest.builder()
+            .optionGroupId(1L).name("순살").build();
+
+        Assertions.assertThrows(OptionGroupNotExistsException.class, () -> {
+            menuService.registerOption(saveRequest);
+        });
+    }
+
+    @Test
+    @DisplayName("옵션그룹이 존재하면, 옵션 생성 성공")
+    void whenRegisterOption_thenSuccess() {
+        MenuJpaEntity menu = MenuJpaEntity.builder().name("황금올리브").build();
+        OptionGroupJpaEntity optionGroup = OptionGroupJpaEntity.builder()
+            .menu(menu).name("부분육 선택").required(true).maxNumOfSelect(1).build();
+
+        memoryMenuRepository.save(menu);
+        memoryOptionGroupRepository.save(optionGroup);
+
+        OptionSaveRequest saveRequest = OptionSaveRequest.builder()
+            .optionGroupId(1L).name("순살").build();
+
+        Assertions.assertDoesNotThrow(() -> {
+            menuService.registerOption(saveRequest);
+        });
+    }
+
+    @Test
+    @DisplayName("옵션 수정 시 옵션이 존재하지 않으면, OptionNotExistsException")
+    void whenUpdateNotExistsOption_thenThrowOptionNotExistsException() {
+        MenuJpaEntity menu = MenuJpaEntity.builder().name("황금올리브").build();
+        OptionGroupJpaEntity optionGroup = OptionGroupJpaEntity.builder()
+            .menu(menu).name("부분육 선택").required(true).maxNumOfSelect(1).build();
+
+        memoryMenuRepository.save(menu);
+        memoryOptionGroupRepository.save(optionGroup);
+
+        OptionUpdateRequest updateRequest = OptionUpdateRequest.builder()
+            .optionId(1L).name("닭다리").price(9999).build();
+
+        Assertions.assertThrows(OptionNotExistsException.class, () -> {
+            menuService.updateOption(updateRequest);
+        });
+    }
+
+    @Test
+    @DisplayName("옵션 수정을 성공하면, 조회 시 수정된 정보로 조회되어야 함")
+    void whenUpdateOptionSuccess_thenChangedOptionInfo() {
+        MenuJpaEntity menu = MenuJpaEntity.builder().name("황금올리브").build();
+        OptionGroupJpaEntity optionGroup = OptionGroupJpaEntity.builder()
+            .menu(menu).name("부분육 선택").required(true).maxNumOfSelect(1).build();
+        OptionJpaEntity option = OptionJpaEntity.builder()
+            .optionGroup(optionGroup).name("순살").price(7000).build();
+
+        memoryMenuRepository.save(menu);
+        memoryOptionGroupRepository.save(optionGroup);
+        memoryOptionRepository.save(option);
+
+        OptionUpdateRequest updateRequest = OptionUpdateRequest.builder()
+            .optionId(1L).name("닭다리").price(9999).build();
+
+        Assertions.assertDoesNotThrow(() -> {
+            menuService.updateOption(updateRequest);
+        });
+
+        OptionJpaEntity result = memoryOptionRepository.findById(1L).get();
+        assertThat(result.getName()).isEqualTo("닭다리");
+        assertThat(result.getPrice()).isEqualTo(9999);
+    }
+
+    @Test
+    @DisplayName("옵션 삭제 시 옵션이 존재하지 않으면, OptionNotExistsException")
+    void whenDeleteNotExistsOption_thenThrowOptionpNotExistsException() {
+        Assertions.assertThrows(OptionNotExistsException.class, () -> {
+            menuService.deleteOption(1L);
+        });
+    }
+
+    @Test
+    @DisplayName("옵션이 존재하면 삭제 성공")
+    void whenDeleteOption_thenSuccess() {
+        MenuJpaEntity menu = MenuJpaEntity.builder().name("황금올리브").build();
+        OptionGroupJpaEntity optionGroup = OptionGroupJpaEntity.builder()
+            .menu(menu).name("부분육 선택").required(true).maxNumOfSelect(1).build();
+        OptionJpaEntity option = OptionJpaEntity.builder()
+            .optionGroup(optionGroup).name("순살").price(7000).build();
+
+        memoryMenuRepository.save(menu);
+        memoryOptionGroupRepository.save(optionGroup);
+        memoryOptionRepository.save(option);
+
+        Assertions.assertDoesNotThrow(() -> {
+            menuService.deleteOption(1L);
+        });
+    }
 }
