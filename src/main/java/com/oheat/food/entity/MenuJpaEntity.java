@@ -2,8 +2,6 @@ package com.oheat.food.entity;
 
 import com.oheat.common.BaseTimeEntity;
 import com.oheat.food.dto.MenuUpdateRequest;
-import com.oheat.food.exception.NoOptionException;
-import com.oheat.food.exception.NoOptionGroupException;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -51,7 +49,7 @@ public class MenuJpaEntity extends BaseTimeEntity {
     @JoinColumn(name = "shop_id", nullable = false)
     private ShopJpaEntity shop;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "menu", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "menu", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<OptionGroupJpaEntity> optionGroups = new ArrayList<>();
 
     public void addOptionGroup(OptionGroupJpaEntity optionGroup) {
@@ -61,29 +59,9 @@ public class MenuJpaEntity extends BaseTimeEntity {
     public void updateMenu(MenuUpdateRequest updateRequest) {
         this.name = updateRequest.getName();
         this.price = updateRequest.getPrice();
-        this.optionGroups.clear();
-        updateRequest.getOptionGroups().forEach(optionGroupUpdateRequest -> {
-            this.optionGroups.add(optionGroupUpdateRequest.toEntity(this));
-        });
-
-        if (isOptionGroupsEmpty()) {
-            throw new NoOptionGroupException();
-        }
-        if (isEmptyOptionGroupExists()) {
-            throw new NoOptionException();
-        }
     }
 
     public boolean isOptionGroupsEmpty() {
         return optionGroups.isEmpty();
-    }
-
-    public boolean isEmptyOptionGroupExists() {
-        for (OptionGroupJpaEntity optionGroup : optionGroups) {
-            if (optionGroup.isOptionsEmpty()) {
-                return true;
-            }
-        }
-        return false;
     }
 }
