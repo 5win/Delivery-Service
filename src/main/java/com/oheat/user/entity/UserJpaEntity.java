@@ -1,6 +1,7 @@
 package com.oheat.user.entity;
 
 import com.oheat.common.BaseTimeEntity;
+import com.oheat.food.entity.ShopJpaEntity;
 import com.oheat.order.entity.CartJpaEntity;
 import com.oheat.user.constant.Role;
 import jakarta.persistence.Column;
@@ -53,5 +54,17 @@ public class UserJpaEntity extends BaseTimeEntity {
         this.password = password;
         this.address = address;
         this.role = role;
+    }
+
+    public void addToCart(CartJpaEntity cart) {
+        cart.changeUser(this);
+        this.cart.add(cart);
+    }
+
+    public boolean hasOtherShopMenuInCart(ShopJpaEntity shop) {
+        if (cart.isEmpty()) {
+            return false;
+        }
+        return !cart.getFirst().getShop().equals(shop);
     }
 }

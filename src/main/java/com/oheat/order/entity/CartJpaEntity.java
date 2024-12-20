@@ -2,6 +2,7 @@ package com.oheat.order.entity;
 
 import com.oheat.common.BaseTimeEntity;
 import com.oheat.food.entity.MenuJpaEntity;
+import com.oheat.food.entity.ShopJpaEntity;
 import com.oheat.user.entity.UserJpaEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -40,6 +41,10 @@ public class CartJpaEntity extends BaseTimeEntity {
     private UserJpaEntity user;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "shop_id", nullable = false)
+    private ShopJpaEntity shop;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "menu_id", nullable = false)
     private MenuJpaEntity menu;
 
@@ -47,9 +52,14 @@ public class CartJpaEntity extends BaseTimeEntity {
     private List<CartOptionGroup> cartOptionGroup = new ArrayList<>();
 
     @Builder
-    public CartJpaEntity(int amount, UserJpaEntity user, MenuJpaEntity menu) {
+    public CartJpaEntity(int amount, UserJpaEntity user, ShopJpaEntity shop, MenuJpaEntity menu) {
         this.amount = amount;
         this.user = user;
+        this.shop = shop;
         this.menu = menu;
+    }
+
+    public void changeUser(UserJpaEntity user) {
+        this.user = user;
     }
 }
