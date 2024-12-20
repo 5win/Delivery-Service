@@ -1,5 +1,9 @@
 package com.oheat.order.dto;
 
+import com.oheat.food.entity.MenuJpaEntity;
+import com.oheat.food.entity.ShopJpaEntity;
+import com.oheat.order.entity.CartJpaEntity;
+import com.oheat.user.entity.UserJpaEntity;
 import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
@@ -14,6 +18,15 @@ public class CartSaveRequest {
     private final Long menuId;
     private final List<CartOptionGroupSaveRequest> optionGroups;
     private final int amount;
+
+    public CartJpaEntity toEntity(UserJpaEntity user, ShopJpaEntity shop, MenuJpaEntity menu) {
+        return CartJpaEntity.builder()
+            .amount(this.amount)
+            .user(user)
+            .shop(shop)
+            .menu(menu)
+            .build();
+    }
 
     @Getter
     @Builder

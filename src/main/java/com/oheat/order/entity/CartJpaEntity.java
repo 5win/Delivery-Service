@@ -68,7 +68,7 @@ public class CartJpaEntity extends BaseTimeEntity {
         this.amount += amount;
     }
 
-    public void addOptionGroup(CartOptionGroup cartOptionGroup) {
+    public void addCartOptionGroup(CartOptionGroup cartOptionGroup) {
         cartOptionGroup.setCart(this);
         this.cartOptionGroups.add(cartOptionGroup);
     }
