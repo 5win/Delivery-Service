@@ -46,7 +46,7 @@ public class UserJpaEntity extends BaseTimeEntity {
     private Role role;
 
     @OneToMany(mappedBy = "user")
-    private List<CartJpaEntity> cart = new ArrayList<>();
+    private List<CartJpaEntity> carts = new ArrayList<>();
 
     @Builder
     public UserJpaEntity(String username, String password, String address, Role role) {
@@ -58,13 +58,13 @@ public class UserJpaEntity extends BaseTimeEntity {
 
     public void addToCart(CartJpaEntity cart) {
         cart.changeUser(this);
-        this.cart.add(cart);
+        this.carts.add(cart);
     }
 
     public boolean hasOtherShopMenuInCart(ShopJpaEntity shop) {
-        if (cart.isEmpty()) {
+        if (carts.isEmpty()) {
             return false;
         }
-        return !cart.getFirst().getShop().equals(shop);
+        return !carts.getFirst().getShop().equals(shop);
     }
 }

@@ -4,6 +4,7 @@ import com.oheat.common.BaseTimeEntity;
 import com.oheat.food.entity.MenuJpaEntity;
 import com.oheat.food.entity.ShopJpaEntity;
 import com.oheat.user.entity.UserJpaEntity;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -48,8 +49,8 @@ public class CartJpaEntity extends BaseTimeEntity {
     @JoinColumn(name = "menu_id", nullable = false)
     private MenuJpaEntity menu;
 
-    @OneToMany(mappedBy = "cart")
-    private List<CartOptionGroup> cartOptionGroup = new ArrayList<>();
+    @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL)
+    private List<CartOptionGroup> cartOptionGroups = new ArrayList<>();
 
     @Builder
     public CartJpaEntity(int amount, UserJpaEntity user, ShopJpaEntity shop, MenuJpaEntity menu) {
@@ -61,5 +62,14 @@ public class CartJpaEntity extends BaseTimeEntity {
 
     public void changeUser(UserJpaEntity user) {
         this.user = user;
+    }
+
+    public void increaseAmount(int amount) {
+        this.amount += amount;
+    }
+
+    public void addOptionGroup(CartOptionGroup cartOptionGroup) {
+        cartOptionGroup.setCart(this);
+        this.cartOptionGroups.add(cartOptionGroup);
     }
 }

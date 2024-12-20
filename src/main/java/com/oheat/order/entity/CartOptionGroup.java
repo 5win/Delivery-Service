@@ -2,6 +2,7 @@ package com.oheat.order.entity;
 
 import com.oheat.common.BaseTimeEntity;
 import com.oheat.food.entity.OptionGroupJpaEntity;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -38,12 +39,21 @@ public class CartOptionGroup extends BaseTimeEntity {
     @JoinColumn(name = "option_group_id", nullable = false)
     private OptionGroupJpaEntity optionGroup;
 
-    @OneToMany(mappedBy = "cartOptionGroup")
-    private List<CartOptionGroupOption> cartOptionGroupOption = new ArrayList<>();
+    @OneToMany(mappedBy = "cartOptionGroup", cascade = CascadeType.ALL)
+    private List<CartOptionGroupOption> cartOptionGroupOptions = new ArrayList<>();
 
     @Builder
     public CartOptionGroup(CartJpaEntity cart, OptionGroupJpaEntity optionGroup) {
         this.cart = cart;
         this.optionGroup = optionGroup;
+    }
+
+    public void setCart(CartJpaEntity cart) {
+        this.cart = cart;
+    }
+
+    public void addOption(CartOptionGroupOption option) {
+        option.setCartOptionGroup(this);
+        this.cartOptionGroupOptions.add((option));
     }
 }

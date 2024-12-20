@@ -40,4 +40,8 @@ public class CartOptionGroupOption extends BaseTimeEntity {
         this.cartOptionGroup = cartOptionGroup;
         this.option = option;
     }
+
+    public void setCartOptionGroup(CartOptionGroup cartOptionGroup) {
+        this.cartOptionGroup = cartOptionGroup;
+    }
 }

@@ -13,6 +13,7 @@ public class CartSaveRequest {
     private final Long shopId;
     private final Long menuId;
     private final List<CartOptionGroupSaveRequest> optionGroups;
+    private final int amount;
 
     @Getter
     @Builder

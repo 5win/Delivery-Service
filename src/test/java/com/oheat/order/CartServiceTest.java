@@ -20,6 +20,7 @@ import com.oheat.order.dto.CartSaveRequest;
 import com.oheat.order.dto.CartSaveRequest.CartOptionGroupSaveRequest;
 import com.oheat.order.entity.CartJpaEntity;
 import com.oheat.order.exception.OtherShopMenuAlreadyExistsException;
+import com.oheat.order.repository.CartRepository;
 import com.oheat.order.service.CartService;
 import com.oheat.user.MemoryUserRepository;
 import com.oheat.user.entity.UserJpaEntity;
@@ -39,12 +40,14 @@ public class CartServiceTest {
     private final MenuRepository memoryMenuRepository = new MemoryMenuRepository();
     private final OptionGroupRepository memoryOptionGroupRepository = new MemoryOptionGroupRepository();
     private final OptionRepository memoryOptionRepository = new MemoryOptionRepository();
+    private final CartRepository memoryCartRepository = new MemoryCartRepository();
     private CartService cartService;
 
     @BeforeEach
     void setUp() {
         cartService = new CartService(memoryUserRepository, memoryShopRepository,
-            memoryMenuRepository, memoryOptionGroupRepository, memoryOptionRepository);
+            memoryMenuRepository, memoryOptionGroupRepository, memoryOptionRepository,
+            memoryCartRepository);
     }
 
     // Create Test
@@ -207,20 +210,6 @@ public class CartServiceTest {
         Assertions.assertDoesNotThrow(() -> {
             cartService.registerCart("username", saveRequest);
         });
-    }
-
-    @Disabled
-    @Test
-    @DisplayName("기존에 추가된 메뉴와 추가할 메뉴, 옵션그룹, 옵션 중 하나라도 다르면, 새로 장바구니에 추가한다")
-    void givenDifferentMenuAndOption_whenAddToCart_thenAddNewCartItem() {
-
-    }
-
-    @Disabled
-    @Test
-    @DisplayName("옵션그룹과 옵션이 모두 같은 메뉴가 이미 추가되어 있으면, 기존 정보에서 개수만 증가시킨다")
-    void test7() {
-
     }
 
     // Read Test
