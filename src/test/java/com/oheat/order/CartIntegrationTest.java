@@ -37,7 +37,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class CartIntegrationTest {
 
     @Autowired
-    UserJpaRepository userJpaRepository;
+    private UserJpaRepository userJpaRepository;
     @Autowired
     private CategoryJpaRepository categoryJpaRepository;
     @Autowired
