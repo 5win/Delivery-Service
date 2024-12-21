@@ -1,7 +1,6 @@
 package com.oheat.order.service;
 
 import com.oheat.food.entity.MenuJpaEntity;
-import com.oheat.food.entity.OptionGroupJpaEntity;
 import com.oheat.food.entity.OptionJpaEntity;
 import com.oheat.food.entity.ShopJpaEntity;
 import com.oheat.food.exception.MenuNotExistsException;
@@ -13,6 +12,7 @@ import com.oheat.food.repository.OptionGroupRepository;
 import com.oheat.food.repository.OptionRepository;
 import com.oheat.food.repository.ShopRepository;
 import com.oheat.order.dto.CartSaveRequest;
+import com.oheat.order.dto.CartSaveRequest.CartOptionGroupSaveRequest;
 import com.oheat.order.entity.CartJpaEntity;
 import com.oheat.order.entity.CartOptionGroup;
 import com.oheat.order.entity.CartOptionGroupOption;
@@ -66,34 +66,43 @@ public class CartService {
 
     }
 
-    private Optional<CartJpaEntity> generateCart(CartSaveRequest saveRequest, UserJpaEntity user,
+    private Optional<CartJpaEntity> generateCart(CartSaveRequest cartInfo, UserJpaEntity user,
         ShopJpaEntity shop, MenuJpaEntity menu) {
-        CartJpaEntity cart = saveRequest.toEntity(user, shop, menu);
 
-        saveRequest.getOptionGroups().forEach(groupInfo -> {
-            OptionGroupJpaEntity optionGroup = optionGroupRepository
-                .findById(groupInfo.getOptionGroupId())
-                .orElseThrow(OptionGroupNotExistsException::new);
+        CartJpaEntity cart = cartInfo.toEntity(user, shop, menu);
 
-            CartOptionGroup cartOptionGroup = CartOptionGroup.builder()
-                .cart(cart)
-                .optionGroup(optionGroup)
-                .build();
-
-            groupInfo.getOptions().forEach(optionId -> {
-                OptionJpaEntity option = optionRepository.findById(optionId)
-                    .orElseThrow(OptionNotExistsException::new);
-
-                CartOptionGroupOption cartOption = CartOptionGroupOption.builder()
-                    .cartOptionGroup(cartOptionGroup)
-                    .option(option)
-                    .build();
-
-                cartOptionGroup.addCartOption(cartOption);
-            });
-            cart.addCartOptionGroup(cartOptionGroup);
-        });
+        for (var groupInfo : cartInfo.getOptionGroups()) {
+            cart.addCartOptionGroup(
+                generateCartOptionGroup(cart, groupInfo)
+            );
+        }
         return Optional.of(cart);
+    }
+
+    private CartOptionGroup generateCartOptionGroup(CartJpaEntity cart,
+        CartOptionGroupSaveRequest groupInfo) {
+
+        CartOptionGroup cartOptionGroup = CartOptionGroup.builder()
+            .cart(cart)
+            .optionGroup(optionGroupRepository.findById(groupInfo.getOptionGroupId())
+                .orElseThrow(OptionGroupNotExistsException::new))
+            .build();
+
+        for (var optionId : groupInfo.getOptions()) {
+            cartOptionGroup.addCartOption(
+                generateCartOptionGroupOption(cartOptionGroup, optionId)
+            );
+        }
+        return cartOptionGroup;
+    }
+
+    private CartOptionGroupOption generateCartOptionGroupOption(CartOptionGroup cartOptionGroup,
+        Long optionId) {
+        return CartOptionGroupOption.builder()
+            .cartOptionGroup(cartOptionGroup)
+            .option(optionRepository.findById(optionId)
+                .orElseThrow(OptionNotExistsException::new))
+            .build();
     }
 
     /**
