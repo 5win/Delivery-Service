@@ -96,27 +96,39 @@ public class CartService {
         return Optional.of(cart);
     }
 
+    /**
+     * 장바구니에서 동일한 항목을 찾아 반환하는 메서드
+     *
+     * @param newCart
+     * @return 존재하면 해당 항목을 담아서 반환
+     */
     private Optional<CartJpaEntity> findSameCartItem(CartJpaEntity newCart) {
         List<CartJpaEntity> carts = cartRepository
             .findAllByUserAndMenu(newCart.getUser(), newCart.getMenu());
 
-        List<CartOptionGroup> sortedCartOptionGroup = newCart.getCartOptionGroups().stream()
-            .sorted(Comparator.comparing(v -> v.getOptionGroup().getId()))
-            .toList();
-
+        // 유저의 장바구니에 동일한 항목이 존재하는지 확인
         for (CartJpaEntity cart : carts) {
-            if (checkOptionGroupSame(cart.getCartOptionGroups(), sortedCartOptionGroup)) {
+            if (checkOptionGroupSame(cart.getCartOptionGroups(), newCart.getCartOptionGroups())) {
                 return Optional.of(cart);
             }
         }
         return Optional.empty();
     }
 
+    /**
+     * 두 장바구니 항목의 옵션 그룹이 동일한지 검증하는 메서드
+     *
+     * @param list1
+     * @param list2
+     * @return 동일하면 true, 동일하지 않으면 false
+     */
     private boolean checkOptionGroupSame(List<CartOptionGroup> list1, List<CartOptionGroup> list2) {
+        // 옵션 그룹의 개수가 다르면, false
         if (list1.size() != list2.size()) {
             return false;
         }
 
+        // 옵션 그룹 id로 정렬
         List<CartOptionGroup> sortedList1 = list1.stream()
             .sorted(Comparator.comparing(v -> v.getOptionGroup().getId()))
             .toList();
@@ -128,9 +140,11 @@ public class CartService {
             final CartOptionGroup cartGroup1 = sortedList1.get(i);
             final CartOptionGroup cartGroup2 = sortedList2.get(i);
 
-            if (!cartGroup1.getOptionGroup().getId().equals(cartGroup2.getOptionGroup().getId())) {
+            // 옵션 그룹이 하나라도 같지 않으면, false
+            if (!cartGroup1.getOptionGroup().equals(cartGroup2.getOptionGroup())) {
                 return false;
             }
+            // 옵션 그룹에 속한 옵션들이 동일하지 않으면, false
             if (!checkOptionSame(
                 cartGroup1.getCartOptionGroupOptions(),
                 cartGroup2.getCartOptionGroupOptions())) {
@@ -140,12 +154,21 @@ public class CartService {
         return true;
     }
 
+    /**
+     * 두 옵션 그룹의 선택된 옵션들이 동일한지 검증하는 메서드
+     *
+     * @param list1
+     * @param list2
+     * @return 동일하면 true, 그렇지 않으면 false
+     */
     private boolean checkOptionSame(List<CartOptionGroupOption> list1,
         List<CartOptionGroupOption> list2) {
+        // 옵션 개수가 다르면, false
         if (list1.size() != list2.size()) {
             return false;
         }
 
+        // 옵션들을 id로 정렬
         List<CartOptionGroupOption> sortedList1 = list1.stream()
             .sorted(Comparator.comparing(v -> v.getOption().getId()))
             .toList();
@@ -154,8 +177,9 @@ public class CartService {
             .toList();
 
         for (int i = 0; i < sortedList1.size(); i++) {
-            OptionJpaEntity option1 = sortedList1.get(i).getOption();
-            OptionJpaEntity option2 = sortedList2.get(i).getOption();
+            final OptionJpaEntity option1 = sortedList1.get(i).getOption();
+            final OptionJpaEntity option2 = sortedList2.get(i).getOption();
+            // 옵션이 하나라도 같지 않으면, false
             if (!option1.equals(option2)) {
                 return false;
             }
