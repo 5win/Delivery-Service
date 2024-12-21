@@ -22,14 +22,17 @@ import com.oheat.order.service.CartService;
 import com.oheat.user.constant.Role;
 import com.oheat.user.entity.UserJpaEntity;
 import com.oheat.user.repository.UserJpaRepository;
+import jakarta.persistence.EntityManager;
 import java.util.List;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
 
+@Transactional
 @SpringBootTest
 public class CartIntegrationTest {
 
@@ -47,9 +50,25 @@ public class CartIntegrationTest {
     private OptionJpaRepository optionJpaRepository;
     @Autowired
     private CartJpaRepository cartJpaRepository;
+    @Autowired
+    private EntityManager entityManager;
 
     @Autowired
     private CartService cartService;
+
+    @AfterEach
+    void tearDown() {
+        entityManager.createNativeQuery("ALTER TABLE shop ALTER COLUMN id RESTART WITH 1")
+            .executeUpdate();
+        entityManager.createNativeQuery("ALTER TABLE menu ALTER COLUMN id RESTART WITH 1")
+            .executeUpdate();
+        entityManager.createNativeQuery("ALTER TABLE option_group ALTER COLUMN id RESTART WITH 1")
+            .executeUpdate();
+        entityManager.createNativeQuery("ALTER TABLE option ALTER COLUMN id RESTART WITH 1")
+            .executeUpdate();
+        entityManager.createNativeQuery("ALTER TABLE cart ALTER COLUMN id RESTART WITH 1")
+            .executeUpdate();
+    }
 
     @Test
     @DisplayName("옵션그룹과 옵션이 모두 같은 메뉴가 이미 추가되어 있으면, 기존 정보에서 개수만 증가시킨다")
@@ -173,7 +192,6 @@ public class CartIntegrationTest {
         assertThat(result.getAmount()).isEqualTo(3);
     }
 
-    @Disabled
     @Test
     @DisplayName("기존에 추가된 메뉴와 추가할 메뉴, 옵션그룹, 옵션 중 하나라도 다르면, 새로 장바구니에 추가한다")
     void givenDifferentMenuAndOption_whenAddToCart_thenAddNewCartItem() {
@@ -273,6 +291,7 @@ public class CartIntegrationTest {
         cartJpaRepository.save(cart);
 
         // 새로 장바구니에 담는 작업 시작
+        // 두 번째 옵션 그룹의 옵션이 1개 다르므로, 별도로 저장되어야 함
         CartSaveRequest saveRequest = CartSaveRequest.builder()
             .shopId(1L)
             .menuId(1L)

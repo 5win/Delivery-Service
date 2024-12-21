@@ -63,7 +63,7 @@ public class CartService {
                 .increaseAmount(saveRequest.getAmount());
             return;
         }
-
+        cartRepository.save(cart);
     }
 
     private Optional<CartJpaEntity> generateCart(CartSaveRequest cartInfo, UserJpaEntity user,

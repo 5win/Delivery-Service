@@ -49,7 +49,7 @@ public class CartJpaEntity extends BaseTimeEntity {
     @JoinColumn(name = "menu_id", nullable = false)
     private MenuJpaEntity menu;
 
-    @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CartOptionGroup> cartOptionGroups = new ArrayList<>();
 
     @Builder

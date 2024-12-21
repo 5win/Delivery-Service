@@ -39,7 +39,7 @@ public class CartOptionGroup extends BaseTimeEntity {
     @JoinColumn(name = "option_group_id", nullable = false)
     private OptionGroupJpaEntity optionGroup;
 
-    @OneToMany(mappedBy = "cartOptionGroup", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "cartOptionGroup", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CartOptionGroupOption> cartOptionGroupOptions = new ArrayList<>();
 
     @Builder
