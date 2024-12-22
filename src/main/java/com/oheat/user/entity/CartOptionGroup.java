@@ -1,4 +1,4 @@
-package com.oheat.order.entity;
+package com.oheat.user.entity;
 
 import com.oheat.common.BaseTimeEntity;
 import com.oheat.food.entity.OptionGroupJpaEntity;

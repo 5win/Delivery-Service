@@ -1,4 +1,4 @@
-package com.oheat.order;
+package com.oheat.user;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -12,16 +12,16 @@ import com.oheat.food.repository.MenuJpaRepository;
 import com.oheat.food.repository.OptionGroupJpaRepository;
 import com.oheat.food.repository.OptionJpaRepository;
 import com.oheat.food.repository.ShopJpaRepository;
-import com.oheat.order.dto.CartSaveRequest;
-import com.oheat.order.dto.CartSaveRequest.CartOptionGroupSaveRequest;
-import com.oheat.order.entity.CartJpaEntity;
-import com.oheat.order.entity.CartOptionGroup;
-import com.oheat.order.entity.CartOptionGroupOption;
-import com.oheat.order.repository.CartJpaRepository;
-import com.oheat.order.service.CartService;
 import com.oheat.user.constant.Role;
+import com.oheat.user.dto.CartSaveRequest;
+import com.oheat.user.dto.CartSaveRequest.CartOptionGroupSaveRequest;
+import com.oheat.user.entity.CartJpaEntity;
+import com.oheat.user.entity.CartOptionGroup;
+import com.oheat.user.entity.CartOptionGroupOption;
 import com.oheat.user.entity.UserJpaEntity;
+import com.oheat.user.repository.CartJpaRepository;
 import com.oheat.user.repository.UserJpaRepository;
+import com.oheat.user.service.CartService;
 import jakarta.persistence.EntityManager;
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;

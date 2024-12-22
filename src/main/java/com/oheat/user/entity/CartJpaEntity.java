@@ -1,9 +1,8 @@
-package com.oheat.order.entity;
+package com.oheat.user.entity;
 
 import com.oheat.common.BaseTimeEntity;
 import com.oheat.food.entity.MenuJpaEntity;
 import com.oheat.food.entity.ShopJpaEntity;
-import com.oheat.user.entity.UserJpaEntity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

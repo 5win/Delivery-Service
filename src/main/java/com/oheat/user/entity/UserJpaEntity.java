@@ -2,7 +2,6 @@ package com.oheat.user.entity;
 
 import com.oheat.common.BaseTimeEntity;
 import com.oheat.food.entity.ShopJpaEntity;
-import com.oheat.order.entity.CartJpaEntity;
 import com.oheat.user.constant.Role;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

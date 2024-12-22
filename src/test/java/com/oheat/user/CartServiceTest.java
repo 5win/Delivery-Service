@@ -1,4 +1,4 @@
-package com.oheat.order;
+package com.oheat.user;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -20,19 +20,18 @@ import com.oheat.food.repository.MenuRepository;
 import com.oheat.food.repository.OptionGroupRepository;
 import com.oheat.food.repository.OptionRepository;
 import com.oheat.food.repository.ShopRepository;
-import com.oheat.order.dto.CartSaveRequest;
-import com.oheat.order.dto.CartSaveRequest.CartOptionGroupSaveRequest;
-import com.oheat.order.entity.CartJpaEntity;
-import com.oheat.order.entity.CartOptionGroup;
-import com.oheat.order.entity.CartOptionGroupOption;
-import com.oheat.order.exception.CartNotExistsException;
-import com.oheat.order.exception.OtherShopMenuAlreadyExistsException;
-import com.oheat.order.repository.CartRepository;
-import com.oheat.order.service.CartService;
-import com.oheat.user.MemoryUserRepository;
+import com.oheat.user.dto.CartSaveRequest;
+import com.oheat.user.dto.CartSaveRequest.CartOptionGroupSaveRequest;
+import com.oheat.user.entity.CartJpaEntity;
+import com.oheat.user.entity.CartOptionGroup;
+import com.oheat.user.entity.CartOptionGroupOption;
 import com.oheat.user.entity.UserJpaEntity;
+import com.oheat.user.exception.CartNotExistsException;
+import com.oheat.user.exception.OtherShopMenuAlreadyExistsException;
 import com.oheat.user.exception.UserNotExistsException;
+import com.oheat.user.repository.CartRepository;
 import com.oheat.user.repository.UserRepository;
+import com.oheat.user.service.CartService;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Assertions;
