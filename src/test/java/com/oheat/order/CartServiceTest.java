@@ -266,21 +266,6 @@ public class CartServiceTest {
         assertThat(option1Result.getName()).isEqualTo("윙,봉 콤보");
     }
 
-    // Update Test
-    @Disabled
-    @Test
-    @DisplayName("메뉴의 수정된 옵션으로 장바구니에 담긴 메뉴 정보를 변경한다")
-    void test12() {
-
-    }
-
-    @Disabled
-    @Test
-    @DisplayName("수정된 정보와 동일한 메뉴가 장바구니에 이미 존재하면, 개수만 증가시킨다")
-    void test13() {
-
-    }
-
     // Delete Test
     @Disabled
     @Test
