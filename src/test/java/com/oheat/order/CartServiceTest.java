@@ -2,6 +2,8 @@ package com.oheat.order;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.oheat.food.dto.MenuUpdateRequest;
+import com.oheat.food.dto.OptionUpdateRequest;
 import com.oheat.food.entity.MenuJpaEntity;
 import com.oheat.food.entity.OptionGroupJpaEntity;
 import com.oheat.food.entity.OptionJpaEntity;
@@ -207,7 +209,6 @@ public class CartServiceTest {
     @Test
     @DisplayName("장바구니에 담은 메뉴, 옵션그룹, 옵션 이름, 개수를 메뉴 단위 목록으로 조회한다")
     void givenCartItem_whenFindByUserId_thenReturn() {
-
         registerOneCartItem();
 
         CartJpaEntity cartResult = cartService.findAllByUsername("username").getFirst();
@@ -215,7 +216,6 @@ public class CartServiceTest {
         CartOptionGroup groupResult1 = cartResult.getCartOptionGroups().get(0);
         CartOptionGroup groupResult2 = cartResult.getCartOptionGroups().get(1);
         OptionJpaEntity optionResult1 = groupResult1.getCartOptionGroupOptions().get(0).getOption();
-        OptionJpaEntity optionResult2 = groupResult1.getCartOptionGroupOptions().get(1).getOption();
         OptionJpaEntity optionResult3 = groupResult2.getCartOptionGroupOptions().get(0).getOption();
         OptionJpaEntity optionResult4 = groupResult2.getCartOptionGroupOptions().get(1).getOption();
 
@@ -224,29 +224,46 @@ public class CartServiceTest {
         assertThat(groupResult1.getOptionGroup().getName()).isEqualTo("부분육 선택");
         assertThat(groupResult2.getOptionGroup().getName()).isEqualTo("음료 선택");
         assertThat(optionResult1.getName()).isEqualTo("순살");
-        assertThat(optionResult2.getName()).isEqualTo("닭다리");
         assertThat(optionResult3.getName()).isEqualTo("콜라");
         assertThat(optionResult4.getName()).isEqualTo("사이다");
     }
 
     @Test
     @DisplayName("장바구니 조회 시, 메뉴 목록에 각 금액이 함께 조회된다")
-    void test9() {
+    void givenCartItem_whenFindByUserId_thenReturnPriceOfEachMenu() {
+        registerOneCartItem();
 
+        int priceOfMenu = cartService.findAllByUsername("username").getFirst()
+            .calcPriceOfMenu();
+
+        assertThat(priceOfMenu).isEqualTo(28_000);
     }
 
-    @Disabled
-    @Test
-    @DisplayName("장바구니에 담은 메뉴들의 총 금액 합을 조회한다")
-    void test10() {
-
-    }
-
-    @Disabled
     @Test
     @DisplayName("장바구니에 담긴 상태에서 메뉴나 옵션 정보가 수정되면, 수정된 정보로 조회한다")
-    void test11() {
+    void givenCartItem_whenChangeMenuAndOptionInfo_thenReturnUpdatedInfo() {
+        registerOneCartItem();
 
+        MenuJpaEntity menu = memoryMenuRepository.findById(1L).get();
+        OptionJpaEntity option = memoryOptionRepository.findById(1L).get();
+
+        MenuUpdateRequest menuUpdateReq = MenuUpdateRequest.builder()
+            .name("땡초 양념 치킨").price(50_000).build();
+        OptionUpdateRequest optionUpdateReq = OptionUpdateRequest.builder()
+            .name("윙,봉 콤보").price(7_000).build();
+
+        menu.updateMenu(menuUpdateReq);
+        option.updateOptionInfo(optionUpdateReq);
+
+        CartJpaEntity cartResult = cartService.findAllByUsername("username").getFirst();
+        OptionJpaEntity option1Result = cartResult.getCartOptionGroups().getFirst()
+            .getCartOptionGroupOptions().getFirst()
+            .getOption();
+
+        // 기존 가격은 28,000원
+        assertThat(cartResult.calcPriceOfMenu()).isEqualTo(61_000);
+        assertThat(cartResult.getMenu().getName()).isEqualTo("땡초 양념 치킨");
+        assertThat(option1Result.getName()).isEqualTo("윙,봉 콤보");
     }
 
     // Update Test
@@ -287,21 +304,22 @@ public class CartServiceTest {
     }
 
     void registerOneCartItem() {
-        UserJpaEntity user = UserJpaEntity.builder().username("username").build();
-        ShopJpaEntity shop = ShopJpaEntity.builder().name("bbq").build();
-        MenuJpaEntity menu = MenuJpaEntity.builder().name("황올").shop(shop).build();
+        UserJpaEntity user = UserJpaEntity.builder()
+            .username("username").build();
+        ShopJpaEntity shop = ShopJpaEntity.builder()
+            .name("bbq").build();
+        MenuJpaEntity menu = MenuJpaEntity.builder()
+            .name("황올").price(20_000).shop(shop).build();
         OptionGroupJpaEntity optionGroup1 = OptionGroupJpaEntity.builder()
             .name("부분육 선택").menu(menu).build();
         OptionGroupJpaEntity optionGroup2 = OptionGroupJpaEntity.builder()
             .name("음료 선택").menu(menu).build();
         OptionJpaEntity option1 = OptionJpaEntity.builder()
-            .name("순살").optionGroup(optionGroup1).build();
+            .name("순살").price(4_000).optionGroup(optionGroup1).build();
         OptionJpaEntity option2 = OptionJpaEntity.builder()
-            .name("닭다리").optionGroup(optionGroup1).build();
+            .name("콜라").price(2_000).optionGroup(optionGroup2).build();
         OptionJpaEntity option3 = OptionJpaEntity.builder()
-            .name("콜라").optionGroup(optionGroup2).build();
-        OptionJpaEntity option4 = OptionJpaEntity.builder()
-            .name("사이다").optionGroup(optionGroup2).build();
+            .name("사이다").price(2_000).optionGroup(optionGroup2).build();
 
         CartJpaEntity cart = CartJpaEntity.builder()
             .amount(1).user(user).shop(shop).menu(menu).build();
@@ -312,16 +330,13 @@ public class CartServiceTest {
         CartOptionGroupOption cartOptionGroupOption1 = CartOptionGroupOption.builder()
             .cartOptionGroup(cartOptionGroup1).option(option1).build();
         CartOptionGroupOption cartOptionGroupOption2 = CartOptionGroupOption.builder()
-            .cartOptionGroup(cartOptionGroup1).option(option2).build();
+            .cartOptionGroup(cartOptionGroup2).option(option2).build();
         CartOptionGroupOption cartOptionGroupOption3 = CartOptionGroupOption.builder()
             .cartOptionGroup(cartOptionGroup2).option(option3).build();
-        CartOptionGroupOption cartOptionGroupOption4 = CartOptionGroupOption.builder()
-            .cartOptionGroup(cartOptionGroup2).option(option4).build();
 
         cartOptionGroup1.addCartOption(cartOptionGroupOption1);
-        cartOptionGroup1.addCartOption(cartOptionGroupOption2);
+        cartOptionGroup2.addCartOption(cartOptionGroupOption2);
         cartOptionGroup2.addCartOption(cartOptionGroupOption3);
-        cartOptionGroup2.addCartOption(cartOptionGroupOption4);
         cart.addCartOptionGroup(cartOptionGroup1);
         cart.addCartOptionGroup(cartOptionGroup2);
         user.addToCart(cart);
@@ -333,7 +348,7 @@ public class CartServiceTest {
         memoryOptionGroupRepository.save(optionGroup2);
         memoryOptionRepository.save(option1);
         memoryOptionRepository.save(option2);
+        memoryOptionRepository.save(option2);
         memoryOptionRepository.save(option3);
-        memoryOptionRepository.save(option4);
     }
 }

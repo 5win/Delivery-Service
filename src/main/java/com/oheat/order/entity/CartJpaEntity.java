@@ -72,4 +72,12 @@ public class CartJpaEntity extends BaseTimeEntity {
         cartOptionGroup.setCart(this);
         this.cartOptionGroups.add(cartOptionGroup);
     }
+
+    public int calcPriceOfMenu() {
+        int totalPrice = this.menu.getPrice();
+        for (var groups : this.cartOptionGroups) {
+            totalPrice += groups.calcTotalPriceOption();
+        }
+        return totalPrice;
+    }
 }

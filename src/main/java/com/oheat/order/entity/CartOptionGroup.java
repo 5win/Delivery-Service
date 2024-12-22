@@ -56,4 +56,10 @@ public class CartOptionGroup extends BaseTimeEntity {
         option.setCartOptionGroup(this);
         this.cartOptionGroupOptions.add((option));
     }
+
+    public int calcTotalPriceOption() {
+        return this.cartOptionGroupOptions.stream()
+            .mapToInt(o -> o.getOption().getPrice())
+            .sum();
+    }
 }
