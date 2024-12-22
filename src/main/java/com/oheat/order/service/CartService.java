@@ -66,6 +66,14 @@ public class CartService {
         cartRepository.save(cart);
     }
 
+    public List<CartJpaEntity> findAllByUsername(String username) {
+        UserJpaEntity user = userRepository.findByUsername(username)
+            .orElseThrow(UserNotExistsException::new);
+
+        return user.getCarts();
+    }
+
+
     private Optional<CartJpaEntity> generateCart(CartSaveRequest cartInfo, UserJpaEntity user,
         ShopJpaEntity shop, MenuJpaEntity menu) {
 

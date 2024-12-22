@@ -1,5 +1,7 @@
 package com.oheat.order;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.oheat.food.entity.MenuJpaEntity;
 import com.oheat.food.entity.OptionGroupJpaEntity;
 import com.oheat.food.entity.OptionJpaEntity;
@@ -19,6 +21,8 @@ import com.oheat.food.repository.ShopRepository;
 import com.oheat.order.dto.CartSaveRequest;
 import com.oheat.order.dto.CartSaveRequest.CartOptionGroupSaveRequest;
 import com.oheat.order.entity.CartJpaEntity;
+import com.oheat.order.entity.CartOptionGroup;
+import com.oheat.order.entity.CartOptionGroupOption;
 import com.oheat.order.exception.OtherShopMenuAlreadyExistsException;
 import com.oheat.order.repository.CartRepository;
 import com.oheat.order.service.CartService;
@@ -176,21 +180,8 @@ public class CartServiceTest {
     @Test
     @DisplayName("여러 옵션과 옵션그룹들이 선택된 메뉴가 장바구니에 추가될 수 있다")
     void givenSeveralOptionAndOptionGroup_whenAddToCart_thenSuccess() {
-        UserJpaEntity user = UserJpaEntity.builder().username("username").build();
-        ShopJpaEntity shop = ShopJpaEntity.builder().name("bbq").build();
-        MenuJpaEntity menu = MenuJpaEntity.builder().name("황올").build();
-        OptionGroupJpaEntity optionGroup = OptionGroupJpaEntity.builder().name("부분육 선택").build();
-        OptionJpaEntity option = OptionJpaEntity.builder().name("순살").build();
-        memoryUserRepository.save(user);
-        memoryShopRepository.save(shop);
-        memoryMenuRepository.save(menu);
-        // 여러 id값만 필요하므로 동일한 그룹과 옵션을 중복 저장하여 테스트함
-        memoryOptionGroupRepository.save(optionGroup);
-        memoryOptionGroupRepository.save(optionGroup);
-        memoryOptionRepository.save(option);
-        memoryOptionRepository.save(option);
-        memoryOptionRepository.save(option);
-        memoryOptionRepository.save(option);
+
+        registerOneCartItem();
 
         CartSaveRequest saveRequest = CartSaveRequest.builder()
             .shopId(1L)
@@ -213,14 +204,31 @@ public class CartServiceTest {
     }
 
     // Read Test
-    @Disabled
     @Test
     @DisplayName("장바구니에 담은 메뉴, 옵션그룹, 옵션 이름, 개수를 메뉴 단위 목록으로 조회한다")
-    void test8() {
+    void givenCartItem_whenFindByUserId_thenReturn() {
 
+        registerOneCartItem();
+
+        CartJpaEntity cartResult = cartService.findAllByUsername("username").getFirst();
+
+        CartOptionGroup groupResult1 = cartResult.getCartOptionGroups().get(0);
+        CartOptionGroup groupResult2 = cartResult.getCartOptionGroups().get(1);
+        OptionJpaEntity optionResult1 = groupResult1.getCartOptionGroupOptions().get(0).getOption();
+        OptionJpaEntity optionResult2 = groupResult1.getCartOptionGroupOptions().get(1).getOption();
+        OptionJpaEntity optionResult3 = groupResult2.getCartOptionGroupOptions().get(0).getOption();
+        OptionJpaEntity optionResult4 = groupResult2.getCartOptionGroupOptions().get(1).getOption();
+
+        assertThat(cartResult.getShop().getName()).isEqualTo("bbq");
+        assertThat(cartResult.getMenu().getName()).isEqualTo("황올");
+        assertThat(groupResult1.getOptionGroup().getName()).isEqualTo("부분육 선택");
+        assertThat(groupResult2.getOptionGroup().getName()).isEqualTo("음료 선택");
+        assertThat(optionResult1.getName()).isEqualTo("순살");
+        assertThat(optionResult2.getName()).isEqualTo("닭다리");
+        assertThat(optionResult3.getName()).isEqualTo("콜라");
+        assertThat(optionResult4.getName()).isEqualTo("사이다");
     }
 
-    @Disabled
     @Test
     @DisplayName("장바구니 조회 시, 메뉴 목록에 각 금액이 함께 조회된다")
     void test9() {
@@ -276,5 +284,56 @@ public class CartServiceTest {
     @DisplayName("매장, 메뉴, 옵션그룹, 옵션 중에 하나라도 삭제되면, 해당 정보를 담은 메뉴가 장바구니에서 삭제된다")
     void test16() {
 
+    }
+
+    void registerOneCartItem() {
+        UserJpaEntity user = UserJpaEntity.builder().username("username").build();
+        ShopJpaEntity shop = ShopJpaEntity.builder().name("bbq").build();
+        MenuJpaEntity menu = MenuJpaEntity.builder().name("황올").shop(shop).build();
+        OptionGroupJpaEntity optionGroup1 = OptionGroupJpaEntity.builder()
+            .name("부분육 선택").menu(menu).build();
+        OptionGroupJpaEntity optionGroup2 = OptionGroupJpaEntity.builder()
+            .name("음료 선택").menu(menu).build();
+        OptionJpaEntity option1 = OptionJpaEntity.builder()
+            .name("순살").optionGroup(optionGroup1).build();
+        OptionJpaEntity option2 = OptionJpaEntity.builder()
+            .name("닭다리").optionGroup(optionGroup1).build();
+        OptionJpaEntity option3 = OptionJpaEntity.builder()
+            .name("콜라").optionGroup(optionGroup2).build();
+        OptionJpaEntity option4 = OptionJpaEntity.builder()
+            .name("사이다").optionGroup(optionGroup2).build();
+
+        CartJpaEntity cart = CartJpaEntity.builder()
+            .amount(1).user(user).shop(shop).menu(menu).build();
+        CartOptionGroup cartOptionGroup1 = CartOptionGroup.builder()
+            .cart(cart).optionGroup(optionGroup1).build();
+        CartOptionGroup cartOptionGroup2 = CartOptionGroup.builder()
+            .cart(cart).optionGroup(optionGroup2).build();
+        CartOptionGroupOption cartOptionGroupOption1 = CartOptionGroupOption.builder()
+            .cartOptionGroup(cartOptionGroup1).option(option1).build();
+        CartOptionGroupOption cartOptionGroupOption2 = CartOptionGroupOption.builder()
+            .cartOptionGroup(cartOptionGroup1).option(option2).build();
+        CartOptionGroupOption cartOptionGroupOption3 = CartOptionGroupOption.builder()
+            .cartOptionGroup(cartOptionGroup2).option(option3).build();
+        CartOptionGroupOption cartOptionGroupOption4 = CartOptionGroupOption.builder()
+            .cartOptionGroup(cartOptionGroup2).option(option4).build();
+
+        cartOptionGroup1.addCartOption(cartOptionGroupOption1);
+        cartOptionGroup1.addCartOption(cartOptionGroupOption2);
+        cartOptionGroup2.addCartOption(cartOptionGroupOption3);
+        cartOptionGroup2.addCartOption(cartOptionGroupOption4);
+        cart.addCartOptionGroup(cartOptionGroup1);
+        cart.addCartOptionGroup(cartOptionGroup2);
+        user.addToCart(cart);
+
+        memoryUserRepository.save(user);
+        memoryShopRepository.save(shop);
+        memoryMenuRepository.save(menu);
+        memoryOptionGroupRepository.save(optionGroup1);
+        memoryOptionGroupRepository.save(optionGroup2);
+        memoryOptionRepository.save(option1);
+        memoryOptionRepository.save(option2);
+        memoryOptionRepository.save(option3);
+        memoryOptionRepository.save(option4);
     }
 }
