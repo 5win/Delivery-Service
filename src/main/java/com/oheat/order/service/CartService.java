@@ -17,6 +17,7 @@ import com.oheat.order.entity.CartJpaEntity;
 import com.oheat.order.entity.CartOptionGroup;
 import com.oheat.order.entity.CartOptionGroupOption;
 import com.oheat.order.exception.CannotCreateCartException;
+import com.oheat.order.exception.CartNotExistsException;
 import com.oheat.order.exception.OtherShopMenuAlreadyExistsException;
 import com.oheat.order.repository.CartRepository;
 import com.oheat.user.entity.UserJpaEntity;
@@ -73,6 +74,19 @@ public class CartService {
         return user.getCarts();
     }
 
+    public void deleteCart(Long cartId) {
+        CartJpaEntity cart = cartRepository.findById(cartId)
+            .orElseThrow(CartNotExistsException::new);
+
+        cartRepository.delete(cart);
+    }
+
+    public void deleteAllByUsername(String username) {
+        UserJpaEntity user = userRepository.findByUsername(username)
+            .orElseThrow(UserNotExistsException::new);
+
+        user.clearCart();
+    }
 
     private Optional<CartJpaEntity> generateCart(CartSaveRequest cartInfo, UserJpaEntity user,
         ShopJpaEntity shop, MenuJpaEntity menu) {

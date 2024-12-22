@@ -26,6 +26,7 @@ import jakarta.persistence.EntityManager;
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -313,5 +314,12 @@ public class CartIntegrationTest {
 
         CartJpaEntity result = cartJpaRepository.findById(2L).get();
         assertThat(result.getAmount()).isEqualTo(2);
+    }
+
+    @Disabled
+    @Test
+    @DisplayName("매장, 메뉴, 옵션그룹, 옵션 중에 하나라도 삭제되면, 해당 정보를 담은 메뉴가 장바구니에서 삭제된다")
+    void test16() {
+
     }
 }

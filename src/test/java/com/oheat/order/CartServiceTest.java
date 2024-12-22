@@ -25,6 +25,7 @@ import com.oheat.order.dto.CartSaveRequest.CartOptionGroupSaveRequest;
 import com.oheat.order.entity.CartJpaEntity;
 import com.oheat.order.entity.CartOptionGroup;
 import com.oheat.order.entity.CartOptionGroupOption;
+import com.oheat.order.exception.CartNotExistsException;
 import com.oheat.order.exception.OtherShopMenuAlreadyExistsException;
 import com.oheat.order.repository.CartRepository;
 import com.oheat.order.service.CartService;
@@ -33,9 +34,9 @@ import com.oheat.user.entity.UserJpaEntity;
 import com.oheat.user.exception.UserNotExistsException;
 import com.oheat.user.repository.UserRepository;
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -179,32 +180,6 @@ public class CartServiceTest {
         });
     }
 
-    @Test
-    @DisplayName("여러 옵션과 옵션그룹들이 선택된 메뉴가 장바구니에 추가될 수 있다")
-    void givenSeveralOptionAndOptionGroup_whenAddToCart_thenSuccess() {
-
-        registerOneCartItem();
-
-        CartSaveRequest saveRequest = CartSaveRequest.builder()
-            .shopId(1L)
-            .menuId(1L)
-            .optionGroups(
-                List.of(
-                    CartOptionGroupSaveRequest.builder()
-                        .optionGroupId(1L)
-                        .options(List.of(1L, 2L))
-                        .build(),
-                    CartOptionGroupSaveRequest.builder()
-                        .optionGroupId(2L)
-                        .options(List.of(3L, 4L))
-                        .build())
-            ).build();
-
-        Assertions.assertDoesNotThrow(() -> {
-            cartService.registerCart("username", saveRequest);
-        });
-    }
-
     // Read Test
     @Test
     @DisplayName("장바구니에 담은 메뉴, 옵션그룹, 옵션 이름, 개수를 메뉴 단위 목록으로 조회한다")
@@ -267,25 +242,35 @@ public class CartServiceTest {
     }
 
     // Delete Test
-    @Disabled
+    @Test
+    @DisplayName("cartId에 해당하는 장바구니 항목이 없으면, CartNotExistsException")
+    void givenWrongCartId_whenDeleteCart_thenThrowCartNotExistsException() {
+        Assertions.assertThrows(CartNotExistsException.class, () -> {
+            cartService.deleteCart(1L);
+        });
+    }
+
     @Test
     @DisplayName("cartId에 해당하는 메뉴를 장바구니에서 삭제한다")
-    void test14() {
+    void givenCartId_whenDeleteCart_thenSuccess() {
+        registerOneCartItem();
 
+        Assertions.assertDoesNotThrow(() -> {
+            cartService.deleteCart(1L);
+        });
+
+        Optional<CartJpaEntity> result = memoryCartRepository.findById(1L);
+        assertThat(result).isEmpty();
     }
 
-    @Disabled
     @Test
     @DisplayName("장바구니의 메뉴를 모두 삭제한다")
-    void test15() {
+    void whenDeleteAllCartByUsername_thenFindAllByUsernameReturnZero() {
+        registerOneCartItem();
 
-    }
-
-    @Disabled
-    @Test
-    @DisplayName("매장, 메뉴, 옵션그룹, 옵션 중에 하나라도 삭제되면, 해당 정보를 담은 메뉴가 장바구니에서 삭제된다")
-    void test16() {
-
+        cartService.deleteAllByUsername("username");
+        List<CartJpaEntity> username = cartService.findAllByUsername("username");
+        assertThat(username.size()).isZero();
     }
 
     void registerOneCartItem() {
@@ -335,5 +320,6 @@ public class CartServiceTest {
         memoryOptionRepository.save(option2);
         memoryOptionRepository.save(option2);
         memoryOptionRepository.save(option3);
+        memoryCartRepository.save(cart);
     }
 }

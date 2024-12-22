@@ -45,7 +45,7 @@ public class UserJpaEntity extends BaseTimeEntity {
     @Column(name = "role", nullable = false)
     private Role role;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", orphanRemoval = true)
     private List<CartJpaEntity> carts = new ArrayList<>();
 
     @Builder
@@ -66,5 +66,9 @@ public class UserJpaEntity extends BaseTimeEntity {
             return false;
         }
         return !carts.getFirst().getShop().equals(shop);
+    }
+
+    public void clearCart() {
+        this.carts.clear();
     }
 }
