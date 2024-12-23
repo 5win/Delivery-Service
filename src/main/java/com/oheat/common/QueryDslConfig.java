@@ -1,4 +1,4 @@
-package com.oheat.common.config;
+package com.oheat.common;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;

@@ -16,7 +16,7 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class UserServiceTest {
+public class UserCRUDTest {
 
     private final UserRepository memoryUserRepository = new MemoryUserRepository();
     private UserService userService;

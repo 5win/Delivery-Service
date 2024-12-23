@@ -29,7 +29,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class MenuGroupServiceTest {
+public class MenuGroupCRUDTest {
 
     private MenuGroupService menuGroupService;
     private final ShopRepository memoryShopRepository = new MemoryShopRepository();
