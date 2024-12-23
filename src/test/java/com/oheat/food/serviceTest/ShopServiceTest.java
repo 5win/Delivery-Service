@@ -23,7 +23,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.Page;
 
-public class ShopCRUDTest {
+public class ShopServiceTest {
 
     private ShopService shopService;
     private CategoryService categoryService;
