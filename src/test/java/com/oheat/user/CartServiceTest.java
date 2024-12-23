@@ -204,13 +204,26 @@ public class CartServiceTest {
 
     @Test
     @DisplayName("장바구니 조회 시, 메뉴 목록에 각 금액이 함께 조회된다")
-    void givenCartItem_whenFindByUserId_thenReturnPriceOfEachMenu() {
+    void givenCartItem_whenFindByUsername_thenReturnPriceOfEachMenu() {
         registerOneCartItem();
 
         int priceOfMenu = cartService.findAllByUsername("username").getFirst()
             .calcPriceOfMenu();
 
         assertThat(priceOfMenu).isEqualTo(28_000);
+    }
+
+    @Test
+    @DisplayName("장바구니의 메뉴 항목 개수가 3개이면, 메뉴 가격 * 3의 가격이 반환된다")
+    void givenCartItemWithAmount3_whenFindByUsername_thenReturn3TimesOfPrice() {
+        registerOneCartItem();
+        CartJpaEntity cart = memoryCartRepository.findById(1L).get();
+        cart.increaseAmount(2);     // 기존 개수는 1개
+
+        int priceOfMenu = cartService.findAllByUsername("username").getFirst()
+            .calcPriceOfMenu();
+
+        assertThat(priceOfMenu).isEqualTo(28_000 * 3);
     }
 
     @Test

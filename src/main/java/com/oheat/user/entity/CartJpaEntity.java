@@ -77,6 +77,6 @@ public class CartJpaEntity extends BaseTimeEntity {
         for (var groups : this.cartOptionGroups) {
             totalPrice += groups.calcTotalPriceOption();
         }
-        return totalPrice;
+        return totalPrice * this.amount;
     }
 }
