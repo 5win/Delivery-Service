@@ -19,6 +19,7 @@ public class CartFindResponse {
     private final Long menuId;
     private final String menuName;
     private final int price;
+    private final int amount;
     private final List<OptionGroupInfo> optionGroups;
 
     public static CartFindResponse from(CartJpaEntity cart) {
@@ -29,6 +30,7 @@ public class CartFindResponse {
             .menuId(cart.getMenu().getId())
             .menuName(cart.getMenu().getName())
             .price(cart.calcPriceOfMenu())
+            .amount(cart.getAmount())
             .optionGroups(OptionGroupInfo.from(cart.getCartOptionGroups()))
             .build();
     }
