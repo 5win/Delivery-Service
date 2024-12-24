@@ -21,7 +21,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode(exclude = {"price"}, callSuper = false)
 @Entity
-@Table(name = "option")
+@Table(name = "options")
 public class OptionJpaEntity extends BaseTimeEntity {
 
     @Builder
