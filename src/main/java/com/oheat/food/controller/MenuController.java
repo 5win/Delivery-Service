@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/v1/food/shops/menus")
+@RequestMapping("/api/v1/foods/shops/menus")
 public class MenuController {
 
     private final MenuService menuService;
