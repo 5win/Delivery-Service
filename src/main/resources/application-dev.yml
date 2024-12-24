@@ -1,14 +1,4 @@
 spring:
-  datasource:
-    url: jdbc:mysql://localhost:3306/oheat
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    username: root
-    password:
-  jpa:
-    database: mysql
-    database-platform: org.hibernate.dialect.MySQL8Dialect
-    hibernate.ddl-auto: create
-    properties.hibernate.format_sql: true
-    show-sql: true
-
-  logging.level.org.hibernate: debug
+  config:
+    import:
+      - application-dev-mysql.yml
