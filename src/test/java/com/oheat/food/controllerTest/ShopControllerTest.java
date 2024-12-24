@@ -49,6 +49,10 @@ public class ShopControllerTest {
             .name("bbq").category("치킨").build();
         String req = objectMapper.writeValueAsString(saveReq);
 
+        doNothing()
+            .when(shopService)
+            .registerShop(any());
+
         this.mockMvc.perform(post("/api/v1/foods/shops")
                 .content(req)
                 .contentType(MediaType.APPLICATION_JSON))
