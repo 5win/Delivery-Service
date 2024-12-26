@@ -1,6 +1,7 @@
 package com.oheat.food.entity;
 
 import com.oheat.common.BaseTimeEntity;
+import com.oheat.food.dto.OptionUpdateRequest;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -43,4 +44,9 @@ public class OptionJpaEntity extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "option_group_id", nullable = false)
     private OptionGroupJpaEntity optionGroup;
+
+    public void updateOptionInfo(OptionUpdateRequest updateRequest) {
+        this.name = updateRequest.getName();
+        this.price = updateRequest.getPrice();
+    }
 }

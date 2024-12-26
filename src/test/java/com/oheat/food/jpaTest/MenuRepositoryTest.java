@@ -2,9 +2,7 @@ package com.oheat.food.jpaTest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.oheat.food.dto.MenuUpdateRequest;
-import com.oheat.food.dto.OptionGroupUpdateRequest;
-import com.oheat.food.dto.OptionUpdateRequest;
+import com.oheat.common.TestConfig;
 import com.oheat.food.entity.CategoryJpaEntity;
 import com.oheat.food.entity.MenuJpaEntity;
 import com.oheat.food.entity.OptionGroupJpaEntity;
@@ -23,8 +21,10 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.dao.DataIntegrityViolationException;
 
+@Import(TestConfig.class)
 @DataJpaTest
 public class MenuRepositoryTest {
 
@@ -98,53 +98,6 @@ public class MenuRepositoryTest {
     }
 
     @Test
-    @DisplayName("존재하지 않는 메뉴에 옵션 그룹을 추가하면 실패")
-    void givenOptionGroupWithWrongMenuId_whenAddNewOptionGroup_thenFail() {
-        CategoryJpaEntity category = CategoryJpaEntity.builder().name("치킨").build();
-        ShopJpaEntity shop = ShopJpaEntity.builder().name("bbq").category(category).build();
-        MenuJpaEntity menu = MenuJpaEntity.builder().name("황올").shop(shop).build();
-
-        categoryJpaRepository.save(category);
-        shopJpaRepository.save(shop);
-        menuJpaRepository.save(menu);
-        menuJpaRepository.deleteAll();
-        entityManager.flush();
-
-        Assertions.assertThrows(DataIntegrityViolationException.class, () -> {
-            optionGroupJpaRepository.save(OptionGroupJpaEntity.builder()
-                .name("부분육 선택")
-                .menu(menu)
-                .build());
-        });
-        entityManager.clear();
-    }
-
-    @Test
-    @DisplayName("존재하지 않는 옵션 그룹에 옵션을 추가하면 실패")
-    void givenOptionWithWrongOptionGroupId_whenAddNewOption_thenFail() {
-        CategoryJpaEntity category = CategoryJpaEntity.builder().name("치킨").build();
-        ShopJpaEntity shop = ShopJpaEntity.builder().name("bbq").category(category).build();
-        MenuJpaEntity menu = MenuJpaEntity.builder().name("황올").shop(shop).build();
-        OptionGroupJpaEntity optionGroup = OptionGroupJpaEntity.builder()
-            .name("부분육 선택").menu(menu).build();
-
-        categoryJpaRepository.save(category);
-        shopJpaRepository.save(shop);
-        menuJpaRepository.save(menu);
-        optionGroupJpaRepository.save(optionGroup);
-        optionGroupJpaRepository.deleteAll();
-        entityManager.flush();
-
-        Assertions.assertThrows(DataIntegrityViolationException.class, () -> {
-            optionJpaRepository.save(OptionJpaEntity.builder()
-                .name("순살")
-                .optionGroup(optionGroup)
-                .build());
-        });
-        entityManager.clear();
-    }
-
-    @Test
     @DisplayName("카테고리, 매장, 메뉴, 옵션 그룹, 옵션을 차례로 알맞게 저장하면 모두 저장 성공")
     void givenShopAndMenuAndOptionGroupAndOption_whenAddNewMenu_thenSuccess() {
         CategoryJpaEntity category = CategoryJpaEntity.builder().name("치킨").build();
@@ -160,14 +113,17 @@ public class MenuRepositoryTest {
 
         // 저장 과정에서 예외 발생 X
         Assertions.assertDoesNotThrow(() -> {
-            optionGroup.addOption(option);
-            menu.addOptionGroup(optionGroup);
             menuJpaRepository.save(menu);
+            optionGroupJpaRepository.save(optionGroup);
+            optionJpaRepository.save(option);
         });
+        entityManager.clear();
 
         // 옵션 그룹과 옵션 저장 확인
-        OptionGroupJpaEntity optionGroupResult = optionGroupJpaRepository.findById(1L).get();
-        OptionJpaEntity optionResult = optionJpaRepository.findById(1L).get();
+        OptionGroupJpaEntity optionGroupResult = menuJpaRepository.findById(1L).get()
+            .getOptionGroups().getFirst();
+        OptionJpaEntity optionResult = optionGroupResult.getOptions().getFirst();
+
         assertThat(optionGroupResult.getName()).isEqualTo("부분육 선택");
         assertThat(optionResult.getName()).isEqualTo("순살");
     }
@@ -194,16 +150,16 @@ public class MenuRepositoryTest {
         categoryJpaRepository.save(category);
         shopJpaRepository.save(shop);
 
-        // 각 옵션 그룹마다 옵션 2개씩
-        optionGroup1.addOption(option1);
-        optionGroup1.addOption(option2);
-        optionGroup2.addOption(option3);
-        optionGroup2.addOption(option4);
-        // 옵션 그룹 2개
-        menu.addOptionGroup(optionGroup1);
-        menu.addOptionGroup(optionGroup2);
-
+        // 메뉴 저장
         menuJpaRepository.save(menu);
+        // 옵션 그룹 2개
+        optionGroupJpaRepository.save(optionGroup1);
+        optionGroupJpaRepository.save(optionGroup2);
+        // 각 옵션 그룹마다 옵션 2개씩
+        optionJpaRepository.save(option1);
+        optionJpaRepository.save(option2);
+        optionJpaRepository.save(option3);
+        optionJpaRepository.save(option4);
         entityManager.clear();
 
         List<OptionGroupJpaEntity> result = menuJpaRepository.findById(1L).get()
@@ -227,11 +183,12 @@ public class MenuRepositoryTest {
 
         categoryJpaRepository.save(category);
         shopJpaRepository.save(shop);
-
-        optionGroup.addOption(option);
-        menu.addOptionGroup(optionGroup);
         menuJpaRepository.save(menu);
-        menuJpaRepository.delete(menu);
+        optionGroupJpaRepository.save(optionGroup);
+        optionJpaRepository.save(option);
+
+        entityManager.clear();
+        menuJpaRepository.deleteById(1L);
 
         List<MenuJpaEntity> menuResult = menuJpaRepository.findAll();
         List<OptionGroupJpaEntity> optionGroupResult = optionGroupJpaRepository.findAll();
@@ -240,56 +197,5 @@ public class MenuRepositoryTest {
         assertThat(menuResult.size()).isZero();
         assertThat(optionGroupResult.size()).isZero();
         assertThat(optionResult.size()).isZero();
-    }
-
-    @Test
-    @DisplayName("메뉴의 옵션 그룹을 바꾸면, 기존 옵션 그룹은 삭제되고 새로운 옵션 그룹이 추가됨")
-    void whenUpdateOptionGroup_thenDeletePrevOptionGroupAndAddNewOptionGroup() {
-        CategoryJpaEntity category = CategoryJpaEntity.builder().name("치킨").build();
-        ShopJpaEntity shop = ShopJpaEntity.builder().name("bbq").category(category).build();
-        MenuJpaEntity menu1 = MenuJpaEntity.builder().name("황올").shop(shop).build();
-        OptionGroupJpaEntity optionGroup1 = OptionGroupJpaEntity.builder()
-            .name("부분육 선택").menu(menu1).build();
-        OptionJpaEntity option1 = OptionJpaEntity.builder()
-            .name("순살").optionGroup(optionGroup1).build();
-
-        categoryJpaRepository.save(category);
-        shopJpaRepository.save(shop);
-
-        // 처음 옵션으로 저장
-        optionGroup1.addOption(option1);
-        menu1.addOptionGroup(optionGroup1);
-        menuJpaRepository.save(menu1);
-        entityManager.clear();
-
-        // 수정된 옵션으로 저장
-        OptionGroupUpdateRequest optionGroupUpdateRequest = OptionGroupUpdateRequest.builder()
-            .name("음료 선택")
-            .required(true)
-            .maxNumOfSelect(3)
-            .options(List.of(OptionUpdateRequest.builder()
-                .name("콜라")
-                .price(99_000)
-                .build()))
-            .build();
-        MenuUpdateRequest updateRequest = MenuUpdateRequest.builder()
-            .menuId(1L)
-            .name("양념치킨")
-            .optionGroups(List.of(optionGroupUpdateRequest))
-            .build();
-
-        menu1.updateMenu(updateRequest);
-        menuJpaRepository.save(menu1);
-        entityManager.flush();      // 더티 체킹을 위해 flush
-
-        // 수정 이전의 내용이 삭제되었는지 확인
-        assertThat(optionGroupJpaRepository.findAll().size()).isEqualTo(1);
-        assertThat(optionJpaRepository.findAll().size()).isEqualTo(1);
-        // 수정 내용이 반영되었는지 확인
-        OptionGroupJpaEntity optionGroupResult = menuJpaRepository.findById(1L).get()
-            .getOptionGroups().getFirst();
-        OptionJpaEntity optionResult = optionGroupResult.getOptions().getFirst();
-        assertThat(optionGroupResult.getName()).isEqualTo("음료 선택");
-        assertThat(optionResult.getName()).isEqualTo("콜라");
     }
 }

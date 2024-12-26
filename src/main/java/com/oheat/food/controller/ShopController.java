@@ -4,8 +4,9 @@ import com.oheat.food.dto.ShopFindByCategoryResponse;
 import com.oheat.food.dto.ShopSaveRequest;
 import com.oheat.food.dto.ShopUpdateRequest;
 import com.oheat.food.service.ShopService;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -32,10 +33,10 @@ public class ShopController {
     }
 
     @GetMapping
-    public List<ShopFindByCategoryResponse> findShopByCategory(@RequestParam String category) {
-        return shopService.findShopByCategory(category).stream()
-            .map(ShopFindByCategoryResponse::from)
-            .toList();
+    public Page<ShopFindByCategoryResponse> findShopByCategory(
+        @RequestParam String category, Pageable pageable) {
+        return shopService.findShopByCategory(category, pageable)
+            .map(ShopFindByCategoryResponse::from);
     }
 
     @PutMapping

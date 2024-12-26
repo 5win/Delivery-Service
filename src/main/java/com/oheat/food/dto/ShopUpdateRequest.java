@@ -14,4 +14,6 @@ public class ShopUpdateRequest {
     private final String phone;
     private final String category;
     private final int minimumOrderAmount;
+    private final int deliveryFee;
+
 }

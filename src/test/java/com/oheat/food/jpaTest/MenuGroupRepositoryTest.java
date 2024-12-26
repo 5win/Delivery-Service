@@ -2,6 +2,7 @@ package com.oheat.food.jpaTest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.oheat.common.TestConfig;
 import com.oheat.food.entity.CategoryJpaEntity;
 import com.oheat.food.entity.MenuGroupJpaEntity;
 import com.oheat.food.entity.MenuGroupMappingJpaEntity;
@@ -21,8 +22,10 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.dao.DataIntegrityViolationException;
 
+@Import(TestConfig.class)
 @DataJpaTest
 public class MenuGroupRepositoryTest {
 

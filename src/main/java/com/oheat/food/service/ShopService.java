@@ -10,8 +10,9 @@ import com.oheat.food.exception.ShopNotExistsException;
 import com.oheat.food.repository.CategoryRepository;
 import com.oheat.food.repository.ShopRepository;
 import jakarta.transaction.Transactional;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
@@ -34,11 +35,11 @@ public class ShopService {
         shopRepository.save(saveRequest.toEntity(category));
     }
 
-    public List<ShopJpaEntity> findShopByCategory(String categoryName) {
+    public Page<ShopJpaEntity> findShopByCategory(String categoryName, Pageable pageable) {
         CategoryJpaEntity category = categoryRepository.findByName(categoryName)
             .orElseThrow(CategoryNotExistsException::new);
 
-        return shopRepository.findByCategory(category);
+        return shopRepository.findByCategory(category, pageable);
     }
 
     @Transactional

@@ -15,6 +15,7 @@ public class ShopFindByCategoryResponse {
     private final String phone;
     private final String category;
     private final int minimumOrderAmount;
+    private final int deliveryFee;
 
     public static ShopFindByCategoryResponse from(ShopJpaEntity shopJpaEntity) {
         return ShopFindByCategoryResponse.builder()
@@ -23,6 +24,7 @@ public class ShopFindByCategoryResponse {
             .phone(shopJpaEntity.getPhone())
             .category(shopJpaEntity.getCategory().getName())
             .minimumOrderAmount(shopJpaEntity.getMinimumOrderAmount())
+            .deliveryFee((shopJpaEntity.getDeliveryFee()))
             .build();
     }
 }
