@@ -71,7 +71,7 @@ public class Order extends BaseTimeEntity {
     private UserJpaEntity user;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<OrderMenu> orderMenu = new ArrayList<>();
+    private List<OrderMenu> orderMenus = new ArrayList<>();
 
     @Builder
     public Order(OrderState orderState, String address, String phone, String msgForShop,
@@ -91,6 +91,6 @@ public class Order extends BaseTimeEntity {
 
     public void addOrderMenu(OrderMenu orderMenu) {
         orderMenu.setOrder(this);
-        this.orderMenu.add(orderMenu);
+        this.orderMenus.add(orderMenu);
     }
 }

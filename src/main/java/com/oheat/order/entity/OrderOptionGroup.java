@@ -1,9 +1,8 @@
 package com.oheat.order.entity;
 
 import com.oheat.common.BaseTimeEntity;
-import com.oheat.food.entity.MenuJpaEntity;
+import com.oheat.food.entity.OptionGroupJpaEntity;
 import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -25,40 +24,36 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode(of = {"id"}, callSuper = false)
 @Entity
-@Table(name = "orders_menu")
-public class OrderMenu extends BaseTimeEntity {
+@Table(name = "orders_options_group")
+public class OrderOptionGroup extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "amount", nullable = false)
-    private int amount;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "orders_menu_id", nullable = false)
+    private OrderMenu orderMenu;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "orders_id", nullable = false)
-    private Order order;
+    @JoinColumn(name = "option_group_id", nullable = false)
+    private OptionGroupJpaEntity optionGroup;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "menu_id", nullable = false)
-    private MenuJpaEntity menu;
-
-    @OneToMany(mappedBy = "orderMenu", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<OrderOptionGroup> orderOptionGroups = new ArrayList<>();
+    @OneToMany(mappedBy = "orderOptionGroup", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<OrderOption> orderOptions = new ArrayList<>();
 
     @Builder
-    public OrderMenu(int amount, Order order, MenuJpaEntity menu) {
-        this.amount = amount;
-        this.order = order;
-        this.menu = menu;
+    public OrderOptionGroup(OrderMenu orderMenu, OptionGroupJpaEntity optionGroup) {
+        this.orderMenu = orderMenu;
+        this.optionGroup = optionGroup;
     }
 
-    public void setOrder(Order order) {
-        this.order = order;
+    public void setOrderMenu(OrderMenu orderMenu) {
+        this.orderMenu = orderMenu;
     }
 
-    public void addOrderOptionGroup(OrderOptionGroup orderOptionGroup) {
-        orderOptionGroup.setOrderMenu(this);
-        this.orderOptionGroups.add(orderOptionGroup);
+    public void addOrderOption(OrderOption orderOption) {
+        orderOption.setOrderOptionGroup(this);
+        this.orderOptions.add(orderOption);
     }
 }
