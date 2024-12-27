@@ -61,4 +61,12 @@ public class OrderMenu extends BaseTimeEntity {
         orderOptionGroup.setOrderMenu(this);
         this.orderOptionGroups.add(orderOptionGroup);
     }
+
+    public int calcTotalPrice() {
+        int sum = this.menu.getPrice();
+        for (var orderOptionGroup : this.orderOptionGroups) {
+            sum += orderOptionGroup.calcTotalPrice();
+        }
+        return sum * this.amount;
+    }
 }

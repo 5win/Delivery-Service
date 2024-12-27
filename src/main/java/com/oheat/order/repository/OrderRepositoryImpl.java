@@ -1,8 +1,11 @@
 package com.oheat.order.repository;
 
 import com.oheat.order.entity.Order;
+import com.oheat.user.entity.UserJpaEntity;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 @RequiredArgsConstructor
@@ -22,7 +25,13 @@ public class OrderRepositoryImpl implements OrderRepository {
     }
 
     @Override
+    public Page<Order> findByUser(UserJpaEntity user, Pageable pageable) {
+        return orderJpaRepository.findByUser(user, pageable);
+    }
+
+    @Override
     public void delete(Order order) {
         orderJpaRepository.delete(order);
     }
+
 }

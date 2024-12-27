@@ -93,4 +93,12 @@ public class Order extends BaseTimeEntity {
         orderMenu.setOrder(this);
         this.orderMenus.add(orderMenu);
     }
+
+    public int calcPayAmount() {
+        int sum = this.deliveryFee - this.discount;
+        for (var orderMenu : this.orderMenus) {
+            sum += orderMenu.calcTotalPrice();
+        }
+        return sum >= 0 ? sum : 0;
+    }
 }

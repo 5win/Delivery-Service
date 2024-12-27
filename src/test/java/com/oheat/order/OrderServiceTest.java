@@ -29,10 +29,10 @@ import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.springframework.data.domain.PageRequest;
 
 public class OrderServiceTest {
 
@@ -212,39 +212,109 @@ public class OrderServiceTest {
     }
 
     // Read
-    @Disabled
     @Test
-    @DisplayName("주문 내역 조회 시, 각 주문의 매장, 결제 금액, 주문 상태 정보를 Page로 반환한다.")
-    void test7() {
+    @DisplayName("주문 내역 조회 시, 각 주문의 매장 이름, 결제 금액, 주문 상태, 리뷰 여부 정보를 Page로 반환한다.")
+    void whenFindOrderHistory_thenReturnInfoByPage() {
+        // 주문 등록
+        UserJpaEntity user = generateUserWithCarts();
+        given(userRepository.findByUsername("user"))
+            .willReturn(Optional.ofNullable(user));
 
+        OrderSaveRequest saveReq = OrderSaveRequest.builder()
+            .msgForShop("치킨무X")
+            .deliveryFee(3000)
+            .discount(500)
+            .payMethod(PayMethod.TOSS)
+            .build();
+        orderService.registerOrder(saveReq, "user");
+
+        // 주문 조회
+        Order result = orderService.findOrderByUser("user", PageRequest.of(0, 10))
+            .getContent().get(0);
+
+        assertThat(result.getShop().getName()).isEqualTo("bbq");
+        assertThat(result.calcPayAmount()).isEqualTo(20_000 + 4_000 + 2_000 + 2_000 + 3_000 - 500);
+        assertThat(result.getOrderState()).isEqualTo(OrderState.PENDING);
+        assertThat(result.isReviewed()).isFalse();
     }
 
-    @Disabled
     @Test
-    @DisplayName("주문 상세 조회 시, 주문 기본 정보를 반환한다.")
-    void test8() {
+    @DisplayName("결제할 금액이 음수이면, 0원으로 조회됨")
+    void whenPayAmountIsNegative_thenSetZero() {
+        // 주문 등록
+        UserJpaEntity user = generateUserWithCarts();
+        given(userRepository.findByUsername("user"))
+            .willReturn(Optional.ofNullable(user));
 
+        OrderSaveRequest saveReq = OrderSaveRequest.builder()
+            .msgForShop("치킨무X")
+            .deliveryFee(3000)
+            .discount(999_999_999)
+            .payMethod(PayMethod.TOSS)
+            .build();
+        orderService.registerOrder(saveReq, "user");
+
+        // 주문 조회
+        Order result = orderService.findOrderByUser("user", PageRequest.of(0, 10))
+            .getContent().get(0);
+
+        assertThat(result.calcPayAmount()).isEqualTo(0);
     }
 
-    @Disabled
     @Test
-    @DisplayName("주문 상세 조회 시, 각 주문 항목의 정보를 리스트로 반환한다.")
-    void test9() {
+    @DisplayName("주문 상세 조회 시, 주문 일시, 주소, 전화번호, 결제 방법, 메뉴, 옵션 정보를 반환한다.")
+    void whenFindOrderDetail_thenReturnDetailInfo() {
+        // 주문 등록
+        UserJpaEntity user = generateUserWithCarts();
+        given(userRepository.findByUsername("user"))
+            .willReturn(Optional.ofNullable(user));
 
+        OrderSaveRequest saveReq = OrderSaveRequest.builder()
+            .msgForShop("치킨무X")
+            .deliveryFee(3000)
+            .discount(0)
+            .payMethod(PayMethod.TOSS)
+            .build();
+        orderService.registerOrder(saveReq, "user");
+
+        // 주문 상세 조회
+        Order order = orderService.findOrderById(1L);
+        List<OrderMenu> orderMenus = order.getOrderMenus();
+        List<OrderOptionGroup> orderOptionGroups = orderMenus.get(0).getOrderOptionGroups();
+        List<OrderOption> orderOptions = orderOptionGroups.get(0).getOrderOptions();
+
+        assertThat(order.getAddress()).isEqualTo("서울특별시");
+        assertThat(order.getPhone()).isEqualTo("010-1234-1234");
+        assertThat(order.getPayMethod()).isEqualTo(PayMethod.TOSS);
+        assertThat(orderMenus.size()).isEqualTo(1);
+        assertThat(orderOptionGroups.size()).isEqualTo(2);
+        assertThat(orderOptions.size()).isEqualTo(1);
     }
 
-    @Disabled
     @Test
-    @DisplayName("주문 상세 조회 시, 메뉴 금액, 배달팁, 할인 금액, 총 금액을 반환한다.")
-    void test10() {
+    @DisplayName("주문 상세 조회 시, 메뉴 금액, 배달팁, 할인 금액, 총 금액, 결제할 금액을 반환한다.")
+    void whenFindOrderDetail_thenReturnMenuPriceAndDeliveryFeeAndDiscountAndTotalPriceAndPayAmount() {
+        // 주문 등록
+        UserJpaEntity user = generateUserWithCarts();
+        given(userRepository.findByUsername("user"))
+            .willReturn(Optional.ofNullable(user));
 
-    }
+        OrderSaveRequest saveReq = OrderSaveRequest.builder()
+            .msgForShop("치킨무X")
+            .deliveryFee(3000)
+            .discount(500)
+            .payMethod(PayMethod.TOSS)
+            .build();
+        orderService.registerOrder(saveReq, "user");
 
-    @Disabled
-    @Test
-    @DisplayName("주문 상세 조회 시, 결제 방법을 반환한다.")
-    void test11() {
+        // 주문 상세 조회
+        Order order = orderService.findOrderById(1L);
+        OrderMenu orderMenu = order.getOrderMenus().get(0);
 
+        assertThat(orderMenu.calcTotalPrice()).isEqualTo(20_000 + 4_000 + 2_000 + 2_000);
+        assertThat(order.getDeliveryFee()).isEqualTo(3_000);
+        assertThat(order.getDiscount()).isEqualTo(500);
+        assertThat(order.calcPayAmount()).isEqualTo(28_000 + 3_000 - 500);
     }
 
     // Delete

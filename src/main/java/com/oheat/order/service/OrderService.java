@@ -17,6 +17,8 @@ import com.oheat.user.exception.UserNotExistsException;
 import com.oheat.user.repository.UserRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
@@ -39,6 +41,17 @@ public class OrderService {
         Order order = generateOrder(shop, user, saveRequest);
 
         orderRepository.save(order);
+    }
+
+    public Page<Order> findOrderByUser(String username, Pageable pageable) {
+        UserJpaEntity user = userRepository.findByUsername(username)
+            .orElseThrow(UserNotExistsException::new);
+        return orderRepository.findByUser(user, pageable);
+    }
+
+    public Order findOrderById(Long orderId) {
+        return orderRepository.findById(orderId)
+            .orElseThrow(OrderNotExistsException::new);
     }
 
     public void deleteOrderHistoryById(Long orderId) {

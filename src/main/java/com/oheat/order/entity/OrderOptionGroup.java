@@ -56,4 +56,10 @@ public class OrderOptionGroup extends BaseTimeEntity {
         orderOption.setOrderOptionGroup(this);
         this.orderOptions.add(orderOption);
     }
+
+    public int calcTotalPrice() {
+        return this.orderOptions.stream()
+            .mapToInt(o -> o.getOption().getPrice())
+            .sum();
+    }
 }
