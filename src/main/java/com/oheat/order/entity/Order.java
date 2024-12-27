@@ -5,6 +5,7 @@ import com.oheat.food.entity.ShopJpaEntity;
 import com.oheat.order.constant.OrderState;
 import com.oheat.order.constant.PayMethod;
 import com.oheat.user.entity.UserJpaEntity;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -15,7 +16,10 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -66,6 +70,9 @@ public class Order extends BaseTimeEntity {
     @JoinColumn(name = "user_id", nullable = false)
     private UserJpaEntity user;
 
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<OrderMenu> orderMenu = new ArrayList<>();
+
     @Builder
     public Order(OrderState orderState, String address, String phone, String msgForShop,
         int deliveryFee, int discount, PayMethod payMethod, boolean reviewed, ShopJpaEntity shop,
@@ -80,5 +87,10 @@ public class Order extends BaseTimeEntity {
         this.reviewed = reviewed;
         this.shop = shop;
         this.user = user;
+    }
+
+    public void addOrderMenu(OrderMenu orderMenu) {
+        orderMenu.setOrder(this);
+        this.orderMenu.add(orderMenu);
     }
 }

@@ -3,6 +3,7 @@ package com.oheat.order.service;
 import com.oheat.food.entity.ShopJpaEntity;
 import com.oheat.order.dto.OrderSaveRequest;
 import com.oheat.order.entity.Order;
+import com.oheat.order.entity.OrderMenu;
 import com.oheat.order.repository.OrderRepository;
 import com.oheat.user.entity.CartJpaEntity;
 import com.oheat.user.entity.UserJpaEntity;
@@ -31,7 +32,23 @@ public class OrderService {
 
         ShopJpaEntity shop = carts.getFirst()
             .getShop();
-        Order order = saveRequest.toEntity(shop, user);
+        Order order = generateOrder(shop, user, saveRequest);
+
         orderRepository.save(order);
+    }
+
+    private Order generateOrder(ShopJpaEntity shop, UserJpaEntity user,
+        OrderSaveRequest saveRequest) {
+
+        Order order = saveRequest.toEntity(shop, user);
+        user.getCarts().forEach(cart -> {
+            order.addOrderMenu(OrderMenu.builder()
+                .amount(cart.getAmount())
+                .order(order)
+                .menu(cart.getMenu())
+                .build()
+            );
+        });
+        return order;
     }
 }

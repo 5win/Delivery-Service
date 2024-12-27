@@ -3,6 +3,7 @@ package com.oheat.order;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 
+import com.oheat.food.entity.MenuJpaEntity;
 import com.oheat.food.entity.ShopJpaEntity;
 import com.oheat.order.constant.OrderState;
 import com.oheat.order.constant.PayMethod;
@@ -134,11 +135,40 @@ public class OrderServiceTest {
         assertThat(result.getOrderState()).isEqualTo(OrderState.PENDING);
     }
 
-    @Disabled
     @Test
     @DisplayName("장바구니에 담긴 메뉴를 주문 메뉴 테이블에 저장한다.")
-    void test4() {
+    void givenCarts_whenOrder_thenSaveMenuToOrdersMenuTable() {
+        // 매뉴를 유저의 장바구니에 추가
+        UserJpaEntity user = UserJpaEntity.builder()
+            .username("user").build();
+        ShopJpaEntity shop = ShopJpaEntity.builder()
+            .name("bbq").build();
+        MenuJpaEntity menu = MenuJpaEntity.builder()
+            .name("황올").price(20_000).shop(shop).build();
+        CartJpaEntity cart = CartJpaEntity.builder()
+            .amount(1).user(user).shop(shop).menu(menu).build();
+        user.addToCart(cart);
 
+        // 주문
+        given(userRepository.findByUsername("user"))
+            .willReturn(Optional.ofNullable(user));
+
+        OrderSaveRequest saveReq = OrderSaveRequest.builder()
+            .msgForShop("치킨무X")
+            .deliveryFee(3000)
+            .discount(0)
+            .payMethod(PayMethod.TOSS)
+            .build();
+
+        orderService.registerOrder(saveReq, "user");
+
+        // 결과
+        Order orderResult = memoryOrderRepository.findById(1L).get();
+        MenuJpaEntity menuResult = orderResult.getOrderMenu().getFirst()
+            .getMenu();
+
+        assertThat(orderResult.getOrderMenu().size()).isEqualTo(1);
+        assertThat(menuResult.getName()).isEqualTo("황올");
     }
 
     @Disabled
