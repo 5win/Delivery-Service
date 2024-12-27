@@ -20,4 +20,13 @@ public class MemoryOrderRepository implements OrderRepository {
     public Optional<Order> findById(Long orderId) {
         return Optional.ofNullable(orders.get(orderId));
     }
+
+    @Override
+    public void delete(Order order) {
+        Long target = orders.entrySet().stream()
+            .filter(e -> e.getValue().equals(order))
+            .findFirst().get()
+            .getKey();
+        orders.remove(target);
+    }
 }

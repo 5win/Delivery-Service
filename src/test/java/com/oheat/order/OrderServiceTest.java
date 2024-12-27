@@ -14,6 +14,7 @@ import com.oheat.order.entity.Order;
 import com.oheat.order.entity.OrderMenu;
 import com.oheat.order.entity.OrderOption;
 import com.oheat.order.entity.OrderOptionGroup;
+import com.oheat.order.exception.OrderNotExistsException;
 import com.oheat.order.repository.OrderRepository;
 import com.oheat.order.service.OrderService;
 import com.oheat.user.entity.CartJpaEntity;
@@ -247,11 +248,22 @@ public class OrderServiceTest {
     }
 
     // Delete
-    @Disabled
+    @Test
+    @DisplayName("주문이 존재하지 않으면, OrderNotExistsException")
+    void givenWrongOrderId_whenDeleteOrderHistory_thenThrowOrderNotExistsException() {
+        Assertions.assertThrows(OrderNotExistsException.class, () -> {
+            orderService.deleteOrderHistoryById(1L);
+        });
+    }
+
     @Test
     @DisplayName("주문 id로 주문 내역을 삭제한다.")
-    void test12() {
+    void givenOrder_whenDeleteOrderHistory_thenDoesNotThrow() {
+        memoryOrderRepository.save(Order.builder().build());
 
+        Assertions.assertDoesNotThrow(() -> {
+            orderService.deleteOrderHistoryById(1L);
+        });
     }
 
     private UserJpaEntity generateUserWithCarts() {

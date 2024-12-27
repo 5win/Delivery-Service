@@ -8,4 +8,6 @@ public interface OrderRepository {
     void save(Order order);
 
     Optional<Order> findById(Long orderId);
+
+    void delete(Order order);
 }

@@ -6,6 +6,7 @@ import com.oheat.order.entity.Order;
 import com.oheat.order.entity.OrderMenu;
 import com.oheat.order.entity.OrderOption;
 import com.oheat.order.entity.OrderOptionGroup;
+import com.oheat.order.exception.OrderNotExistsException;
 import com.oheat.order.repository.OrderRepository;
 import com.oheat.user.entity.CartJpaEntity;
 import com.oheat.user.entity.CartOptionGroup;
@@ -38,6 +39,12 @@ public class OrderService {
         Order order = generateOrder(shop, user, saveRequest);
 
         orderRepository.save(order);
+    }
+
+    public void deleteOrderHistoryById(Long orderId) {
+        Order order = orderRepository.findById(orderId)
+            .orElseThrow(OrderNotExistsException::new);
+        orderRepository.delete(order);
     }
 
     /**

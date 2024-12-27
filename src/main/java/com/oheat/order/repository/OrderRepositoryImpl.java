@@ -20,4 +20,9 @@ public class OrderRepositoryImpl implements OrderRepository {
     public Optional<Order> findById(Long orderId) {
         return orderJpaRepository.findById(orderId);
     }
+
+    @Override
+    public void delete(Order order) {
+        orderJpaRepository.delete(order);
+    }
 }
