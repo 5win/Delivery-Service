@@ -11,11 +11,13 @@ import com.oheat.food.repository.CategoryJpaRepository;
 import com.oheat.food.repository.ShopJpaRepository;
 import jakarta.persistence.EntityManager;
 import java.util.List;
-import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -25,6 +27,7 @@ import org.springframework.data.domain.Sort;
 
 @Import(TestConfig.class)
 @DataJpaTest
+@AutoConfigureTestDatabase(replace = Replace.NONE)
 public class ShopRepositoryTest {
 
     @Autowired
@@ -34,9 +37,9 @@ public class ShopRepositoryTest {
     @Autowired
     private EntityManager entityManager;
 
-    @AfterEach
-    void tearDown() {
-        entityManager.createNativeQuery("ALTER TABLE shop ALTER COLUMN id RESTART WITH 1")
+    @BeforeEach
+    void reset() {
+        entityManager.createNativeQuery("ALTER TABLE shop AUTO_INCREMENT=1")
             .executeUpdate();
     }
 
