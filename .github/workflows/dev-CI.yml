@@ -1,15 +1,15 @@
 name: Java CI with Gradle
 
 on:
-  push:
-    branches: [ "infra/#17" ]
-#  pull_request:
-#    branches: [ "develop" ]
+  pull_request:
+    branches: [ "develop" ]
 
 jobs:
   build:
 
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
 
     services:
       mysql:
@@ -45,3 +45,13 @@ jobs:
 
       - name: Build with Gradle Wrapper
         run: ./gradlew build
+
+      - name: Add coverage to PR
+        id: jacoco
+        uses: madrapps/jacoco-report@v1.7.1
+        with:
+          paths: |
+            ${{ github.workspace }}/build/reports/jacoco/test/jacocoTestReport.xml,
+          token: ${{ secrets.GITHUB_TOKEN }}
+          min-coverage-overall: 40
+          min-coverage-changed-files: 60
