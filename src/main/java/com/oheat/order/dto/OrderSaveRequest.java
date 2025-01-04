@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class OrderSaveRequest {
 
+    private final String paymentKey;
     private final String msgForShop;
     private final int deliveryFee;
     private final int discount;

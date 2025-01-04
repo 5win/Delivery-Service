@@ -35,4 +35,8 @@ public class Payment extends BaseTimeEntity {
         this.orderId = orderId;
         this.amount = amount;
     }
+
+    public boolean validateAmount(int amount) {
+        return this.amount == amount;
+    }
 }

@@ -28,8 +28,7 @@ public class TossPaymentService {
     }
 
     public ResponseEntity<TossPaymentResponse> confirm(Payment paymentFromTossPayments) {
-        Optional<Payment> paymentFromClient = paymentRepository.findById(
-            paymentFromTossPayments.getPaymentKey());
+        Optional<Payment> paymentFromClient = paymentRepository.findById(paymentFromTossPayments.getPaymentKey());
 
         if (paymentFromClient.isEmpty() || !paymentFromClient.get().equals(paymentFromTossPayments)) {
             throw new InvalidPaymentInfoException(HttpStatus.BAD_REQUEST, "결제 정보가 유효하지 않습니다.");

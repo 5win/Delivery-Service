@@ -157,7 +157,7 @@ public class PaymentServiceTest {
 
     @Test
     @DisplayName("결제 승인 요청의 문제로 NOT_FOUND_PAYMENT_SESSION 에러 발생하면, 404를 반환한다.")
-    void whenConfirmResponseNotFoundPaymentSession_thenReceive404() {
+    void whenConfirmResponseNotFoundPaymentSession_thenReturn404() {
         UUID uuid = UUID.randomUUID();
         String paymentKey = "tgen_20250102210202h9Oy0";
 
@@ -178,7 +178,7 @@ public class PaymentServiceTest {
 
     @Test
     @DisplayName("결제 승인 요청 시, forbidden 에러 발생하면, 403을 반환한다.")
-    void whenConfirmResponseForbidden_thenReceive403() {
+    void whenConfirmResponseForbidden_thenReturn403() {
         UUID uuid = UUID.randomUUID();
         String paymentKey = "tgen_20250102210202h9Oy0";
 
@@ -199,7 +199,7 @@ public class PaymentServiceTest {
 
     @Test
     @DisplayName("결제 승인 요청 시, API 키를 잘못 입력하여 UNAUTHORIZED_KEY 에러 발생하면, 401을 반환한다.")
-    void whenConfirmResponseUnauthorizedKey_thenReceive401() {
+    void whenConfirmResponseUnauthorizedKey_thenReturn401() {
         UUID uuid = UUID.randomUUID();
         String paymentKey = "tgen_20250102210202h9Oy0";
 
@@ -220,7 +220,7 @@ public class PaymentServiceTest {
 
     @Test
     @DisplayName("결제 승인 요청 시, PG 서버 내부 오류로 Server Internal Error가 발생하면, 500을 반환한다.")
-    void whenConfirmResponseInternalError_thenReceive500() {
+    void whenConfirmResponseInternalError_thenReturn500() {
         UUID uuid = UUID.randomUUID();
         String paymentKey = "tgen_20250102210202h9Oy0";
 
@@ -237,30 +237,5 @@ public class PaymentServiceTest {
         Assertions.assertThrows(TossPaymentConfirmException.class, () -> {
             tossPaymentService.confirm(payment);
         });
-    }
-
-    @Test
-    @DisplayName("결제 승인에 성공했지만, 주문 정보를 저장하는 과정에서 문제 발생 시 롤백하고 500을 반환한다.")
-    void test12() {
-
-    }
-
-    @Test
-    @DisplayName("결제 승인에 성공하고 주문을 저장한 뒤, 장바구니를 비우는 과정에서 문제 발생 시 롤백하고 500을 반환한다.")
-    void test10() {
-
-    }
-
-    @Test
-    @DisplayName("결제 승인에 성공하고 주문을 저장했으면, 장바구니를 비운다.")
-    void test11() {
-
-    }
-
-    @Disabled
-    @Test
-    @DisplayName("결제 승인에 성공하면, 주문 정보를 저장하고 200을 반환한다.")
-    void test13() {
-
     }
 }

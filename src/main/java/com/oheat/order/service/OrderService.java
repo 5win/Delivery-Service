@@ -6,8 +6,12 @@ import com.oheat.order.entity.Order;
 import com.oheat.order.entity.OrderMenu;
 import com.oheat.order.entity.OrderOption;
 import com.oheat.order.entity.OrderOptionGroup;
+import com.oheat.order.entity.Payment;
+import com.oheat.order.exception.InvalidPaymentInfoException;
 import com.oheat.order.exception.OrderNotExistsException;
+import com.oheat.order.exception.PaymentNotExistsException;
 import com.oheat.order.repository.OrderRepository;
+import com.oheat.order.repository.PaymentRepository;
 import com.oheat.user.entity.CartJpaEntity;
 import com.oheat.user.entity.CartOptionGroup;
 import com.oheat.user.entity.CartOptionGroupOption;
@@ -19,7 +23,9 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
@@ -27,7 +33,9 @@ public class OrderService {
 
     private final UserRepository userRepository;
     private final OrderRepository orderRepository;
+    private final PaymentRepository paymentRepository;
 
+    @Transactional
     public void registerOrder(OrderSaveRequest saveRequest, String username) {
         UserJpaEntity user = userRepository.findByUsername(username)
             .orElseThrow(UserNotExistsException::new);
@@ -37,10 +45,18 @@ public class OrderService {
             throw new CartEmptyException();
         }
 
+        Payment payment = paymentRepository.findById(saveRequest.getPaymentKey())
+            .orElseThrow(() -> new PaymentNotExistsException(HttpStatus.BAD_REQUEST, "결제 정보가 존재하지 않습니다."));
+
         ShopJpaEntity shop = carts.getFirst().getShop();
         Order order = generateOrder(shop, user, saveRequest);
 
+        if (!payment.validateAmount(order.calcPayAmount())) {
+            throw new InvalidPaymentInfoException(HttpStatus.BAD_REQUEST, "결제 정보가 일치하지 않습니다.");
+        }
+
         orderRepository.save(order);
+        user.clearCart();
     }
 
     public Page<Order> findOrderByUser(String username, Pageable pageable) {

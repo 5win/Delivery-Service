@@ -2,6 +2,8 @@ package com.oheat.order;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.when;
 
 import com.oheat.food.entity.MenuJpaEntity;
 import com.oheat.food.entity.OptionGroupJpaEntity;
@@ -14,8 +16,12 @@ import com.oheat.order.entity.Order;
 import com.oheat.order.entity.OrderMenu;
 import com.oheat.order.entity.OrderOption;
 import com.oheat.order.entity.OrderOptionGroup;
+import com.oheat.order.entity.Payment;
+import com.oheat.order.exception.InvalidPaymentInfoException;
 import com.oheat.order.exception.OrderNotExistsException;
+import com.oheat.order.exception.PaymentNotExistsException;
 import com.oheat.order.repository.OrderRepository;
+import com.oheat.order.repository.PaymentRepository;
 import com.oheat.order.service.OrderService;
 import com.oheat.user.entity.CartJpaEntity;
 import com.oheat.user.entity.CartOptionGroup;
@@ -27,6 +33,7 @@ import com.oheat.user.repository.UserRepository;
 import com.oheat.user.repository.UserRepositoryImpl;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -41,13 +48,14 @@ public class OrderServiceTest {
 
     // fake DB
     private final OrderRepository memoryOrderRepository = new MemoryOrderRepository();
+    private final PaymentRepository memoryPaymentRepository = new MemoryPaymentRepository();
 
     // service
     private OrderService orderService;
 
     @BeforeEach
     void setUp() {
-        orderService = new OrderService(userRepository, memoryOrderRepository);
+        orderService = new OrderService(userRepository, memoryOrderRepository, memoryPaymentRepository);
     }
 
     // Create
@@ -78,14 +86,68 @@ public class OrderServiceTest {
     }
 
     @Test
+    @DisplayName("paymentKey가 Payment 테이블에 존재하지 않으면, PaymentNotExistsException")
+    void whenPaymentKeyNotExistsInPaymentTable_thenThrowPaymentNotExistsException() {
+        UserJpaEntity user = generateUserWithCarts();
+
+        // 주문
+        given(userRepository.findByUsername("user"))
+            .willReturn(Optional.ofNullable(user));
+
+        OrderSaveRequest saveReq = OrderSaveRequest.builder()
+            .paymentKey("tgen_20250102210202h9Oy0")
+            .msgForShop("치킨무X")
+            .deliveryFee(3000)
+            .discount(0)
+            .payMethod(PayMethod.TOSS)
+            .build();
+
+        Assertions.assertThrows(PaymentNotExistsException.class, () -> {
+            orderService.registerOrder(saveReq, "user");
+        });
+    }
+
+    @Test
+    @DisplayName("결제 정보의 amount값이 장바구니의 totalPayAmount값과 일치하지 않으면, InvalidPaymentInfoException")
+    void whenAmountNotEqualsTotalPayAmount_thenThrowInvalidPaymentInfoException() {
+        UserJpaEntity user = generateUserWithCarts();
+
+        // 결제
+        String paymentKey = "tgen_20250102210202h9Oy0";
+        savePayment(UUID.randomUUID(), paymentKey, 30_500);
+
+        // 주문
+        given(userRepository.findByUsername("user"))
+            .willReturn(Optional.ofNullable(user));
+
+        OrderSaveRequest saveReq = OrderSaveRequest.builder()
+            .paymentKey(paymentKey)
+            .msgForShop("치킨무X")
+            .deliveryFee(3000)
+            .discount(0)
+            .payMethod(PayMethod.TOSS)
+            .build();
+
+        // totalPayAmount = 28,000 + 3,000
+        Assertions.assertThrows(InvalidPaymentInfoException.class, () -> {
+            orderService.registerOrder(saveReq, "user");
+        });
+    }
+
+    @Test
     @DisplayName("주문 시, 주문 테이블에 주문 상세 정보가 저장된다.")
     void whenOrder_thenSaveToOrdersTable() {
         UserJpaEntity user = generateUserWithCarts();
+
+        // 결제
+        String paymentKey = "tgen_20250102210202h9Oy0";
+        savePayment(UUID.randomUUID(), paymentKey, 31_000);
 
         given(userRepository.findByUsername("user"))
             .willReturn(Optional.of(user));
 
         OrderSaveRequest saveReq = OrderSaveRequest.builder()
+            .paymentKey(paymentKey)
             .msgForShop("치킨무X")
             .deliveryFee(3000)
             .discount(0)
@@ -108,10 +170,15 @@ public class OrderServiceTest {
     void whenOrderSuccess_thenOrderStateIsPending() {
         UserJpaEntity user = generateUserWithCarts();
 
+        // 결제
+        String paymentKey = "tgen_20250102210202h9Oy0";
+        savePayment(UUID.randomUUID(), paymentKey, 31_000);
+
         given(userRepository.findByUsername("user"))
             .willReturn(Optional.of(user));
 
         OrderSaveRequest saveReq = OrderSaveRequest.builder()
+            .paymentKey(paymentKey)
             .msgForShop("치킨무X")
             .deliveryFee(3000)
             .discount(0)
@@ -130,11 +197,16 @@ public class OrderServiceTest {
         // 매뉴를 유저의 장바구니에 추가
         UserJpaEntity user = generateUserWithCarts();
 
+        // 결제
+        String paymentKey = "tgen_20250102210202h9Oy0";
+        savePayment(UUID.randomUUID(), paymentKey, 31_000);
+
         // 주문
         given(userRepository.findByUsername("user"))
             .willReturn(Optional.ofNullable(user));
 
         OrderSaveRequest saveReq = OrderSaveRequest.builder()
+            .paymentKey(paymentKey)
             .msgForShop("치킨무X")
             .deliveryFee(3000)
             .discount(0)
@@ -157,11 +229,16 @@ public class OrderServiceTest {
     void givenCarts_whenOrder_thenSaveOptionGroupToOrdersOptionGroupTable() {
         UserJpaEntity user = generateUserWithCarts();
 
+        // 결제
+        String paymentKey = "tgen_20250102210202h9Oy0";
+        savePayment(UUID.randomUUID(), paymentKey, 31_000);
+
         // 주문
         given(userRepository.findByUsername("user"))
             .willReturn(Optional.ofNullable(user));
 
         OrderSaveRequest saveReq = OrderSaveRequest.builder()
+            .paymentKey(paymentKey)
             .msgForShop("치킨무X")
             .deliveryFee(3000)
             .discount(0)
@@ -186,11 +263,16 @@ public class OrderServiceTest {
     void givenCarts_whenOrder_thenSaveOptionToOrderOptionTable() {
         UserJpaEntity user = generateUserWithCarts();
 
+        // 결제
+        String paymentKey = "tgen_20250102210202h9Oy0";
+        savePayment(UUID.randomUUID(), paymentKey, 31_000);
+
         // 주문
         given(userRepository.findByUsername("user"))
             .willReturn(Optional.ofNullable(user));
 
         OrderSaveRequest saveReq = OrderSaveRequest.builder()
+            .paymentKey(paymentKey)
             .msgForShop("치킨무X")
             .deliveryFee(3000)
             .discount(0)
@@ -211,16 +293,77 @@ public class OrderServiceTest {
         assertThat(orderOptions2.size()).isEqualTo(2);
     }
 
+    @Test
+    @DisplayName("결제 승인에 성공하고 주문을 저장한 뒤, 장바구니를 비우는 과정에서 문제 발생 시 롤백하고 500을 반환한다.")
+    void afterOrder_whenErrorAtClearingCart_thenRollbackAndReturn500() {
+        UserJpaEntity spyUser = Mockito.spy(generateUserWithCarts());
+
+        // 결제
+        String paymentKey = "tgen_20250102210202h9Oy0";
+        savePayment(UUID.randomUUID(), paymentKey, 31_000);
+
+        // 주문
+        when(userRepository.findByUsername("user"))
+            .thenReturn(Optional.ofNullable(spyUser));
+
+        doThrow(RuntimeException.class)
+            .when(spyUser)
+            .clearCart();
+
+        OrderSaveRequest saveReq = OrderSaveRequest.builder()
+            .paymentKey(paymentKey)
+            .deliveryFee(3000)
+            .discount(0)
+            .payMethod(PayMethod.TOSS)
+            .build();
+
+        Assertions.assertThrows(Exception.class, () -> {
+            orderService.registerOrder(saveReq, "user");
+        });
+    }
+
+    @Test
+    @DisplayName("결제 승인에 성공하고 주문을 저장했으면, 장바구니를 비운다.")
+    void whenSuccessOrder_thenCartIsEmpty() {
+        UserJpaEntity user = generateUserWithCarts();
+
+        // 결제
+        String paymentKey = "tgen_20250102210202h9Oy0";
+        savePayment(UUID.randomUUID(), paymentKey, 31_000);
+
+        // 주문
+        when(userRepository.findByUsername("user"))
+            .thenReturn(Optional.ofNullable(user));
+
+        OrderSaveRequest saveReq = OrderSaveRequest.builder()
+            .paymentKey(paymentKey)
+            .deliveryFee(3000)
+            .discount(0)
+            .payMethod(PayMethod.TOSS)
+            .build();
+
+        Assertions.assertDoesNotThrow(() -> {
+            orderService.registerOrder(saveReq, "user");
+        });
+        assertThat(user.getCarts()).hasSize(0);
+    }
+
     // Read
     @Test
     @DisplayName("주문 내역 조회 시, 각 주문의 매장 이름, 결제 금액, 주문 상태, 리뷰 여부 정보를 Page로 반환한다.")
     void whenFindOrderHistory_thenReturnInfoByPage() {
         // 주문 등록
         UserJpaEntity user = generateUserWithCarts();
+
+        // 결제
+        String paymentKey = "tgen_20250102210202h9Oy0";
+        savePayment(UUID.randomUUID(), paymentKey, 30_500);
+
         given(userRepository.findByUsername("user"))
             .willReturn(Optional.ofNullable(user));
 
         OrderSaveRequest saveReq = OrderSaveRequest.builder()
+            .paymentKey(paymentKey)
             .msgForShop("치킨무X")
             .deliveryFee(3000)
             .discount(500)
@@ -233,7 +376,7 @@ public class OrderServiceTest {
             .getContent().get(0);
 
         assertThat(result.getShop().getName()).isEqualTo("bbq");
-        assertThat(result.calcPayAmount()).isEqualTo(20_000 + 4_000 + 2_000 + 2_000 + 3_000 - 500);
+        assertThat(result.calcPayAmount()).isEqualTo(20_000 + 4_000 + 2_000 + 2_000 + 3_000 - 500); // 30,500
         assertThat(result.getOrderState()).isEqualTo(OrderState.PENDING);
         assertThat(result.isReviewed()).isFalse();
     }
@@ -243,10 +386,16 @@ public class OrderServiceTest {
     void whenPayAmountIsNegative_thenSetZero() {
         // 주문 등록
         UserJpaEntity user = generateUserWithCarts();
+
+        // 결제
+        String paymentKey = "tgen_20250102210202h9Oy0";
+        savePayment(UUID.randomUUID(), paymentKey, 0);
+
         given(userRepository.findByUsername("user"))
             .willReturn(Optional.ofNullable(user));
 
         OrderSaveRequest saveReq = OrderSaveRequest.builder()
+            .paymentKey(paymentKey)
             .msgForShop("치킨무X")
             .deliveryFee(3000)
             .discount(999_999_999)
@@ -266,13 +415,19 @@ public class OrderServiceTest {
     void whenFindOrderDetail_thenReturnDetailInfo() {
         // 주문 등록
         UserJpaEntity user = generateUserWithCarts();
+
+        // 결제
+        String paymentKey = "tgen_20250102210202h9Oy0";
+        savePayment(UUID.randomUUID(), paymentKey, 30_500);
+
         given(userRepository.findByUsername("user"))
             .willReturn(Optional.ofNullable(user));
 
         OrderSaveRequest saveReq = OrderSaveRequest.builder()
+            .paymentKey(paymentKey)
             .msgForShop("치킨무X")
             .deliveryFee(3000)
-            .discount(0)
+            .discount(500)
             .payMethod(PayMethod.TOSS)
             .build();
         orderService.registerOrder(saveReq, "user");
@@ -296,10 +451,16 @@ public class OrderServiceTest {
     void whenFindOrderDetail_thenReturnMenuPriceAndDeliveryFeeAndDiscountAndTotalPriceAndPayAmount() {
         // 주문 등록
         UserJpaEntity user = generateUserWithCarts();
+
+        // 결제
+        String paymentKey = "tgen_20250102210202h9Oy0";
+        savePayment(UUID.randomUUID(), paymentKey, 30_500);
+
         given(userRepository.findByUsername("user"))
             .willReturn(Optional.ofNullable(user));
 
         OrderSaveRequest saveReq = OrderSaveRequest.builder()
+            .paymentKey(paymentKey)
             .msgForShop("치킨무X")
             .deliveryFee(3000)
             .discount(500)
@@ -334,6 +495,14 @@ public class OrderServiceTest {
         Assertions.assertDoesNotThrow(() -> {
             orderService.deleteOrderHistoryById(1L);
         });
+    }
+
+    private void savePayment(UUID orderId, String paymentKey, int amount) {
+        memoryPaymentRepository.save(Payment.builder()
+            .orderId(orderId)
+            .paymentKey(paymentKey)
+            .amount(amount)
+            .build());
     }
 
     private UserJpaEntity generateUserWithCarts() {
