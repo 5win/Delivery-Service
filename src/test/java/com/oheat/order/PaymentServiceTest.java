@@ -245,6 +245,18 @@ public class PaymentServiceTest {
 
     }
 
+    @Test
+    @DisplayName("결제 승인에 성공하고 주문을 저장한 뒤, 장바구니를 비우는 과정에서 문제 발생 시 롤백하고 500을 반환한다.")
+    void test10() {
+
+    }
+
+    @Test
+    @DisplayName("결제 승인에 성공하고 주문을 저장했으면, 장바구니를 비운다.")
+    void test11() {
+
+    }
+
     @Disabled
     @Test
     @DisplayName("결제 승인에 성공하면, 주문 정보를 저장하고 200을 반환한다.")
