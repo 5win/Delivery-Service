@@ -49,9 +49,9 @@ public class OrderService {
             .orElseThrow(() -> new PaymentNotExistsException(HttpStatus.BAD_REQUEST, "결제 정보가 존재하지 않습니다."));
 
         ShopJpaEntity shop = carts.getFirst().getShop();
-        Order order = generateOrder(shop, user, saveRequest);
+        Order order = generateOrder(shop, user, payment, saveRequest);
 
-        if (!payment.validateAmount(order.calcPayAmount())) {
+        if (!order.validatePayAmount()) {
             throw new InvalidPaymentInfoException(HttpStatus.BAD_REQUEST, "결제 정보가 일치하지 않습니다.");
         }
 
@@ -79,10 +79,8 @@ public class OrderService {
     /**
      * 주문 객체 생성 메서드
      */
-    private Order generateOrder(ShopJpaEntity shop, UserJpaEntity user,
-        OrderSaveRequest saveRequest) {
-
-        Order order = saveRequest.toEntity(shop, user);
+    private Order generateOrder(ShopJpaEntity shop, UserJpaEntity user, Payment payment, OrderSaveRequest saveRequest) {
+        Order order = saveRequest.toEntity(shop, user, payment);
         user.getCarts().forEach(cart -> {
             order.addOrderMenu(generateOrderMenu(cart));
         });

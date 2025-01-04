@@ -17,6 +17,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import java.util.ArrayList;
 import java.util.List;
@@ -73,10 +74,14 @@ public class Order extends BaseTimeEntity {
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderMenu> orderMenus = new ArrayList<>();
 
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "payment_key")
+    private Payment payment;
+
     @Builder
     public Order(OrderState orderState, String address, String phone, String msgForShop,
         int deliveryFee, int discount, PayMethod payMethod, boolean reviewed, ShopJpaEntity shop,
-        UserJpaEntity user) {
+        UserJpaEntity user, Payment payment) {
         this.orderState = orderState;
         this.address = address;
         this.phone = phone;
@@ -87,6 +92,7 @@ public class Order extends BaseTimeEntity {
         this.reviewed = reviewed;
         this.shop = shop;
         this.user = user;
+        this.payment = payment;
     }
 
     public void addOrderMenu(OrderMenu orderMenu) {
@@ -100,5 +106,9 @@ public class Order extends BaseTimeEntity {
             sum += orderMenu.calcTotalPrice();
         }
         return sum >= 0 ? sum : 0;
+    }
+
+    public boolean validatePayAmount() {
+        return this.payment != null && this.payment.getAmount() == calcPayAmount();
     }
 }
