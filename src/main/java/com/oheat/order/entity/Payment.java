@@ -20,19 +20,27 @@ import lombok.NoArgsConstructor;
 public class Payment extends BaseTimeEntity {
 
     @Id
-    @Column(name = "payment_key")
+    @Column(name = "payment_key", nullable = false)
     private String paymentKey;
 
-    @Column(name = "order_id")
+    @Column(name = "order_id", nullable = false)
     private UUID orderId;
 
-    @Column(name = "amount")
+    @Column(name = "amount", nullable = false)
     private int amount;
 
+    @Column(name = "paid", nullable = false)
+    private boolean paid;
+
     @Builder
-    public Payment(String paymentKey, UUID orderId, int amount) {
+    public Payment(String paymentKey, UUID orderId, int amount, boolean paid) {
         this.paymentKey = paymentKey;
         this.orderId = orderId;
         this.amount = amount;
+        this.paid = paid;
+    }
+
+    public void setPaid(boolean paid) {
+        this.paid = paid;
     }
 }

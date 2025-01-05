@@ -9,7 +9,7 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @Builder
 @RequiredArgsConstructor
-public class TossPaymentResponse {
+public class TossPaymentConfirmResponse {
 
     private final UUID orderId;
     private final String mId;

@@ -19,6 +19,7 @@ import com.oheat.order.entity.OrderOptionGroup;
 import com.oheat.order.entity.Payment;
 import com.oheat.order.exception.InvalidPaymentInfoException;
 import com.oheat.order.exception.OrderNotExistsException;
+import com.oheat.order.exception.PaymentNotConfirmedException;
 import com.oheat.order.exception.PaymentNotExistsException;
 import com.oheat.order.repository.OrderRepository;
 import com.oheat.order.repository.PaymentRepository;
@@ -108,13 +109,39 @@ public class OrderServiceTest {
     }
 
     @Test
+    @DisplayName("전달된 결제 정보가 승인되지 않은 결제이면, PaymentNotConfirmedException")
+    void whenPaymentNotConfirmed_thenThrowPaymentNotConfirmedException() {
+        UserJpaEntity user = generateUserWithCarts();
+
+        // 결제
+        String paymentKey = "tgen_20250102210202h9Oy0";
+        savePayment(UUID.randomUUID(), paymentKey, 30_500, false); // 결제 승인이 false
+
+        // 주문
+        given(userRepository.findByUsername("user"))
+            .willReturn(Optional.ofNullable(user));
+
+        OrderSaveRequest saveReq = OrderSaveRequest.builder()
+            .paymentKey("tgen_20250102210202h9Oy0")
+            .msgForShop("치킨무X")
+            .deliveryFee(3000)
+            .discount(0)
+            .payMethod(PayMethod.TOSS)
+            .build();
+
+        Assertions.assertThrows(PaymentNotConfirmedException.class, () -> {
+            orderService.registerOrder(saveReq, "user");
+        });
+    }
+
+    @Test
     @DisplayName("결제 정보의 amount값이 장바구니의 totalPayAmount값과 일치하지 않으면, InvalidPaymentInfoException")
     void whenAmountNotEqualsTotalPayAmount_thenThrowInvalidPaymentInfoException() {
         UserJpaEntity user = generateUserWithCarts();
 
         // 결제
         String paymentKey = "tgen_20250102210202h9Oy0";
-        savePayment(UUID.randomUUID(), paymentKey, 30_500);
+        savePayment(UUID.randomUUID(), paymentKey, 30_500, true);
 
         // 주문
         given(userRepository.findByUsername("user"))
@@ -141,7 +168,7 @@ public class OrderServiceTest {
 
         // 결제
         String paymentKey = "tgen_20250102210202h9Oy0";
-        savePayment(UUID.randomUUID(), paymentKey, 31_000);
+        savePayment(UUID.randomUUID(), paymentKey, 31_000, true);
 
         given(userRepository.findByUsername("user"))
             .willReturn(Optional.of(user));
@@ -172,7 +199,7 @@ public class OrderServiceTest {
 
         // 결제
         String paymentKey = "tgen_20250102210202h9Oy0";
-        savePayment(UUID.randomUUID(), paymentKey, 31_000);
+        savePayment(UUID.randomUUID(), paymentKey, 31_000, true);
 
         given(userRepository.findByUsername("user"))
             .willReturn(Optional.of(user));
@@ -199,7 +226,7 @@ public class OrderServiceTest {
 
         // 결제
         String paymentKey = "tgen_20250102210202h9Oy0";
-        savePayment(UUID.randomUUID(), paymentKey, 31_000);
+        savePayment(UUID.randomUUID(), paymentKey, 31_000, true);
 
         // 주문
         given(userRepository.findByUsername("user"))
@@ -231,7 +258,7 @@ public class OrderServiceTest {
 
         // 결제
         String paymentKey = "tgen_20250102210202h9Oy0";
-        savePayment(UUID.randomUUID(), paymentKey, 31_000);
+        savePayment(UUID.randomUUID(), paymentKey, 31_000, true);
 
         // 주문
         given(userRepository.findByUsername("user"))
@@ -265,7 +292,7 @@ public class OrderServiceTest {
 
         // 결제
         String paymentKey = "tgen_20250102210202h9Oy0";
-        savePayment(UUID.randomUUID(), paymentKey, 31_000);
+        savePayment(UUID.randomUUID(), paymentKey, 31_000, true);
 
         // 주문
         given(userRepository.findByUsername("user"))
@@ -300,7 +327,7 @@ public class OrderServiceTest {
 
         // 결제
         String paymentKey = "tgen_20250102210202h9Oy0";
-        savePayment(UUID.randomUUID(), paymentKey, 31_000);
+        savePayment(UUID.randomUUID(), paymentKey, 31_000, true);
 
         // 주문
         when(userRepository.findByUsername("user"))
@@ -329,7 +356,7 @@ public class OrderServiceTest {
 
         // 결제
         String paymentKey = "tgen_20250102210202h9Oy0";
-        savePayment(UUID.randomUUID(), paymentKey, 31_000);
+        savePayment(UUID.randomUUID(), paymentKey, 31_000, true);
 
         // 주문
         when(userRepository.findByUsername("user"))
@@ -357,7 +384,7 @@ public class OrderServiceTest {
 
         // 결제
         String paymentKey = "tgen_20250102210202h9Oy0";
-        savePayment(UUID.randomUUID(), paymentKey, 30_500);
+        savePayment(UUID.randomUUID(), paymentKey, 30_500, true);
 
         given(userRepository.findByUsername("user"))
             .willReturn(Optional.ofNullable(user));
@@ -389,7 +416,7 @@ public class OrderServiceTest {
 
         // 결제
         String paymentKey = "tgen_20250102210202h9Oy0";
-        savePayment(UUID.randomUUID(), paymentKey, 0);
+        savePayment(UUID.randomUUID(), paymentKey, 0, true);
 
         given(userRepository.findByUsername("user"))
             .willReturn(Optional.ofNullable(user));
@@ -418,7 +445,7 @@ public class OrderServiceTest {
 
         // 결제
         String paymentKey = "tgen_20250102210202h9Oy0";
-        savePayment(UUID.randomUUID(), paymentKey, 30_500);
+        savePayment(UUID.randomUUID(), paymentKey, 30_500, true);
 
         given(userRepository.findByUsername("user"))
             .willReturn(Optional.ofNullable(user));
@@ -454,7 +481,7 @@ public class OrderServiceTest {
 
         // 결제
         String paymentKey = "tgen_20250102210202h9Oy0";
-        savePayment(UUID.randomUUID(), paymentKey, 30_500);
+        savePayment(UUID.randomUUID(), paymentKey, 30_500, true);
 
         given(userRepository.findByUsername("user"))
             .willReturn(Optional.ofNullable(user));
@@ -497,11 +524,12 @@ public class OrderServiceTest {
         });
     }
 
-    private void savePayment(UUID orderId, String paymentKey, int amount) {
+    private void savePayment(UUID orderId, String paymentKey, int amount, boolean paid) {
         memoryPaymentRepository.save(Payment.builder()
             .orderId(orderId)
             .paymentKey(paymentKey)
             .amount(amount)
+            .paid(paid)
             .build());
     }
 

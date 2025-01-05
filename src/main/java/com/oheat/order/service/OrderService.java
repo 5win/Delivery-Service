@@ -9,6 +9,7 @@ import com.oheat.order.entity.OrderOptionGroup;
 import com.oheat.order.entity.Payment;
 import com.oheat.order.exception.InvalidPaymentInfoException;
 import com.oheat.order.exception.OrderNotExistsException;
+import com.oheat.order.exception.PaymentNotConfirmedException;
 import com.oheat.order.exception.PaymentNotExistsException;
 import com.oheat.order.repository.OrderRepository;
 import com.oheat.order.repository.PaymentRepository;
@@ -47,6 +48,9 @@ public class OrderService {
 
         Payment payment = paymentRepository.findById(saveRequest.getPaymentKey())
             .orElseThrow(() -> new PaymentNotExistsException(HttpStatus.BAD_REQUEST, "결제 정보가 존재하지 않습니다."));
+        if (!payment.isPaid()) {
+            throw new PaymentNotConfirmedException(HttpStatus.BAD_REQUEST, "승인되지 않은 결제입니다.");
+        }
 
         ShopJpaEntity shop = carts.getFirst().getShop();
         Order order = generateOrder(shop, user, payment, saveRequest);

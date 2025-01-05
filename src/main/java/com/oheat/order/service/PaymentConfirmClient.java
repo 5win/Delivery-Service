@@ -1,6 +1,6 @@
 package com.oheat.order.service;
 
-import com.oheat.order.dto.TossPaymentResponse;
+import com.oheat.order.dto.TossPaymentConfirmResponse;
 import com.oheat.order.entity.Payment;
 import com.oheat.order.exception.TossPaymentConfirmException;
 import java.io.IOException;
@@ -25,7 +25,7 @@ public class PaymentConfirmClient {
     @Value("${spring.payment.toss.confirm-url}")
     private String confirmUrl;
 
-    public ResponseEntity<TossPaymentResponse> confirmTossPayment(Payment payment) {
+    public ResponseEntity<TossPaymentConfirmResponse> confirmTossPayment(Payment payment) {
 
         Encoder encoder = Base64.getEncoder();
         byte[] encodedBytes = encoder.encode((secretKey + ":").getBytes(StandardCharsets.UTF_8));
@@ -39,7 +39,7 @@ public class PaymentConfirmClient {
             .retrieve()
             .onStatus(HttpStatusCode::is4xxClientError, this::errorhandler4xx)
             .onStatus(HttpStatusCode::is5xxServerError, this::errorhandler5xx)
-            .toEntity(TossPaymentResponse.class);
+            .toEntity(TossPaymentConfirmResponse.class);
     }
 
     private void errorhandler4xx(HttpRequest request, ClientHttpResponse response)

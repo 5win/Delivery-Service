@@ -4,7 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-import com.oheat.order.dto.TossPaymentResponse;
+import com.oheat.order.dto.TossPaymentConfirmResponse;
 import com.oheat.order.entity.Payment;
 import com.oheat.order.exception.DuplicatePaymentKeyException;
 import com.oheat.order.exception.InvalidPaymentInfoException;
@@ -144,15 +144,41 @@ public class PaymentServiceTest {
         paymentRepository.save(payment);
 
         when(paymentConfirmClient.confirmTossPayment(any()))
-            .thenReturn(ResponseEntity.ok(TossPaymentResponse.builder()
+            .thenReturn(ResponseEntity.ok(TossPaymentConfirmResponse.builder()
                 .orderId(uuid)
                 .paymentKey(paymentKey)
                 .build()));
 
-        ResponseEntity<TossPaymentResponse> result = tossPaymentService.confirm(payment);
+        ResponseEntity<TossPaymentConfirmResponse> result = tossPaymentService.confirm(payment);
         assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(result.getBody().getOrderId()).isEqualTo(uuid);
         assertThat(result.getBody().getPaymentKey()).isEqualTo(paymentKey);
+    }
+
+    @Test
+    @DisplayName("토스페이먼츠 결제 승인에 성공하면, Payment 객체의 paid가 true가 된다.")
+    void whenRequestConfirm_thenPaidIsTrue() {
+        UUID uuid = UUID.randomUUID();
+        String paymentKey = "tgen_20250102210202h9Oy0";
+
+        Payment payment = Payment.builder()
+            .orderId(uuid)
+            .amount(50_000)
+            .paymentKey(paymentKey)
+            .paid(false)
+            .build();
+        paymentRepository.save(payment);
+
+        when(paymentConfirmClient.confirmTossPayment(any()))
+            .thenReturn(ResponseEntity.ok(TossPaymentConfirmResponse.builder()
+                .orderId(uuid)
+                .paymentKey(paymentKey)
+                .build()));
+
+        tossPaymentService.confirm(payment);
+
+        Payment result = paymentRepository.findById(paymentKey).get();
+        assertThat(result.isPaid()).isTrue();
     }
 
     @Test
