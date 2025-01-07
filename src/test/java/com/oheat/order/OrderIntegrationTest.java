@@ -16,6 +16,7 @@ import com.oheat.food.repository.OptionGroupJpaRepository;
 import com.oheat.food.repository.OptionJpaRepository;
 import com.oheat.food.repository.ShopJpaRepository;
 import com.oheat.order.constant.PayMethod;
+import com.oheat.order.constant.PaymentState;
 import com.oheat.order.dto.OrderSaveRequest;
 import com.oheat.order.entity.Order;
 import com.oheat.order.entity.Payment;
@@ -99,7 +100,7 @@ public class OrderIntegrationTest {
         // 승인된 결제 정보 저장
         UUID orderId = UUID.randomUUID();
         String paymentKey = "tgen_20250102210202h9Oy0";
-        savePayment(orderId, paymentKey, 26_000, true);
+        savePayment(orderId, paymentKey, 26_000, PaymentState.CONFIRMED);
 
         // User, UserRepository 모킹
         UserJpaEntity spyUser = Mockito.spy(userJpaRepository.findByUsername("username").get());
@@ -134,7 +135,7 @@ public class OrderIntegrationTest {
         // 승인된 결제 정보 저장
         UUID orderId = UUID.randomUUID();
         String paymentKey = "tgen_20250102210202h9Oy0";
-        savePayment(orderId, paymentKey, 26_000, true);
+        savePayment(orderId, paymentKey, 26_000, PaymentState.CONFIRMED);
 
         // OrderRepository 모킹
         doThrow(RuntimeException.class)
@@ -175,7 +176,7 @@ public class OrderIntegrationTest {
             // 승인된 결제 정보 저장
             UUID orderId = UUID.randomUUID();
             String paymentKey = "tgen_20250102210202h9Oy0";
-            savePayment(orderId, paymentKey, 26_000, true);
+            savePayment(orderId, paymentKey, 26_000, PaymentState.CONFIRMED);
 
             // 주문
             OrderSaveRequest orderSaveRequest = OrderSaveRequest.builder()
@@ -202,12 +203,12 @@ public class OrderIntegrationTest {
         }
     }
 
-    Payment savePayment(UUID orderId, String paymentKey, int amount, boolean paid) {
+    Payment savePayment(UUID orderId, String paymentKey, int amount, PaymentState state) {
         Payment payment = Payment.builder()
             .orderId(orderId)
             .paymentKey(paymentKey)
             .amount(amount)
-            .paid(paid)
+            .state(state)
             .build();
         paymentJpaRepository.save(payment);
         return payment;

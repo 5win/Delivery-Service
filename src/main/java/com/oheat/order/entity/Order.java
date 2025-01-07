@@ -58,6 +58,7 @@ public class Order extends BaseTimeEntity {
     private int discount;
 
     @Column(name = "pay_method", nullable = false)
+    @Enumerated(value = EnumType.STRING)
     private PayMethod payMethod;
 
     @Column(name = "reviewed", nullable = false)

@@ -49,7 +49,7 @@ public class OrderService {
 
         Payment payment = paymentRepository.findById(saveRequest.getPaymentKey())
             .orElseThrow(() -> new PaymentNotExistsException(HttpStatus.BAD_REQUEST, "결제 정보가 존재하지 않습니다."));
-        if (!payment.isPaid()) {
+        if (!payment.isConfirmed()) {
             throw new PaymentNotConfirmedException(HttpStatus.BAD_REQUEST, "승인되지 않은 결제입니다.");
         }
 

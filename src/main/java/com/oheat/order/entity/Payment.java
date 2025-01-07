@@ -1,8 +1,11 @@
 package com.oheat.order.entity;
 
 import com.oheat.common.BaseTimeEntity;
+import com.oheat.order.constant.PaymentState;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.util.UUID;
@@ -29,18 +32,23 @@ public class Payment extends BaseTimeEntity {
     @Column(name = "amount", nullable = false)
     private int amount;
 
-    @Column(name = "paid", nullable = false)
-    private boolean paid;
+    @Column(name = "status", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private PaymentState state;
 
     @Builder
-    public Payment(String paymentKey, UUID orderId, int amount, boolean paid) {
+    public Payment(String paymentKey, UUID orderId, int amount, PaymentState state) {
         this.paymentKey = paymentKey;
         this.orderId = orderId;
         this.amount = amount;
-        this.paid = paid;
+        this.state = state;
     }
 
-    public void setPaid(boolean paid) {
-        this.paid = paid;
+    public boolean isConfirmed() {
+        return this.state == PaymentState.CONFIRMED;
+    }
+
+    public void setConfirmed() {
+        this.state = PaymentState.CONFIRMED;
     }
 }
