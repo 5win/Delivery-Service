@@ -8,9 +8,9 @@ import com.oheat.order.constant.PaymentState;
 import com.oheat.order.dto.TossPaymentConfirmResponse;
 import com.oheat.order.entity.Payment;
 import com.oheat.order.exception.DuplicatePaymentKeyException;
-import com.oheat.order.exception.TossPaymentConfirmException;
+import com.oheat.order.exception.PaymentCannotConfirmException;
 import com.oheat.order.repository.PaymentRepository;
-import com.oheat.order.service.PaymentConfirmClient;
+import com.oheat.order.service.TossPaymentClient;
 import com.oheat.order.service.TossPaymentService;
 import java.util.UUID;
 import org.junit.jupiter.api.Assertions;
@@ -25,12 +25,12 @@ import org.springframework.http.ResponseEntity;
 public class PaymentServiceTest {
 
     private final PaymentRepository paymentRepository = new MemoryPaymentRepository();
-    private final PaymentConfirmClient paymentConfirmClient = Mockito.mock(PaymentConfirmClient.class);
+    private final TossPaymentClient tossPaymentClient = Mockito.mock(TossPaymentClient.class);
     private TossPaymentService tossPaymentService;
 
     @BeforeEach
     void setUp() {
-        tossPaymentService = new TossPaymentService(paymentRepository, paymentConfirmClient);
+        tossPaymentService = new TossPaymentService(paymentRepository, tossPaymentClient);
     }
 
     @Test
@@ -42,7 +42,7 @@ public class PaymentServiceTest {
             .paymentKey("tgen_20250102210202h9Oy0")
             .build();
 
-        when(paymentConfirmClient.confirmTossPayment(any()))
+        when(tossPaymentClient.confirmPayment(any()))
             .thenReturn(ResponseEntity.ok().build());
 
         Assertions.assertDoesNotThrow(() -> {
@@ -98,7 +98,7 @@ public class PaymentServiceTest {
             .paymentKey(paymentKey)
             .build();
 
-        when(paymentConfirmClient.confirmTossPayment(any()))
+        when(tossPaymentClient.confirmPayment(any()))
             .thenReturn(ResponseEntity.ok(TossPaymentConfirmResponse.builder()
                 .orderId(uuid)
                 .paymentKey(paymentKey)
@@ -123,7 +123,7 @@ public class PaymentServiceTest {
             .state(PaymentState.UNCONFIRMED)
             .build();
 
-        when(paymentConfirmClient.confirmTossPayment(any()))
+        when(tossPaymentClient.confirmPayment(any()))
             .thenReturn(ResponseEntity.ok(TossPaymentConfirmResponse.builder()
                 .orderId(uuid)
                 .paymentKey(paymentKey)
@@ -147,10 +147,10 @@ public class PaymentServiceTest {
             .paymentKey(paymentKey)
             .build();
 
-        when(paymentConfirmClient.confirmTossPayment(any()))
-            .thenThrow(new TossPaymentConfirmException(HttpStatus.NOT_FOUND, "결제 승인에 실패했습니다."));
+        when(tossPaymentClient.confirmPayment(any()))
+            .thenThrow(new PaymentCannotConfirmException(HttpStatus.NOT_FOUND, "결제 승인에 실패했습니다."));
 
-        Assertions.assertThrows(TossPaymentConfirmException.class, () -> {
+        Assertions.assertThrows(PaymentCannotConfirmException.class, () -> {
             tossPaymentService.confirm(payment);
         });
     }
@@ -167,10 +167,10 @@ public class PaymentServiceTest {
             .paymentKey(paymentKey)
             .build();
 
-        when(paymentConfirmClient.confirmTossPayment(any()))
-            .thenThrow(new TossPaymentConfirmException(HttpStatus.FORBIDDEN, "결제 승인에 실패했습니다."));
+        when(tossPaymentClient.confirmPayment(any()))
+            .thenThrow(new PaymentCannotConfirmException(HttpStatus.FORBIDDEN, "결제 승인에 실패했습니다."));
 
-        Assertions.assertThrows(TossPaymentConfirmException.class, () -> {
+        Assertions.assertThrows(PaymentCannotConfirmException.class, () -> {
             tossPaymentService.confirm(payment);
         });
     }
@@ -187,10 +187,10 @@ public class PaymentServiceTest {
             .paymentKey(paymentKey)
             .build();
 
-        when(paymentConfirmClient.confirmTossPayment(any()))
-            .thenThrow(new TossPaymentConfirmException(HttpStatus.UNAUTHORIZED, "결제 승인에 실패했습니다."));
+        when(tossPaymentClient.confirmPayment(any()))
+            .thenThrow(new PaymentCannotConfirmException(HttpStatus.UNAUTHORIZED, "결제 승인에 실패했습니다."));
 
-        Assertions.assertThrows(TossPaymentConfirmException.class, () -> {
+        Assertions.assertThrows(PaymentCannotConfirmException.class, () -> {
             tossPaymentService.confirm(payment);
         });
     }
@@ -207,10 +207,10 @@ public class PaymentServiceTest {
             .paymentKey(paymentKey)
             .build();
 
-        when(paymentConfirmClient.confirmTossPayment(any()))
-            .thenThrow(new TossPaymentConfirmException(HttpStatus.INTERNAL_SERVER_ERROR, "결제 서버 오류로 결제 승인에 실패했습니다."));
+        when(tossPaymentClient.confirmPayment(any()))
+            .thenThrow(new PaymentCannotConfirmException(HttpStatus.INTERNAL_SERVER_ERROR, "결제 서버 오류로 결제 승인에 실패했습니다."));
 
-        Assertions.assertThrows(TossPaymentConfirmException.class, () -> {
+        Assertions.assertThrows(PaymentCannotConfirmException.class, () -> {
             tossPaymentService.confirm(payment);
         });
     }

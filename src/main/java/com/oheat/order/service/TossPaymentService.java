@@ -14,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class TossPaymentService {
 
     private final PaymentRepository paymentRepository;
-    private final PaymentConfirmClient paymentConfirmClient;
+    private final TossPaymentClient tossPaymentClient;
 
     @Transactional
     public ResponseEntity<TossPaymentConfirmResponse> confirm(Payment payment) {
@@ -23,7 +23,7 @@ public class TossPaymentService {
                 throw new DuplicatePaymentKeyException();
             });
 
-        var response = paymentConfirmClient.confirmTossPayment(payment);
+        var response = tossPaymentClient.confirmPayment(payment);
         if (response.getStatusCode().is2xxSuccessful()) {
             payment.setConfirmed();
         }

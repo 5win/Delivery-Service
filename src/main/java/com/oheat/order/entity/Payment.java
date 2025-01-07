@@ -51,4 +51,8 @@ public class Payment extends BaseTimeEntity {
     public void setConfirmed() {
         this.state = PaymentState.CONFIRMED;
     }
+
+    public void setCancelled() {
+        this.state = PaymentState.CANCELLED;
+    }
 }

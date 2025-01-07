@@ -41,6 +41,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.PageRequest;
 
 public class OrderServiceTest {
@@ -54,10 +55,12 @@ public class OrderServiceTest {
 
     // service
     private OrderService orderService;
+    private final ApplicationEventPublisher applicationEventPublisher = Mockito.mock(ApplicationEventPublisher.class);
 
     @BeforeEach
     void setUp() {
-        orderService = new OrderService(userRepository, memoryOrderRepository, memoryPaymentRepository);
+        orderService = new OrderService(userRepository, memoryOrderRepository, memoryPaymentRepository,
+            applicationEventPublisher);
     }
 
     // Create
@@ -67,8 +70,12 @@ public class OrderServiceTest {
         given(userRepository.findByUsername("user"))
             .willReturn(Optional.empty());
 
+        OrderSaveRequest saveReq = OrderSaveRequest.builder()
+            .paymentKey("tgen_20250102210202h9Oy0")
+            .build();
+
         Assertions.assertThrows(UserNotExistsException.class, () -> {
-            orderService.registerOrder(null, "user");
+            orderService.registerOrder(saveReq, "user");
         });
     }
 
@@ -82,8 +89,12 @@ public class OrderServiceTest {
         given(userRepository.findByUsername("user"))
             .willReturn(Optional.ofNullable(user));
 
+        OrderSaveRequest saveReq = OrderSaveRequest.builder()
+            .paymentKey("tgen_20250102210202h9Oy0")
+            .build();
+
         Assertions.assertThrows(CartEmptyException.class, () -> {
-            orderService.registerOrder(null, "user");
+            orderService.registerOrder(saveReq, "user");
         });
     }
 

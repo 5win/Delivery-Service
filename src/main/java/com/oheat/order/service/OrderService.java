@@ -22,6 +22,7 @@ import com.oheat.user.exception.UserNotExistsException;
 import com.oheat.user.repository.UserRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -37,8 +38,12 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final PaymentRepository paymentRepository;
 
+    private final ApplicationEventPublisher eventPublisher;
+
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void registerOrder(OrderSaveRequest saveRequest, String username) {
+        eventPublisher.publishEvent(saveRequest.getPaymentKey());   // rollback event publisher
+
         UserJpaEntity user = userRepository.findByUsername(username)
             .orElseThrow(UserNotExistsException::new);
 

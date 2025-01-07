@@ -23,6 +23,7 @@ import com.oheat.order.entity.Payment;
 import com.oheat.order.repository.OrderJpaRepository;
 import com.oheat.order.repository.PaymentJpaRepository;
 import com.oheat.order.service.OrderService;
+import com.oheat.order.service.TossPaymentClient;
 import com.oheat.user.constant.Role;
 import com.oheat.user.entity.CartJpaEntity;
 import com.oheat.user.entity.CartOptionGroup;
@@ -43,8 +44,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
@@ -64,6 +67,8 @@ public class OrderIntegrationTest {
     private UserJpaRepository userJpaRepository;
     @MockitoSpyBean
     private OrderJpaRepository orderJpaRepository;
+    @MockitoBean
+    private TossPaymentClient tossPaymentClient;
 
     // Repository Bean
     @Autowired
@@ -159,8 +164,53 @@ public class OrderIntegrationTest {
 
     @Test
     @DisplayName("장바구니를 비우는 과정에서 문제 발생 시, 결제를 취소한다.")
-    void test3() {
+    void whenClearCartFail_thenCancelPayment() {
+        DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+        def.setName("Test code TX");
+        TransactionStatus status = transactionManager.getTransaction(def);
+        try {
+            // 유저, 매장 등등 정보 생성 후 장바구니에 담음
+            addToCart();
 
+            // 승인된 결제 정보 저장
+            UUID orderId = UUID.randomUUID();
+            String paymentKey = "tgen_20250102210202h9Oy0";
+            savePayment(orderId, paymentKey, 26_000, PaymentState.CONFIRMED);
+
+            // User, UserRepository 모킹
+            UserJpaEntity spyUser = Mockito.spy(userJpaRepository.findByUsername("username").get());
+            doThrow(RuntimeException.class)
+                .when(spyUser)
+                .clearCart();
+
+            when(userJpaRepository.findByUsername("username"))
+                .thenReturn(Optional.of(spyUser));
+
+            when(tossPaymentClient.cancelPayment(any(), any()))
+                .thenReturn(ResponseEntity.ok().build());
+
+            // 주문
+            OrderSaveRequest orderSaveRequest = OrderSaveRequest.builder()
+                .paymentKey(paymentKey)
+                .deliveryFee(0)
+                .payMethod(PayMethod.TOSS)
+                .discount(0)
+                .build();
+
+            entityManager.flush();
+            entityManager.clear();
+
+            transactionManager.commit(status);
+
+            Assertions.assertThrows(RuntimeException.class, () -> {
+                orderService.registerOrder(orderSaveRequest, "username");
+            });
+            Payment result = paymentJpaRepository.findById(paymentKey).get();
+            assertThat(result.getState()).isEqualTo(PaymentState.CANCELLED);
+
+        } catch (Exception e) {
+            transactionManager.rollback(status);
+        }
     }
 
     @Test
