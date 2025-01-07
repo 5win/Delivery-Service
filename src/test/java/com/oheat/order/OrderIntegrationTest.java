@@ -35,7 +35,6 @@ import java.util.Optional;
 import java.util.UUID;
 import org.hibernate.Session;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -44,11 +43,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
-@Transactional
+@DirtiesContext(classMode = ClassMode.BEFORE_EACH_TEST_METHOD)
 @SpringBootTest
 @AutoConfigureTestDatabase(replace = Replace.NONE)
 public class OrderIntegrationTest {
@@ -80,23 +83,10 @@ public class OrderIntegrationTest {
     private OrderService orderService;
 
     @Autowired
+    private PlatformTransactionManager transactionManager;
+    @Autowired
     private EntityManager entityManager;
 
-    @BeforeEach
-    void reset() {
-        entityManager.createNativeQuery("ALTER TABLE users AUTO_INCREMENT = 1")
-            .executeUpdate();
-        entityManager.createNativeQuery("ALTER TABLE shop AUTO_INCREMENT = 1")
-            .executeUpdate();
-        entityManager.createNativeQuery("ALTER TABLE menu AUTO_INCREMENT = 1")
-            .executeUpdate();
-        entityManager.createNativeQuery("ALTER TABLE option_group AUTO_INCREMENT = 1")
-            .executeUpdate();
-        entityManager.createNativeQuery("ALTER TABLE options AUTO_INCREMENT = 1")
-            .executeUpdate();
-        entityManager.createNativeQuery("ALTER TABLE cart AUTO_INCREMENT = 1")
-            .executeUpdate();
-    }
 
     @Test
     @DisplayName("장바구니를 비우는 과정에서 문제 발생 시, 저장된 주문 데이터를 롤백한다.")
@@ -125,8 +115,6 @@ public class OrderIntegrationTest {
             .payMethod(PayMethod.TOSS)
             .discount(0)
             .build();
-
-        entityManager.flush();
 
         Assertions.assertThrows(RuntimeException.class, () -> {
             orderService.registerOrder(orderSaveRequest, "username");
@@ -176,32 +164,41 @@ public class OrderIntegrationTest {
     @Test
     @DisplayName("결제부터 주문 성공까지의 프로세스를 성공한다.")
     void successPaymentAndOrder() {
-        // 유저, 매장 등등 정보 생성 후 장바구니에 담음
-        addToCart();
+        DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+        def.setName("Test code TX");
+        TransactionStatus status = transactionManager.getTransaction(def);
+        try {
+            // 유저, 매장 등등 정보 생성 후 장바구니에 담음
+            addToCart();
 
-        // 승인된 결제 정보 저장
-        UUID orderId = UUID.randomUUID();
-        String paymentKey = "tgen_20250102210202h9Oy0";
-        savePayment(orderId, paymentKey, 26_000, true);
+            // 승인된 결제 정보 저장
+            UUID orderId = UUID.randomUUID();
+            String paymentKey = "tgen_20250102210202h9Oy0";
+            savePayment(orderId, paymentKey, 26_000, true);
 
-        // 주문
-        OrderSaveRequest orderSaveRequest = OrderSaveRequest.builder()
-            .paymentKey(paymentKey)
-            .deliveryFee(0)
-            .payMethod(PayMethod.TOSS)
-            .discount(0)
-            .build();
+            // 주문
+            OrderSaveRequest orderSaveRequest = OrderSaveRequest.builder()
+                .paymentKey(paymentKey)
+                .deliveryFee(0)
+                .payMethod(PayMethod.TOSS)
+                .discount(0)
+                .build();
 
-        entityManager.flush();
-        entityManager.clear();
+            entityManager.flush();
+            entityManager.clear();
 
-        Session session = entityManager.unwrap(Session.class);
-        System.out.println("Transaction Name: " + TransactionSynchronizationManager.getCurrentTransactionName());
-        System.out.println("Isolation Level: " + session.doReturningWork(Connection::getTransactionIsolation));
+            System.out.println("Transaction Name: " + TransactionSynchronizationManager.getCurrentTransactionName());
+            transactionManager.commit(status);
 
-        Assertions.assertDoesNotThrow(() -> {
-            orderService.registerOrder(orderSaveRequest, "username");
-        });
+            Session session = entityManager.unwrap(Session.class);
+            System.out.println("Isolation Level: " + session.doReturningWork(Connection::getTransactionIsolation));
+
+            Assertions.assertDoesNotThrow(() -> {
+                orderService.registerOrder(orderSaveRequest, "username");
+            });
+        } catch (Exception e) {
+            transactionManager.rollback(status);
+        }
     }
 
     Payment savePayment(UUID orderId, String paymentKey, int amount, boolean paid) {

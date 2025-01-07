@@ -26,6 +26,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
@@ -36,7 +37,7 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final PaymentRepository paymentRepository;
 
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void registerOrder(OrderSaveRequest saveRequest, String username) {
         UserJpaEntity user = userRepository.findByUsername(username)
             .orElseThrow(UserNotExistsException::new);
