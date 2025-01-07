@@ -35,7 +35,6 @@ import java.util.Optional;
 import java.util.UUID;
 import org.hibernate.Session;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -51,6 +50,9 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
+/**
+ * 테스트 코드와 비즈니스 로직의 트랜잭션 분리 및 롤백을 위해 @DirtiesContext 사용
+ */
 @DirtiesContext(classMode = ClassMode.BEFORE_EACH_TEST_METHOD)
 @SpringBootTest
 @AutoConfigureTestDatabase(replace = Replace.NONE)
@@ -154,7 +156,6 @@ public class OrderIntegrationTest {
         assertThat(result).isNotPresent();
     }
 
-    @Disabled
     @Test
     @DisplayName("장바구니를 비우는 과정에서 문제 발생 시, 결제를 취소한다.")
     void test3() {
