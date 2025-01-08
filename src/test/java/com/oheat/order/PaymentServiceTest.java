@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import com.oheat.order.constant.PaymentState;
+import com.oheat.order.dto.PaymentCancelRequest;
 import com.oheat.order.dto.TossPaymentConfirmRequest;
 import com.oheat.order.dto.TossPaymentConfirmResponse;
 import com.oheat.order.entity.Payment;
@@ -198,5 +199,32 @@ public class PaymentServiceTest {
         Assertions.assertThrows(PaymentCannotConfirmException.class, () -> {
             tossPaymentService.confirm(confirmReq);
         });
+    }
+
+    @Test
+    @DisplayName("승인된 결제를 취소하면, 결제 상태가 CANCELLED 로 변경된다.")
+    void whenPaymentCancel_thenPaymentStatusIsCancelled() {
+        UUID uuid = UUID.randomUUID();
+        String paymentKey = "tgen_20250102210202h9Oy0";
+
+        PaymentCancelRequest cancelReq = PaymentCancelRequest.builder()
+            .paymentKey(paymentKey)
+            .cancelReason("just do it")
+            .build();
+
+        Payment payment = Payment.builder()
+            .orderId(uuid)
+            .totalAmount(50_000)
+            .paymentKey(paymentKey)
+            .state(PaymentState.CONFIRMED)
+            .build();
+        paymentRepository.save(payment);
+
+        when(tossPaymentClient.cancelPayment(any(), any()))
+            .thenReturn(ResponseEntity.ok().build());
+
+        Assertions.assertDoesNotThrow(() -> tossPaymentService.cancel(cancelReq));
+        Payment result = paymentRepository.findById(paymentKey).get();
+        assertThat(result.getState()).isEqualTo(PaymentState.CANCELLED);
     }
 }
