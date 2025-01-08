@@ -2,3 +2,4 @@ spring:
   config:
     import:
       - application-dev-mysql.yml
+      - application-dev-payment.yml

@@ -6,8 +6,13 @@ import com.oheat.order.entity.Order;
 import com.oheat.order.entity.OrderMenu;
 import com.oheat.order.entity.OrderOption;
 import com.oheat.order.entity.OrderOptionGroup;
+import com.oheat.order.entity.Payment;
+import com.oheat.order.exception.InvalidPaymentInfoException;
 import com.oheat.order.exception.OrderNotExistsException;
+import com.oheat.order.exception.PaymentNotConfirmedException;
+import com.oheat.order.exception.PaymentNotExistsException;
 import com.oheat.order.repository.OrderRepository;
+import com.oheat.order.repository.PaymentRepository;
 import com.oheat.user.entity.CartJpaEntity;
 import com.oheat.user.entity.CartOptionGroup;
 import com.oheat.user.entity.CartOptionGroupOption;
@@ -17,9 +22,13 @@ import com.oheat.user.exception.UserNotExistsException;
 import com.oheat.user.repository.UserRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
@@ -27,8 +36,14 @@ public class OrderService {
 
     private final UserRepository userRepository;
     private final OrderRepository orderRepository;
+    private final PaymentRepository paymentRepository;
 
+    private final ApplicationEventPublisher eventPublisher;
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void registerOrder(OrderSaveRequest saveRequest, String username) {
+        eventPublisher.publishEvent(saveRequest.getPaymentKey());   // rollback event publisher
+
         UserJpaEntity user = userRepository.findByUsername(username)
             .orElseThrow(UserNotExistsException::new);
 
@@ -37,10 +52,21 @@ public class OrderService {
             throw new CartEmptyException();
         }
 
+        Payment payment = paymentRepository.findById(saveRequest.getPaymentKey())
+            .orElseThrow(() -> new PaymentNotExistsException(HttpStatus.BAD_REQUEST, "결제 정보가 존재하지 않습니다."));
+        if (!payment.isConfirmed()) {
+            throw new PaymentNotConfirmedException(HttpStatus.BAD_REQUEST, "승인되지 않은 결제입니다.");
+        }
+
         ShopJpaEntity shop = carts.getFirst().getShop();
-        Order order = generateOrder(shop, user, saveRequest);
+        Order order = generateOrder(shop, user, payment, saveRequest);
+
+        if (!order.validatePayAmount()) {
+            throw new InvalidPaymentInfoException(HttpStatus.BAD_REQUEST, "결제 정보가 일치하지 않습니다.");
+        }
 
         orderRepository.save(order);
+        user.clearCart();
     }
 
     public Page<Order> findOrderByUser(String username, Pageable pageable) {
@@ -63,10 +89,8 @@ public class OrderService {
     /**
      * 주문 객체 생성 메서드
      */
-    private Order generateOrder(ShopJpaEntity shop, UserJpaEntity user,
-        OrderSaveRequest saveRequest) {
-
-        Order order = saveRequest.toEntity(shop, user);
+    private Order generateOrder(ShopJpaEntity shop, UserJpaEntity user, Payment payment, OrderSaveRequest saveRequest) {
+        Order order = saveRequest.toEntity(shop, user, payment);
         user.getCarts().forEach(cart -> {
             order.addOrderMenu(generateOrderMenu(cart));
         });
