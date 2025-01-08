@@ -1,5 +1,6 @@
 package com.oheat.order.service;
 
+import com.oheat.order.dto.PaymentCancelRequest;
 import com.oheat.order.dto.TossPaymentConfirmResponse;
 import com.oheat.order.entity.Payment;
 import com.oheat.order.exception.DuplicatePaymentKeyException;
@@ -30,5 +31,9 @@ public class TossPaymentService {
         paymentRepository.save(payment);
 
         return response;
+    }
+
+    public void cancel(PaymentCancelRequest cancelRequest) {
+        tossPaymentClient.cancelPayment(cancelRequest.getPaymentKey(), cancelRequest.getCancelReason());
     }
 }

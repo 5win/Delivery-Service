@@ -1,5 +1,6 @@
 package com.oheat.order.controller;
 
+import com.oheat.order.dto.PaymentCancelRequest;
 import com.oheat.order.dto.PaymentSaveRequest;
 import com.oheat.order.service.TossPaymentService;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +18,14 @@ public class TossPaymentController {
     private final TossPaymentService tossPaymentService;
 
     @PostMapping("/confirm")
-    public ResponseEntity<?> successPayment(@RequestBody PaymentSaveRequest saveRequest) {
-        return tossPaymentService.confirm(saveRequest.toEntity());
+    public ResponseEntity<?> confirmPayment(@RequestBody PaymentSaveRequest saveRequest) {
+        tossPaymentService.confirm(saveRequest.toEntity());
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/cancel")
+    public ResponseEntity<?> cancelPayment(@RequestBody PaymentCancelRequest cancelRequest) {
+        tossPaymentService.cancel(cancelRequest);
+        return ResponseEntity.ok().build();
     }
 }
