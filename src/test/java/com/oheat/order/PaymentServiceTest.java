@@ -15,7 +15,6 @@ import com.oheat.order.service.TossPaymentService;
 import java.util.UUID;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -63,27 +62,6 @@ public class PaymentServiceTest {
         Assertions.assertThrows(DuplicatePaymentKeyException.class, () -> {
             tossPaymentService.confirm(payment);
         });
-    }
-
-    @Disabled
-    @Test
-    @DisplayName("구매자에 의해 결제가 취소(PAY_PROCESS_CANCELED)되어 failUrl로 응답이 오면 실패 사유와 함께 400을 반환한다.")
-    void test2() {
-
-    }
-
-    @Disabled
-    @Test
-    @DisplayName("결제가 실패(PAY_PROCESS_ABORTED)하여 failUrl로 응답이 오면 실패 사유와 함께 400을 반환한다.")
-    void test3() {
-
-    }
-
-    @Disabled
-    @Test
-    @DisplayName("구매자의 카드 정보 문제(REJECT_CARD_COMPANY)로 인해 failUrl로 응답이 오면 실패 사유와 함께 403 반환한다.")
-    void test4() {
-
     }
 
     @Test
