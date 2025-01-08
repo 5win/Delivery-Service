@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import com.oheat.order.constant.PaymentState;
+import com.oheat.order.dto.TossPaymentConfirmRequest;
 import com.oheat.order.dto.TossPaymentConfirmResponse;
 import com.oheat.order.entity.Payment;
 import com.oheat.order.exception.DuplicatePaymentKeyException;
@@ -35,42 +36,50 @@ public class PaymentServiceTest {
     @Test
     @DisplayName("클라이언트로부터 받은 orderId(UUID), paymentKey, amount 정보를 저장한다.")
     void whenReceiveOrderIdAndPaymentKeyAndAmountFromClient_thenSaveSuccess() {
-        Payment payment = Payment.builder()
+        TossPaymentConfirmRequest confirmReq = TossPaymentConfirmRequest.builder()
             .orderId(UUID.randomUUID())
             .amount(50_000)
             .paymentKey("tgen_20250102210202h9Oy0")
             .build();
 
         when(tossPaymentClient.confirmPayment(any()))
-            .thenReturn(ResponseEntity.ok().build());
+            .thenReturn(ResponseEntity.ok(TossPaymentConfirmResponse.builder()
+                .orderId(confirmReq.getOrderId())
+                .paymentKey(confirmReq.getPaymentKey())
+                .build()));
 
         Assertions.assertDoesNotThrow(() -> {
-            tossPaymentService.confirm(payment);
+            tossPaymentService.confirm(confirmReq);
         });
     }
 
     @Test
     @DisplayName("클라이언트로부터 받은 orderId(UUID) 가 이미 존재하면 실패한다.")
     void whenReceiveDuplicateOrderId_thenThrowDuplicateOrderIdException() {
-        Payment payment = Payment.builder()
+        TossPaymentConfirmRequest confirmReq = TossPaymentConfirmRequest.builder()
             .orderId(UUID.randomUUID())
             .amount(50_000)
+            .paymentKey("tgen_20250102210202h9Oy0")
+            .build();
+        Payment payment = Payment.builder()
+            .orderId(UUID.randomUUID())
+            .totalAmount(50_000)
             .paymentKey("tgen_20250102210202h9Oy0")
             .build();
         paymentRepository.save(payment);
 
         Assertions.assertThrows(DuplicatePaymentKeyException.class, () -> {
-            tossPaymentService.confirm(payment);
+            tossPaymentService.confirm(confirmReq);
         });
     }
 
     @Test
-    @DisplayName("결제 승인 요청이 오면, 토스페이먼츠 결제 승인 API에 요청을 보내고 200 응답과 정보를 받는다.")
+    @DisplayName("결제 승인 요청이 오면, 토스페이먼츠 결제 승인 API에 요청을 보내고 성공한다.")
     void whenPaymentInfoValid_thenRequestConfirmApiAndSuccess() {
         UUID uuid = UUID.randomUUID();
         String paymentKey = "tgen_20250102210202h9Oy0";
 
-        Payment payment = Payment.builder()
+        TossPaymentConfirmRequest confirmReq = TossPaymentConfirmRequest.builder()
             .orderId(uuid)
             .amount(50_000)
             .paymentKey(paymentKey)
@@ -82,23 +91,21 @@ public class PaymentServiceTest {
                 .paymentKey(paymentKey)
                 .build()));
 
-        ResponseEntity<TossPaymentConfirmResponse> result = tossPaymentService.confirm(payment);
-        assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(result.getBody().getOrderId()).isEqualTo(uuid);
-        assertThat(result.getBody().getPaymentKey()).isEqualTo(paymentKey);
+        Assertions.assertDoesNotThrow(() -> {
+            tossPaymentService.confirm(confirmReq);
+        });
     }
 
     @Test
-    @DisplayName("토스페이먼츠 결제 승인에 성공하면, Payment 객체의 승인 상태가 CONFIRMED 가 된다.")
+    @DisplayName("토스페이먼츠 결제 승인에 성공하면, Payment 객체의 승인 상태가 CONFIRMED 이다.")
     void whenRequestConfirm_thenPaidIsTrue() {
         UUID uuid = UUID.randomUUID();
         String paymentKey = "tgen_20250102210202h9Oy0";
 
-        Payment payment = Payment.builder()
+        TossPaymentConfirmRequest confirmReq = TossPaymentConfirmRequest.builder()
             .orderId(uuid)
             .amount(50_000)
             .paymentKey(paymentKey)
-            .state(PaymentState.UNCONFIRMED)
             .build();
 
         when(tossPaymentClient.confirmPayment(any()))
@@ -107,7 +114,7 @@ public class PaymentServiceTest {
                 .paymentKey(paymentKey)
                 .build()));
 
-        tossPaymentService.confirm(payment);
+        tossPaymentService.confirm(confirmReq);
 
         Payment result = paymentRepository.findById(paymentKey).get();
         assertThat(result.getState()).isEqualTo(PaymentState.CONFIRMED);
@@ -119,7 +126,7 @@ public class PaymentServiceTest {
         UUID uuid = UUID.randomUUID();
         String paymentKey = "tgen_20250102210202h9Oy0";
 
-        Payment payment = Payment.builder()
+        TossPaymentConfirmRequest confirmReq = TossPaymentConfirmRequest.builder()
             .orderId(uuid)
             .amount(50_000)
             .paymentKey(paymentKey)
@@ -129,7 +136,7 @@ public class PaymentServiceTest {
             .thenThrow(new PaymentCannotConfirmException(HttpStatus.NOT_FOUND, "결제 승인에 실패했습니다."));
 
         Assertions.assertThrows(PaymentCannotConfirmException.class, () -> {
-            tossPaymentService.confirm(payment);
+            tossPaymentService.confirm(confirmReq);
         });
     }
 
@@ -139,7 +146,7 @@ public class PaymentServiceTest {
         UUID uuid = UUID.randomUUID();
         String paymentKey = "tgen_20250102210202h9Oy0";
 
-        Payment payment = Payment.builder()
+        TossPaymentConfirmRequest confirmReq = TossPaymentConfirmRequest.builder()
             .orderId(uuid)
             .amount(50_000)
             .paymentKey(paymentKey)
@@ -149,7 +156,7 @@ public class PaymentServiceTest {
             .thenThrow(new PaymentCannotConfirmException(HttpStatus.FORBIDDEN, "결제 승인에 실패했습니다."));
 
         Assertions.assertThrows(PaymentCannotConfirmException.class, () -> {
-            tossPaymentService.confirm(payment);
+            tossPaymentService.confirm(confirmReq);
         });
     }
 
@@ -159,7 +166,7 @@ public class PaymentServiceTest {
         UUID uuid = UUID.randomUUID();
         String paymentKey = "tgen_20250102210202h9Oy0";
 
-        Payment payment = Payment.builder()
+        TossPaymentConfirmRequest confirmReq = TossPaymentConfirmRequest.builder()
             .orderId(uuid)
             .amount(50_000)
             .paymentKey(paymentKey)
@@ -169,7 +176,7 @@ public class PaymentServiceTest {
             .thenThrow(new PaymentCannotConfirmException(HttpStatus.UNAUTHORIZED, "결제 승인에 실패했습니다."));
 
         Assertions.assertThrows(PaymentCannotConfirmException.class, () -> {
-            tossPaymentService.confirm(payment);
+            tossPaymentService.confirm(confirmReq);
         });
     }
 
@@ -179,7 +186,7 @@ public class PaymentServiceTest {
         UUID uuid = UUID.randomUUID();
         String paymentKey = "tgen_20250102210202h9Oy0";
 
-        Payment payment = Payment.builder()
+        TossPaymentConfirmRequest confirmReq = TossPaymentConfirmRequest.builder()
             .orderId(uuid)
             .amount(50_000)
             .paymentKey(paymentKey)
@@ -189,7 +196,7 @@ public class PaymentServiceTest {
             .thenThrow(new PaymentCannotConfirmException(HttpStatus.INTERNAL_SERVER_ERROR, "결제 서버 오류로 결제 승인에 실패했습니다."));
 
         Assertions.assertThrows(PaymentCannotConfirmException.class, () -> {
-            tossPaymentService.confirm(payment);
+            tossPaymentService.confirm(confirmReq);
         });
     }
 }

@@ -6,7 +6,7 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withServerError;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
-import com.oheat.order.entity.Payment;
+import com.oheat.order.dto.TossPaymentConfirmRequest;
 import com.oheat.order.exception.PaymentCannotCancelException;
 import com.oheat.order.exception.PaymentCannotConfirmException;
 import com.oheat.order.service.TossPaymentClient;
@@ -37,26 +37,26 @@ public class TossPaymentClientTest {
     @Test
     @DisplayName("토스페이먼츠 결제 승인에 성공하면, 200을 반환한다.")
     void whenTossSuccessPaymentConfirm_thenReturn200() {
-        Payment payment = Payment.builder().build();
+        TossPaymentConfirmRequest confirmReq = TossPaymentConfirmRequest.builder().build();
 
         mockRestServiceServer.expect(requestTo("https://api.tosspayments.com/v1/payments/confirm"))
             .andRespond(withSuccess());
 
-        var response = tossPaymentClient.confirmPayment(payment);
+        var response = tossPaymentClient.confirmPayment(confirmReq);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
     }
 
     @Test
     @DisplayName("토스페이먼츠 결제 승인 요청에서 400 에러가 발생하면, 400을 반환한다.")
     void whenTossPaymentConfirm400Fail_thenReturn400() {
-        Payment payment = Payment.builder().build();
+        TossPaymentConfirmRequest confirmReq = TossPaymentConfirmRequest.builder().build();
 
         mockRestServiceServer.expect(requestTo("https://api.tosspayments.com/v1/payments/confirm"))
             .andRespond(withBadRequest());
 
         var result = Assertions.assertThrows(
             PaymentCannotConfirmException.class, () ->
-                tossPaymentClient.confirmPayment(payment)
+                tossPaymentClient.confirmPayment(confirmReq)
         );
         assertThat(result.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     }
@@ -64,14 +64,14 @@ public class TossPaymentClientTest {
     @Test
     @DisplayName("토스페이먼츠 결제 승인 요청에서 500 에러가 발생하면, 500을 반환한다.")
     void whenTossPaymentConfirm500Fail_thenReturn500() {
-        Payment payment = Payment.builder().build();
+        TossPaymentConfirmRequest confirmReq = TossPaymentConfirmRequest.builder().build();
 
         mockRestServiceServer.expect(requestTo("https://api.tosspayments.com/v1/payments/confirm"))
             .andRespond(withServerError());
 
         var result = Assertions.assertThrows(
             PaymentCannotConfirmException.class, () -> {
-                tossPaymentClient.confirmPayment(payment);
+                tossPaymentClient.confirmPayment(confirmReq);
             });
         assertThat(result.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
     }

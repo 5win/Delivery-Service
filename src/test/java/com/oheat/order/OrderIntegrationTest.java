@@ -116,6 +116,9 @@ public class OrderIntegrationTest {
         when(userJpaRepository.findByUsername("username"))
             .thenReturn(Optional.of(spyUser));
 
+        when(tossPaymentClient.cancelPayment(any(), any()))
+            .thenReturn(ResponseEntity.ok().build());
+
         // 주문
         OrderSaveRequest orderSaveRequest = OrderSaveRequest.builder()
             .paymentKey(paymentKey)
@@ -146,6 +149,9 @@ public class OrderIntegrationTest {
         doThrow(RuntimeException.class)
             .when(orderJpaRepository)
             .save(any());
+
+        when(tossPaymentClient.cancelPayment(any(), any()))
+            .thenReturn(ResponseEntity.ok().build());
 
         // 주문
         OrderSaveRequest orderSaveRequest = OrderSaveRequest.builder()
@@ -257,7 +263,7 @@ public class OrderIntegrationTest {
         Payment payment = Payment.builder()
             .orderId(orderId)
             .paymentKey(paymentKey)
-            .amount(amount)
+            .totalAmount(amount)
             .state(state)
             .build();
         paymentJpaRepository.save(payment);

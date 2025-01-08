@@ -110,6 +110,6 @@ public class Order extends BaseTimeEntity {
     }
 
     public boolean validatePayAmount() {
-        return this.payment != null && this.payment.getAmount() == calcPayAmount();
+        return this.payment != null && this.payment.getTotalAmount() == calcPayAmount();
     }
 }

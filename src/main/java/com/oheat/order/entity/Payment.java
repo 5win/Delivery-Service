@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@EqualsAndHashCode(of = {"paymentKey", "orderId", "amount"}, callSuper = false)
+@EqualsAndHashCode(of = {"paymentKey", "orderId", "totalAmount"}, callSuper = false)
 @Entity
 @Table(name = "payment")
 public class Payment extends BaseTimeEntity {
@@ -29,18 +29,18 @@ public class Payment extends BaseTimeEntity {
     @Column(name = "order_id", nullable = false)
     private UUID orderId;
 
-    @Column(name = "amount", nullable = false)
-    private int amount;
+    @Column(name = "total_amount", nullable = false)
+    private int totalAmount;
 
     @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
     private PaymentState state;
 
     @Builder
-    public Payment(String paymentKey, UUID orderId, int amount, PaymentState state) {
+    public Payment(String paymentKey, UUID orderId, int totalAmount, PaymentState state) {
         this.paymentKey = paymentKey;
         this.orderId = orderId;
-        this.amount = amount;
+        this.totalAmount = totalAmount;
         this.state = state;
     }
 

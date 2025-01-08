@@ -566,7 +566,7 @@ public class OrderServiceTest {
         memoryPaymentRepository.save(Payment.builder()
             .orderId(orderId)
             .paymentKey(paymentKey)
-            .amount(amount)
+            .totalAmount(amount)
             .state(state)
             .build());
     }
