@@ -9,6 +9,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Base64.Encoder;
 import java.util.Map;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpRequest;
 import org.springframework.http.HttpStatusCode;
@@ -19,10 +20,11 @@ import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
+@RequiredArgsConstructor
 @Component
 public class TossPaymentClient {
 
-    private final RestClient restClient = RestClient.create();
+    private final RestClient restClient;
     @Value("${spring.payment.toss.secret-key}")
     private String secretKey;
     @Value("${spring.payment.toss.base-url}")
