@@ -3,6 +3,7 @@ package com.oheat.food.serviceTest;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.oheat.food.dto.ShopFindRequest;
 import com.oheat.food.dto.ShopFindResponse;
 import com.oheat.food.dto.ShopSaveRequest;
 import com.oheat.food.dto.ShopUpdateRequest;
@@ -22,6 +23,8 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 
 public class ShopServiceTest {
 
@@ -110,7 +113,12 @@ public class ShopServiceTest {
                 .build());
         }
 
-        Page<ShopFindResponse> result = shopService.findShopByCategory("치킨", null);
+        ShopFindRequest findReq = ShopFindRequest.builder()
+            .categoryName("치킨")
+            .build();
+
+        PageRequest pageable = PageRequest.of(0, 5, Sort.by("id").descending());
+        Page<ShopFindResponse> result = shopService.findShopByCategory(findReq, pageable);
 
         Assertions.assertThat(result.getContent().size()).isEqualTo(3);
     }

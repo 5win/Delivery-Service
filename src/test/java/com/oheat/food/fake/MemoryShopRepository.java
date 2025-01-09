@@ -1,5 +1,6 @@
 package com.oheat.food.fake;
 
+import com.oheat.food.dto.Coordinates;
 import com.oheat.food.entity.CategoryJpaEntity;
 import com.oheat.food.entity.ShopJpaEntity;
 import com.oheat.food.repository.ShopRepository;
@@ -41,6 +42,13 @@ public class MemoryShopRepository implements ShopRepository {
             .filter(shop -> shop.getCategory().equals(category))
             .toList();
         return new PageImpl<>(shopList);
+    }
+
+    @Override
+    public Page<ShopJpaEntity> findByCategoryOrderByDistance(CategoryJpaEntity category, Coordinates coordinates,
+        Pageable pageable) {
+        // Do nothing
+        return null;
     }
 
     @Override

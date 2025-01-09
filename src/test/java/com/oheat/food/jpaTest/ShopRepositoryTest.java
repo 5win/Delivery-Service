@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.oheat.common.TestConfig;
+import com.oheat.food.dto.Coordinates;
 import com.oheat.food.entity.CategoryJpaEntity;
 import com.oheat.food.entity.ShopJpaEntity;
 import com.oheat.food.repository.CategoryJpaRepository;
@@ -116,7 +117,7 @@ public class ShopRepositoryTest {
         }
 
         PageRequest page0 = PageRequest.of(0, 5);
-        Page<ShopJpaEntity> result = shopJpaRepository.findShopByCategory(category, page0);
+        Page<ShopJpaEntity> result = shopJpaRepository.findByCategory(category, page0);
 
         assertThat(result.getContent().size()).isEqualTo(3);
     }
@@ -139,9 +140,9 @@ public class ShopRepositoryTest {
         PageRequest page0 = PageRequest.of(0, 5);
         PageRequest page1 = PageRequest.of(1, 5);
         Page<ShopJpaEntity> result1 = shopJpaRepository
-            .findShopByCategory(category, page0);
+            .findByCategory(category, page0);
         Page<ShopJpaEntity> result2 = shopJpaRepository
-            .findShopByCategory(category, page1);
+            .findByCategory(category, page1);
 
         assertThat(result1.getContent().size()).isEqualTo(5);
         assertThat(result2.getContent().size()).isEqualTo(2);
@@ -175,7 +176,7 @@ public class ShopRepositoryTest {
             .build());
 
         PageRequest page0 = PageRequest.of(0, 5, Sort.by("id").descending());
-        List<ShopJpaEntity> result = shopJpaRepository.findShopByCategory(category, page0)
+        List<ShopJpaEntity> result = shopJpaRepository.findByCategory(category, page0)
             .getContent();
 
         assertThat(result.get(0).getId()).isEqualTo(3L);
@@ -212,7 +213,7 @@ public class ShopRepositoryTest {
             .build());
 
         PageRequest page0 = PageRequest.of(0, 5, Sort.by("deliveryFee").ascending());
-        List<ShopJpaEntity> result = shopJpaRepository.findShopByCategory(category, page0)
+        List<ShopJpaEntity> result = shopJpaRepository.findByCategory(category, page0)
             .getContent();
 
         assertThat(result.get(0).getId()).isEqualTo(2L);
@@ -249,7 +250,7 @@ public class ShopRepositoryTest {
             .build());
 
         PageRequest page0 = PageRequest.of(0, 5, Sort.by("minimumOrderAmount").ascending());
-        List<ShopJpaEntity> result = shopJpaRepository.findShopByCategory(category, page0)
+        List<ShopJpaEntity> result = shopJpaRepository.findByCategory(category, page0)
             .getContent();
 
         assertThat(result.get(0).getId()).isEqualTo(2L);
@@ -287,7 +288,7 @@ public class ShopRepositoryTest {
 
         PageRequest page0 = PageRequest.of(0, 5, Sort.by("minimumOrderAmount").ascending()
             .and(Sort.by("id").descending()));
-        List<ShopJpaEntity> result = shopJpaRepository.findShopByCategory(category, page0)
+        List<ShopJpaEntity> result = shopJpaRepository.findByCategory(category, page0)
             .getContent();
 
         assertThat(result.get(0).getId()).isEqualTo(3L);
@@ -312,16 +313,32 @@ public class ShopRepositoryTest {
             .name("bbq 2호점")
             .category(category)
             .minimumOrderAmount(3000)
-            .latitude(37.0)
-            .longitude(127.0)
+            .latitude(37.1)
+            .longitude(127.1)
             .build());
         shopJpaRepository.save(ShopJpaEntity.builder()
             .name("bbq 3호점")
             .category(category)
             .minimumOrderAmount(1000)
-            .latitude(37.0)
-            .longitude(127.0)
+            .latitude(37.2)
+            .longitude(127.2)
             .build());
+
+        Coordinates coordinates = Coordinates.builder()
+            .latitude(37.3)
+            .longitude(127.3)
+            .build();
+
+        PageRequest distanceOrder = PageRequest.of(0, 5, Sort.by("distance")
+            .and(Sort.by("id").descending()));
+
+        List<ShopJpaEntity> result = shopJpaRepository.findByCategoryOrderByDistance(category, coordinates,
+                distanceOrder)
+            .getContent();
+
+        assertThat(result.get(0).getId()).isEqualTo(3L);
+        assertThat(result.get(1).getId()).isEqualTo(2L);
+        assertThat(result.get(2).getId()).isEqualTo(1L);
     }
 
     @Disabled

@@ -1,5 +1,7 @@
 package com.oheat.food.service;
 
+import com.oheat.food.dto.Coordinates;
+import com.oheat.food.dto.ShopFindRequest;
 import com.oheat.food.dto.ShopFindResponse;
 import com.oheat.food.dto.ShopSaveRequest;
 import com.oheat.food.dto.ShopUpdateRequest;
@@ -14,6 +16,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort.Order;
 import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
@@ -36,11 +39,16 @@ public class ShopService {
         shopRepository.save(saveRequest.toEntity(category));
     }
 
-    public Page<ShopFindResponse> findShopByCategory(String categoryName, Pageable pageable) {
-        CategoryJpaEntity category = categoryRepository.findByName(categoryName)
+    public Page<ShopFindResponse> findShopByCategory(ShopFindRequest findRequest, Pageable pageable) {
+        CategoryJpaEntity category = categoryRepository.findByName(findRequest.getCategoryName())
             .orElseThrow(CategoryNotExistsException::new);
 
-        return shopRepository.findByCategory(category, pageable)
+        Order distanceOrder = pageable.getSort().getOrderFor("distance");
+        if (distanceOrder == null) {
+            return shopRepository.findByCategory(category, pageable)
+                .map(ShopFindResponse::from);
+        }
+        return shopRepository.findByCategoryOrderByDistance(category, Coordinates.from(findRequest), pageable)
             .map(ShopFindResponse::from);
     }
 
