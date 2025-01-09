@@ -16,6 +16,8 @@ public class ShopSaveRequest {
     private final String category;
     private final int minimumOrderAmount;
     private final int deliveryFee;
+    private final Double latitude;
+    private final Double longitude;
 
     public ShopJpaEntity toEntity(CategoryJpaEntity category) {
         return ShopJpaEntity.builder()
@@ -24,6 +26,8 @@ public class ShopSaveRequest {
             .category(category)
             .minimumOrderAmount(this.minimumOrderAmount)
             .deliveryFee(this.deliveryFee)
+            .latitude(this.latitude)
+            .longitude(this.longitude)
             .build();
     }
 }

@@ -3,6 +3,7 @@ package com.oheat.food.serviceTest;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.oheat.food.dto.ShopFindResponse;
 import com.oheat.food.dto.ShopSaveRequest;
 import com.oheat.food.dto.ShopUpdateRequest;
 import com.oheat.food.entity.CategoryJpaEntity;
@@ -14,7 +15,6 @@ import com.oheat.food.fake.MemoryCategoryRepository;
 import com.oheat.food.fake.MemoryShopRepository;
 import com.oheat.food.repository.CategoryRepository;
 import com.oheat.food.repository.ShopRepository;
-import com.oheat.food.service.CategoryService;
 import com.oheat.food.service.ShopService;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,14 +26,12 @@ import org.springframework.data.domain.Page;
 public class ShopServiceTest {
 
     private ShopService shopService;
-    private CategoryService categoryService;
     private final ShopRepository memoryShopRepository = new MemoryShopRepository();
     private final CategoryRepository memoryCategoryRepository = new MemoryCategoryRepository();
 
     @BeforeEach
     void setUp() {
         shopService = new ShopService(memoryShopRepository, memoryCategoryRepository);
-        categoryService = new CategoryService(memoryCategoryRepository);
     }
 
     @Test
@@ -112,7 +110,7 @@ public class ShopServiceTest {
                 .build());
         }
 
-        Page<ShopJpaEntity> result = shopService.findShopByCategory("치킨", null);
+        Page<ShopFindResponse> result = shopService.findShopByCategory("치킨", null);
 
         Assertions.assertThat(result.getContent().size()).isEqualTo(3);
     }

@@ -1,5 +1,6 @@
 package com.oheat.food.service;
 
+import com.oheat.food.dto.ShopFindResponse;
 import com.oheat.food.dto.ShopSaveRequest;
 import com.oheat.food.dto.ShopUpdateRequest;
 import com.oheat.food.entity.CategoryJpaEntity;
@@ -35,11 +36,12 @@ public class ShopService {
         shopRepository.save(saveRequest.toEntity(category));
     }
 
-    public Page<ShopJpaEntity> findShopByCategory(String categoryName, Pageable pageable) {
+    public Page<ShopFindResponse> findShopByCategory(String categoryName, Pageable pageable) {
         CategoryJpaEntity category = categoryRepository.findByName(categoryName)
             .orElseThrow(CategoryNotExistsException::new);
 
-        return shopRepository.findByCategory(category, pageable);
+        return shopRepository.findByCategory(category, pageable)
+            .map(ShopFindResponse::from);
     }
 
     @Transactional

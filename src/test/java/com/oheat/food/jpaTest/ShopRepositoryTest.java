@@ -60,46 +60,41 @@ public class ShopRepositoryTest {
     @Test
     @DisplayName("이름이 중복되지 않으면, 매장 등록 성공")
     void shopNameNotDuplicate_thenSuccess() {
-        categoryJpaRepository.save(
-            CategoryJpaEntity.builder()
-                .name("치킨")
-                .build()
-        );
-        CategoryJpaEntity category = categoryJpaRepository.findByName("치킨").get();
+        CategoryJpaEntity category = CategoryJpaEntity.builder()
+            .name("치킨")
+            .build();
+        ShopJpaEntity shop = ShopJpaEntity.builder()
+            .name("bbq").category(category).latitude(37.0).longitude(127.0).build();
 
-        assertDoesNotThrow(() -> {
-            shopJpaRepository.save(
-                ShopJpaEntity.builder()
-                    .name("bbq")
-                    .category(category)
-                    .minimumOrderAmount(14_000)
-                    .build());
-        });
+        categoryJpaRepository.save(category);
+
+        assertDoesNotThrow(() -> shopJpaRepository.save(shop));
     }
 
     @Test
     @DisplayName("이름이 중복되면, 매장 등록 실패")
     void shopNameDuplicate_thenFail() {
-        categoryJpaRepository.save(
-            CategoryJpaEntity.builder()
-                .name("치킨")
-                .build()
-        );
-        CategoryJpaEntity category = categoryJpaRepository.findByName("치킨").get();
+        CategoryJpaEntity category = CategoryJpaEntity.builder()
+            .name("치킨")
+            .build();
+        ShopJpaEntity shop = ShopJpaEntity.builder()
+            .name("bbq")
+            .category(category)
+            .minimumOrderAmount(14_000)
+            .latitude(37.0)
+            .longitude(127.0)
+            .build();
 
-        shopJpaRepository.save(
-            ShopJpaEntity.builder()
-                .name("bbq")
-                .category(category)
-                .minimumOrderAmount(14_000)
-                .build());
+        categoryJpaRepository.save(category);
+        shopJpaRepository.save(shop);
 
         assertThrows(DataIntegrityViolationException.class, () -> {
             shopJpaRepository.save(
                 ShopJpaEntity.builder()
                     .name("bbq")
                     .category(category)
-                    .minimumOrderAmount(14_000)
+                    .latitude(37.0)
+                    .longitude(127.0)
                     .build());
         });
         entityManager.clear();
@@ -113,7 +108,11 @@ public class ShopRepositoryTest {
 
         for (int i = 0; i < 3; i++) {
             shopJpaRepository.save(ShopJpaEntity.builder()
-                .name("bbq " + i + "호점").category(category).build());
+                .name("bbq " + i + "호점")
+                .category(category)
+                .latitude(37.0)
+                .longitude(127.0)
+                .build());
         }
 
         PageRequest page0 = PageRequest.of(0, 5);
@@ -130,7 +129,11 @@ public class ShopRepositoryTest {
 
         for (int i = 0; i < 7; i++) {
             shopJpaRepository.save(ShopJpaEntity.builder()
-                .name("bbq " + i + "호점").category(category).build());
+                .name("bbq " + i + "호점")
+                .category(category)
+                .latitude(37.0)
+                .longitude(127.0)
+                .build());
         }
 
         PageRequest page0 = PageRequest.of(0, 5);
@@ -153,11 +156,23 @@ public class ShopRepositoryTest {
         categoryJpaRepository.save(category);
 
         shopJpaRepository.save(ShopJpaEntity.builder()
-            .name("bbq 1호점").category(category).build());
+            .name("bbq 1호점")
+            .category(category)
+            .latitude(37.0)
+            .longitude(127.0)
+            .build());
         shopJpaRepository.save(ShopJpaEntity.builder()
-            .name("bbq 2호점").category(category).build());
+            .name("bbq 2호점")
+            .category(category)
+            .latitude(37.0)
+            .longitude(127.0)
+            .build());
         shopJpaRepository.save(ShopJpaEntity.builder()
-            .name("bbq 3호점").category(category).build());
+            .name("bbq 3호점")
+            .category(category)
+            .latitude(37.0)
+            .longitude(127.0)
+            .build());
 
         PageRequest page0 = PageRequest.of(0, 5, Sort.by("id").descending());
         List<ShopJpaEntity> result = shopJpaRepository.findShopByCategory(category, page0)
@@ -175,11 +190,26 @@ public class ShopRepositoryTest {
         categoryJpaRepository.save(category);
 
         shopJpaRepository.save(ShopJpaEntity.builder()
-            .name("bbq 1호점").category(category).deliveryFee(2000).build());
+            .name("bbq 1호점")
+            .category(category)
+            .deliveryFee(2000)
+            .latitude(37.0)
+            .longitude(127.0)
+            .build());
         shopJpaRepository.save(ShopJpaEntity.builder()
-            .name("bbq 2호점").category(category).deliveryFee(1000).build());
+            .name("bbq 2호점")
+            .category(category)
+            .deliveryFee(1000)
+            .latitude(37.0)
+            .longitude(127.0)
+            .build());
         shopJpaRepository.save(ShopJpaEntity.builder()
-            .name("bbq 3호점").category(category).deliveryFee(5000).build());
+            .name("bbq 3호점")
+            .category(category)
+            .deliveryFee(5000)
+            .latitude(37.0)
+            .longitude(127.0)
+            .build());
 
         PageRequest page0 = PageRequest.of(0, 5, Sort.by("deliveryFee").ascending());
         List<ShopJpaEntity> result = shopJpaRepository.findShopByCategory(category, page0)
@@ -197,11 +227,26 @@ public class ShopRepositoryTest {
         categoryJpaRepository.save(category);
 
         shopJpaRepository.save(ShopJpaEntity.builder()
-            .name("bbq 1호점").category(category).minimumOrderAmount(2000).build());
+            .name("bbq 1호점")
+            .category(category)
+            .minimumOrderAmount(2000)
+            .latitude(37.0)
+            .longitude(127.0)
+            .build());
         shopJpaRepository.save(ShopJpaEntity.builder()
-            .name("bbq 2호점").category(category).minimumOrderAmount(1000).build());
+            .name("bbq 2호점")
+            .category(category)
+            .minimumOrderAmount(1000)
+            .latitude(37.0)
+            .longitude(127.0)
+            .build());
         shopJpaRepository.save(ShopJpaEntity.builder()
-            .name("bbq 3호점").category(category).minimumOrderAmount(5000).build());
+            .name("bbq 3호점")
+            .category(category)
+            .minimumOrderAmount(5000)
+            .latitude(37.0)
+            .longitude(127.0)
+            .build());
 
         PageRequest page0 = PageRequest.of(0, 5, Sort.by("minimumOrderAmount").ascending());
         List<ShopJpaEntity> result = shopJpaRepository.findShopByCategory(category, page0)
@@ -219,11 +264,26 @@ public class ShopRepositoryTest {
         categoryJpaRepository.save(category);
 
         shopJpaRepository.save(ShopJpaEntity.builder()
-            .name("bbq 1호점").category(category).minimumOrderAmount(1000).build());
+            .name("bbq 1호점")
+            .category(category)
+            .minimumOrderAmount(1000)
+            .latitude(37.0)
+            .longitude(127.0)
+            .build());
         shopJpaRepository.save(ShopJpaEntity.builder()
-            .name("bbq 2호점").category(category).minimumOrderAmount(3000).build());
+            .name("bbq 2호점")
+            .category(category)
+            .minimumOrderAmount(3000)
+            .latitude(37.0)
+            .longitude(127.0)
+            .build());
         shopJpaRepository.save(ShopJpaEntity.builder()
-            .name("bbq 3호점").category(category).minimumOrderAmount(1000).build());
+            .name("bbq 3호점")
+            .category(category)
+            .minimumOrderAmount(1000)
+            .latitude(37.0)
+            .longitude(127.0)
+            .build());
 
         PageRequest page0 = PageRequest.of(0, 5, Sort.by("minimumOrderAmount").ascending()
             .and(Sort.by("id").descending()));
@@ -235,11 +295,33 @@ public class ShopRepositoryTest {
         assertThat(result.get(2).getId()).isEqualTo(2L);
     }
 
-    @Disabled
     @Test
     @DisplayName("카테고리로 매장 목록 조회 시 정렬 기준이 가까운 순이면, 내 위치에서의 거리 오름차순으로 조회")
     void whenSortByNearestOrder_thenDistanceInMyLocationAscendingOrder() {
+        CategoryJpaEntity category = CategoryJpaEntity.builder().name("치킨").build();
+        categoryJpaRepository.save(category);
 
+        shopJpaRepository.save(ShopJpaEntity.builder()
+            .name("bbq 1호점")
+            .category(category)
+            .minimumOrderAmount(1000)
+            .latitude(37.0)
+            .longitude(127.0)
+            .build());
+        shopJpaRepository.save(ShopJpaEntity.builder()
+            .name("bbq 2호점")
+            .category(category)
+            .minimumOrderAmount(3000)
+            .latitude(37.0)
+            .longitude(127.0)
+            .build());
+        shopJpaRepository.save(ShopJpaEntity.builder()
+            .name("bbq 3호점")
+            .category(category)
+            .minimumOrderAmount(1000)
+            .latitude(37.0)
+            .longitude(127.0)
+            .build());
     }
 
     @Disabled

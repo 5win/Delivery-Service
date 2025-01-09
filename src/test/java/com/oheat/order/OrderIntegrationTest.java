@@ -287,6 +287,8 @@ public class OrderIntegrationTest {
             .minimumOrderAmount(10000)
             .deliveryFee(2000)
             .category(category)
+            .latitude(37.0)
+            .longitude(127.0)
             .build();
         MenuJpaEntity menu = MenuJpaEntity.builder()
             .name("황올")

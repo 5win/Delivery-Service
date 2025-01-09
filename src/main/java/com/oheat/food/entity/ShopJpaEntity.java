@@ -32,16 +32,6 @@ import lombok.NoArgsConstructor;
 @Table(name = "shop")
 public class ShopJpaEntity extends BaseTimeEntity {
 
-    @Builder
-    public ShopJpaEntity(String name, String phone, CategoryJpaEntity category,
-        int minimumOrderAmount, int deliveryFee) {
-        this.name = name;
-        this.phone = phone;
-        this.category = category;
-        this.minimumOrderAmount = minimumOrderAmount;
-        this.deliveryFee = deliveryFee;
-    }
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -58,6 +48,12 @@ public class ShopJpaEntity extends BaseTimeEntity {
     @Column(name = "delivery_fee", nullable = false)
     private int deliveryFee;
 
+    @Column(name = "latitude", nullable = false)
+    private Double latitude;
+
+    @Column(name = "longitude", nullable = false)
+    private Double longitude;
+
     @ManyToOne
     @JoinColumn(name = "category", referencedColumnName = "name", nullable = false)
     private CategoryJpaEntity category;
@@ -68,12 +64,26 @@ public class ShopJpaEntity extends BaseTimeEntity {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "shop")
     private final List<MenuGroupJpaEntity> menuGroups = new ArrayList<>();
 
+    @Builder
+    public ShopJpaEntity(String name, String phone, CategoryJpaEntity category,
+        int minimumOrderAmount, int deliveryFee, Double latitude, Double longitude) {
+        this.name = name;
+        this.phone = phone;
+        this.category = category;
+        this.minimumOrderAmount = minimumOrderAmount;
+        this.deliveryFee = deliveryFee;
+        this.latitude = latitude;
+        this.longitude = longitude;
+    }
+
     public void updateShopInfo(ShopUpdateRequest updateRequest, CategoryJpaEntity category) {
         this.name = updateRequest.getName();
         this.phone = updateRequest.getPhone();
         this.category = category;
         this.minimumOrderAmount = updateRequest.getMinimumOrderAmount();
         this.deliveryFee = updateRequest.getDeliveryFee();
+        this.latitude = updateRequest.getLatitude();
+        this.longitude = updateRequest.getLongitude();
     }
 
     public void addMenu(MenuJpaEntity menu) {
