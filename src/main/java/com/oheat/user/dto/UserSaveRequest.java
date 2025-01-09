@@ -13,7 +13,6 @@ public class UserSaveRequest {
 
     private final String username;
     private final String password;
-    private final String address;
     private final String phone;
     private final Role role;
 
@@ -21,7 +20,6 @@ public class UserSaveRequest {
         return UserJpaEntity.builder()
             .username(this.username)
             .password(this.password)
-            .address(this.address)
             .phone(this.phone)
             .role(this.role)
             .build();

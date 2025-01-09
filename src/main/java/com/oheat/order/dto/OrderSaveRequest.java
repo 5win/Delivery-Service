@@ -20,12 +20,15 @@ public class OrderSaveRequest {
     private final int deliveryFee;
     private final int discount;
     private final PayMethod payMethod;
+    private final String address;
+    private final String detailAddress;
 
     public Order toEntity(ShopJpaEntity shop, UserJpaEntity user, Payment payment) {
         return Order.builder()
             .id(payment.getOrderId())
             .orderState(OrderState.PENDING)
-            .address(user.getAddress())
+            .address(address)
+            .detailAddress(detailAddress)
             .phone(user.getPhone())
             .msgForShop(this.msgForShop)
             .deliveryFee(this.deliveryFee)

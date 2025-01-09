@@ -81,7 +81,6 @@ public class CartIntegrationTest {
         UserJpaEntity user = UserJpaEntity.builder()
             .username("username")
             .password("pw")
-            .address("서울특별시")
             .phone("010-1234-1234")
             .role(Role.CUSTOMER)
             .build();
@@ -205,7 +204,6 @@ public class CartIntegrationTest {
         UserJpaEntity user = UserJpaEntity.builder()
             .username("username")
             .password("pw")
-            .address("서울특별시")
             .phone("010-1234-1234")
             .role(Role.CUSTOMER)
             .build();

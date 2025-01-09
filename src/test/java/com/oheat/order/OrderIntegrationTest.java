@@ -240,6 +240,7 @@ public class OrderIntegrationTest {
                 .deliveryFee(0)
                 .payMethod(PayMethod.TOSS)
                 .discount(0)
+                .address("서울특별시")
                 .build();
 
             entityManager.flush();
@@ -275,7 +276,6 @@ public class OrderIntegrationTest {
         UserJpaEntity user = UserJpaEntity.builder()
             .username("username")
             .password("pw")
-            .address("서울특별시")
             .phone("010-1234-1234")
             .role(Role.CUSTOMER)
             .build();
