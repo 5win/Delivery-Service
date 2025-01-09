@@ -130,7 +130,7 @@ public class OrderIntegrationTest {
         Assertions.assertThrows(RuntimeException.class, () -> {
             orderService.registerOrder(orderSaveRequest, "username");
         });
-        Optional<Order> result = orderJpaRepository.findById(1L);
+        Optional<Order> result = orderJpaRepository.findById(orderId);
         assertThat(result).isNotPresent();
     }
 
@@ -164,8 +164,8 @@ public class OrderIntegrationTest {
         Assertions.assertThrows(RuntimeException.class, () -> {
             orderService.registerOrder(orderSaveRequest, "username");
         });
-        Optional<Order> result = orderJpaRepository.findById(1L);
-        assertThat(result).isNotPresent();
+        Payment result = paymentJpaRepository.findById(paymentKey).get();
+        assertThat(result.getState()).isEqualTo(PaymentState.CANCELLED);
     }
 
     @Test

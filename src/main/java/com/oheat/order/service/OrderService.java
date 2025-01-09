@@ -21,6 +21,7 @@ import com.oheat.user.exception.CartEmptyException;
 import com.oheat.user.exception.UserNotExistsException;
 import com.oheat.user.repository.UserRepository;
 import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
@@ -75,12 +76,12 @@ public class OrderService {
         return orderRepository.findByUser(user, pageable);
     }
 
-    public Order findOrderById(Long orderId) {
+    public Order findOrderById(UUID orderId) {
         return orderRepository.findById(orderId)
             .orElseThrow(OrderNotExistsException::new);
     }
 
-    public void deleteOrderHistoryById(Long orderId) {
+    public void deleteOrderHistoryById(UUID orderId) {
         Order order = orderRepository.findById(orderId)
             .orElseThrow(OrderNotExistsException::new);
         orderRepository.delete(order);
