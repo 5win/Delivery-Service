@@ -11,8 +11,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -21,6 +19,7 @@ import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -35,8 +34,7 @@ import lombok.NoArgsConstructor;
 public class Order extends BaseTimeEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private UUID id;
 
     @Column(name = "order_state", nullable = false)
     @Enumerated(value = EnumType.STRING)
@@ -80,9 +78,10 @@ public class Order extends BaseTimeEntity {
     private Payment payment;
 
     @Builder
-    public Order(OrderState orderState, String address, String phone, String msgForShop,
+    public Order(UUID id, OrderState orderState, String address, String phone, String msgForShop,
         int deliveryFee, int discount, PayMethod payMethod, boolean reviewed, ShopJpaEntity shop,
         UserJpaEntity user, Payment payment) {
+        this.id = id;
         this.orderState = orderState;
         this.address = address;
         this.phone = phone;

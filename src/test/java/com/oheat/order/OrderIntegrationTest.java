@@ -130,7 +130,7 @@ public class OrderIntegrationTest {
         Assertions.assertThrows(RuntimeException.class, () -> {
             orderService.registerOrder(orderSaveRequest, "username");
         });
-        Optional<Order> result = orderJpaRepository.findById(1L);
+        Optional<Order> result = orderJpaRepository.findById(orderId);
         assertThat(result).isNotPresent();
     }
 

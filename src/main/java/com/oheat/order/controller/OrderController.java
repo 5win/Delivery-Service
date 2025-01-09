@@ -6,6 +6,7 @@ import com.oheat.order.dto.OrderSaveRequest;
 import com.oheat.order.entity.Order;
 import com.oheat.order.service.OrderService;
 import jakarta.servlet.http.HttpServletRequest;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -44,13 +45,13 @@ public class OrderController {
     }
 
     @GetMapping("/{id}")
-    public OrderFindByIdResponse findOrderById(@PathVariable(name = "id") Long orderId) {
+    public OrderFindByIdResponse findOrderById(@PathVariable(name = "id") UUID orderId) {
         Order order = orderService.findOrderById(orderId);
         return OrderFindByIdResponse.from(order);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteOrderHistoryById(@PathVariable(name = "id") Long orderId) {
+    public ResponseEntity<?> deleteOrderHistoryById(@PathVariable(name = "id") UUID orderId) {
         orderService.deleteOrderHistoryById(orderId);
         return new ResponseEntity<>(HttpStatus.OK);
     }

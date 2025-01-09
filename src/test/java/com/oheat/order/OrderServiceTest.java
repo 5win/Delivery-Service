@@ -205,8 +205,9 @@ public class OrderServiceTest {
         UserJpaEntity user = generateUserWithCarts();
 
         // 결제
+        UUID orderId = UUID.randomUUID();
         String paymentKey = "tgen_20250102210202h9Oy0";
-        savePayment(UUID.randomUUID(), paymentKey, 31_000, PaymentState.CONFIRMED);
+        savePayment(orderId, paymentKey, 31_000, PaymentState.CONFIRMED);
 
         given(userRepository.findByUsername("user"))
             .willReturn(Optional.of(user));
@@ -223,7 +224,7 @@ public class OrderServiceTest {
             orderService.registerOrder(saveReq, "user");
         });
 
-        Order result = memoryOrderRepository.findById(1L).get();
+        Order result = memoryOrderRepository.findById(orderId).get();
         assertThat(result.getAddress()).isEqualTo("서울특별시");
         assertThat(result.getPhone()).isEqualTo("010-1234-1234");
         assertThat(result.getDeliveryFee()).isEqualTo(3000);
@@ -236,8 +237,9 @@ public class OrderServiceTest {
         UserJpaEntity user = generateUserWithCarts();
 
         // 결제
+        UUID orderId = UUID.randomUUID();
         String paymentKey = "tgen_20250102210202h9Oy0";
-        savePayment(UUID.randomUUID(), paymentKey, 31_000, PaymentState.CONFIRMED);
+        savePayment(orderId, paymentKey, 31_000, PaymentState.CONFIRMED);
 
         given(userRepository.findByUsername("user"))
             .willReturn(Optional.of(user));
@@ -251,7 +253,7 @@ public class OrderServiceTest {
             .build();
 
         orderService.registerOrder(saveReq, "user");
-        Order result = memoryOrderRepository.findById(1L).get();
+        Order result = memoryOrderRepository.findById(orderId).get();
 
         assertThat(result.getOrderState()).isEqualTo(OrderState.PENDING);
     }
@@ -263,8 +265,9 @@ public class OrderServiceTest {
         UserJpaEntity user = generateUserWithCarts();
 
         // 결제
+        UUID orderId = UUID.randomUUID();
         String paymentKey = "tgen_20250102210202h9Oy0";
-        savePayment(UUID.randomUUID(), paymentKey, 31_000, PaymentState.CONFIRMED);
+        savePayment(orderId, paymentKey, 31_000, PaymentState.CONFIRMED);
 
         // 주문
         given(userRepository.findByUsername("user"))
@@ -281,7 +284,7 @@ public class OrderServiceTest {
         orderService.registerOrder(saveReq, "user");
 
         // 결과
-        Order orderResult = memoryOrderRepository.findById(1L).get();
+        Order orderResult = memoryOrderRepository.findById(orderId).get();
         MenuJpaEntity menuResult = orderResult.getOrderMenus().getFirst()
             .getMenu();
 
@@ -295,8 +298,9 @@ public class OrderServiceTest {
         UserJpaEntity user = generateUserWithCarts();
 
         // 결제
+        UUID orderId = UUID.randomUUID();
         String paymentKey = "tgen_20250102210202h9Oy0";
-        savePayment(UUID.randomUUID(), paymentKey, 31_000, PaymentState.CONFIRMED);
+        savePayment(orderId, paymentKey, 31_000, PaymentState.CONFIRMED);
 
         // 주문
         given(userRepository.findByUsername("user"))
@@ -313,7 +317,7 @@ public class OrderServiceTest {
         orderService.registerOrder(saveReq, "user");
 
         // 결과
-        Order orderResult = memoryOrderRepository.findById(1L).get();
+        Order orderResult = memoryOrderRepository.findById(orderId).get();
         List<OrderMenu> orderMenuResult = orderResult.getOrderMenus();
         List<OrderOptionGroup> orderOptionGroupResult = orderMenuResult.getFirst()
             .getOrderOptionGroups();
@@ -329,8 +333,9 @@ public class OrderServiceTest {
         UserJpaEntity user = generateUserWithCarts();
 
         // 결제
+        UUID orderId = UUID.randomUUID();
         String paymentKey = "tgen_20250102210202h9Oy0";
-        savePayment(UUID.randomUUID(), paymentKey, 31_000, PaymentState.CONFIRMED);
+        savePayment(orderId, paymentKey, 31_000, PaymentState.CONFIRMED);
 
         // 주문
         given(userRepository.findByUsername("user"))
@@ -347,7 +352,7 @@ public class OrderServiceTest {
         orderService.registerOrder(saveReq, "user");
 
         // 결과
-        Order order = memoryOrderRepository.findById(1L).get();
+        Order order = memoryOrderRepository.findById(orderId).get();
         OrderMenu orderMenu = order.getOrderMenus().getFirst();
         OrderOptionGroup orderOptionGroups1 = orderMenu.getOrderOptionGroups().get(0);
         OrderOptionGroup orderOptionGroups2 = orderMenu.getOrderOptionGroups().get(1);
@@ -482,8 +487,9 @@ public class OrderServiceTest {
         UserJpaEntity user = generateUserWithCarts();
 
         // 결제
+        UUID orderId = UUID.randomUUID();
         String paymentKey = "tgen_20250102210202h9Oy0";
-        savePayment(UUID.randomUUID(), paymentKey, 30_500, PaymentState.CONFIRMED);
+        savePayment(orderId, paymentKey, 30_500, PaymentState.CONFIRMED);
 
         given(userRepository.findByUsername("user"))
             .willReturn(Optional.ofNullable(user));
@@ -498,7 +504,7 @@ public class OrderServiceTest {
         orderService.registerOrder(saveReq, "user");
 
         // 주문 상세 조회
-        Order order = orderService.findOrderById(1L);
+        Order order = orderService.findOrderById(orderId);
         List<OrderMenu> orderMenus = order.getOrderMenus();
         List<OrderOptionGroup> orderOptionGroups = orderMenus.get(0).getOrderOptionGroups();
         List<OrderOption> orderOptions = orderOptionGroups.get(0).getOrderOptions();
@@ -518,8 +524,9 @@ public class OrderServiceTest {
         UserJpaEntity user = generateUserWithCarts();
 
         // 결제
+        UUID orderId = UUID.randomUUID();
         String paymentKey = "tgen_20250102210202h9Oy0";
-        savePayment(UUID.randomUUID(), paymentKey, 30_500, PaymentState.CONFIRMED);
+        savePayment(orderId, paymentKey, 30_500, PaymentState.CONFIRMED);
 
         given(userRepository.findByUsername("user"))
             .willReturn(Optional.ofNullable(user));
@@ -534,7 +541,7 @@ public class OrderServiceTest {
         orderService.registerOrder(saveReq, "user");
 
         // 주문 상세 조회
-        Order order = orderService.findOrderById(1L);
+        Order order = orderService.findOrderById(orderId);
         OrderMenu orderMenu = order.getOrderMenus().get(0);
 
         assertThat(orderMenu.calcTotalPrice()).isEqualTo(20_000 + 4_000 + 2_000 + 2_000);
@@ -548,17 +555,20 @@ public class OrderServiceTest {
     @DisplayName("주문이 존재하지 않으면, OrderNotExistsException")
     void givenWrongOrderId_whenDeleteOrderHistory_thenThrowOrderNotExistsException() {
         Assertions.assertThrows(OrderNotExistsException.class, () -> {
-            orderService.deleteOrderHistoryById(1L);
+            orderService.deleteOrderHistoryById(UUID.randomUUID());
         });
     }
 
     @Test
     @DisplayName("주문 id로 주문 내역을 삭제한다.")
     void givenOrder_whenDeleteOrderHistory_thenDoesNotThrow() {
-        memoryOrderRepository.save(Order.builder().build());
+        UUID orderId = UUID.randomUUID();
+        memoryOrderRepository.save(Order.builder()
+            .id(orderId)
+            .build());
 
         Assertions.assertDoesNotThrow(() -> {
-            orderService.deleteOrderHistoryById(1L);
+            orderService.deleteOrderHistoryById(orderId);
         });
     }
 

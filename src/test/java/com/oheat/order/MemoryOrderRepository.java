@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -14,16 +15,15 @@ import org.springframework.data.domain.Pageable;
 
 public class MemoryOrderRepository implements OrderRepository {
 
-    private final Map<Long, Order> orders = new HashMap<>();
-    private Long autoId = 1L;
+    private final Map<UUID, Order> orders = new HashMap<>();
 
     @Override
     public void save(Order order) {
-        orders.put(autoId++, order);
+        orders.put(order.getId(), order);
     }
 
     @Override
-    public Optional<Order> findById(Long orderId) {
+    public Optional<Order> findById(UUID orderId) {
         return Optional.ofNullable(orders.get(orderId));
     }
 
@@ -37,7 +37,7 @@ public class MemoryOrderRepository implements OrderRepository {
 
     @Override
     public void delete(Order order) {
-        Long target = orders.entrySet().stream()
+        UUID target = orders.entrySet().stream()
             .filter(e -> e.getValue().equals(order))
             .findFirst().get()
             .getKey();

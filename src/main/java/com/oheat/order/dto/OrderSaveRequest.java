@@ -23,6 +23,7 @@ public class OrderSaveRequest {
 
     public Order toEntity(ShopJpaEntity shop, UserJpaEntity user, Payment payment) {
         return Order.builder()
+            .id(payment.getOrderId())
             .orderState(OrderState.PENDING)
             .address(user.getAddress())
             .phone(user.getPhone())

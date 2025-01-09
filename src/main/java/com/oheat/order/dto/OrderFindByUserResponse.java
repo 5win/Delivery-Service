@@ -2,6 +2,7 @@ package com.oheat.order.dto;
 
 import com.oheat.order.constant.OrderState;
 import com.oheat.order.entity.Order;
+import java.util.UUID;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -11,7 +12,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class OrderFindByUserResponse {
 
-    private final Long id;
+    private final UUID id;
     private final Long shopId;
     private final String shopName;
     private final int payAmount;

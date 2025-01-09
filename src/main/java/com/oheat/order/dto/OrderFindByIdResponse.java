@@ -10,6 +10,7 @@ import com.oheat.order.entity.OrderMenu;
 import com.oheat.order.entity.OrderOption;
 import com.oheat.order.entity.OrderOptionGroup;
 import java.util.List;
+import java.util.UUID;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +20,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class OrderFindByIdResponse {
 
-    private final Long orderId;
+    private final UUID orderId;
     private final OrderState orderState;
     private final String address;
     private final String phone;

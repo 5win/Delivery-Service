@@ -3,6 +3,7 @@ package com.oheat.order.repository;
 import com.oheat.order.entity.Order;
 import com.oheat.user.entity.UserJpaEntity;
 import java.util.Optional;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,7 +21,7 @@ public class OrderRepositoryImpl implements OrderRepository {
     }
 
     @Override
-    public Optional<Order> findById(Long orderId) {
+    public Optional<Order> findById(UUID orderId) {
         return orderJpaRepository.findById(orderId);
     }
 
