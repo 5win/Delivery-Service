@@ -1,5 +1,6 @@
 package com.oheat.user.service;
 
+import com.oheat.user.dto.AddressFindResponse;
 import com.oheat.user.dto.AddressSaveRequest;
 import com.oheat.user.entity.Address;
 import com.oheat.user.entity.UserJpaEntity;
@@ -27,11 +28,13 @@ public class AddressService {
         addressRepository.save(saveRequest.toEntity(user));
     }
 
-    public List<Address> findAllByUsername(String username) {
+    public List<AddressFindResponse> findAllByUsername(String username) {
         UserJpaEntity user = userRepository.findByUsername(username)
             .orElseThrow(UserNotExistsException::new);
 
-        return addressRepository.findAllByUser(user);
+        return addressRepository.findAllByUser(user)
+            .stream().map(AddressFindResponse::from)
+            .toList();
     }
 
     @Transactional

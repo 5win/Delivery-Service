@@ -3,6 +3,7 @@ package com.oheat.user;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.oheat.user.constant.Role;
+import com.oheat.user.dto.AddressFindResponse;
 import com.oheat.user.dto.AddressSaveRequest;
 import com.oheat.user.entity.Address;
 import com.oheat.user.entity.UserJpaEntity;
@@ -67,7 +68,7 @@ public class AddressServiceTest {
         addressService.registerAddress(addressSaveRequest, "sgoh");
         addressService.registerAddress(addressSaveRequest, "sgoh");
 
-        List<Address> result = addressService.findAllByUsername("sgoh");
+        List<AddressFindResponse> result = addressService.findAllByUsername("sgoh");
         assertThat(result.size()).isEqualTo(2);
     }
 
@@ -93,7 +94,7 @@ public class AddressServiceTest {
 
         addressService.changeSelectedAddress(2L, "sgoh");
 
-        List<Address> result = addressService.findAllByUsername("sgoh");
+        List<AddressFindResponse> result = addressService.findAllByUsername("sgoh");
         assertThat(result.get(0).isSelected()).isFalse();
         assertThat(result.get(1).isSelected()).isTrue();
     }
