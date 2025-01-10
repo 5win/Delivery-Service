@@ -43,6 +43,9 @@ public class Order extends BaseTimeEntity {
     @Column(name = "address", nullable = false)
     private String address;
 
+    @Column(name = "detail_address")
+    private String detailAddress;
+
     @Column(name = "phone", nullable = false)
     private String phone;
 
@@ -78,12 +81,13 @@ public class Order extends BaseTimeEntity {
     private Payment payment;
 
     @Builder
-    public Order(UUID id, OrderState orderState, String address, String phone, String msgForShop,
+    public Order(UUID id, OrderState orderState, String address, String detailAddress, String phone, String msgForShop,
         int deliveryFee, int discount, PayMethod payMethod, boolean reviewed, ShopJpaEntity shop,
         UserJpaEntity user, Payment payment) {
         this.id = id;
         this.orderState = orderState;
         this.address = address;
+        this.detailAddress = detailAddress;
         this.phone = phone;
         this.msgForShop = msgForShop;
         this.deliveryFee = deliveryFee;

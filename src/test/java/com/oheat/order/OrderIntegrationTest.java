@@ -240,6 +240,7 @@ public class OrderIntegrationTest {
                 .deliveryFee(0)
                 .payMethod(PayMethod.TOSS)
                 .discount(0)
+                .address("서울특별시")
                 .build();
 
             entityManager.flush();
@@ -275,7 +276,6 @@ public class OrderIntegrationTest {
         UserJpaEntity user = UserJpaEntity.builder()
             .username("username")
             .password("pw")
-            .address("서울특별시")
             .phone("010-1234-1234")
             .role(Role.CUSTOMER)
             .build();
@@ -287,6 +287,8 @@ public class OrderIntegrationTest {
             .minimumOrderAmount(10000)
             .deliveryFee(2000)
             .category(category)
+            .latitude(37.0)
+            .longitude(127.0)
             .build();
         MenuJpaEntity menu = MenuJpaEntity.builder()
             .name("황올")

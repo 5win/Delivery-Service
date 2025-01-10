@@ -22,7 +22,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@EqualsAndHashCode(exclude = {"password", "address", "role"}, callSuper = false)
+@EqualsAndHashCode(exclude = {"password", "role"}, callSuper = false)
 @Entity
 @Table(name = "users")
 public class UserJpaEntity extends BaseTimeEntity {
@@ -37,9 +37,6 @@ public class UserJpaEntity extends BaseTimeEntity {
     @Column(name = "password", nullable = false)
     private String password;
 
-    @Column(name = "address", nullable = false)
-    private String address;
-
     @Column(name = "phone", nullable = false)
     private String phone;
 
@@ -51,11 +48,10 @@ public class UserJpaEntity extends BaseTimeEntity {
     private List<CartJpaEntity> carts = new ArrayList<>();
 
     @Builder
-    public UserJpaEntity(String username, String password, String address, String phone,
+    public UserJpaEntity(String username, String password, String phone,
         Role role) {
         this.username = username;
         this.password = password;
-        this.address = address;
         this.phone = phone;
         this.role = role;
     }

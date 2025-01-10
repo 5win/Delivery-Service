@@ -2,10 +2,13 @@ package com.oheat.food.repository;
 
 import static com.oheat.food.entity.QShopJpaEntity.shopJpaEntity;
 
+import com.oheat.food.dto.Coordinates;
 import com.oheat.food.entity.CategoryJpaEntity;
 import com.oheat.food.entity.ShopJpaEntity;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.core.types.dsl.NumberTemplate;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +24,7 @@ public class ShopCustomRepositoryImpl implements ShopCustomRepository {
     private final JPAQueryFactory jpaQueryFactory;
 
     @Override
-    public Page<ShopJpaEntity> findShopByCategory(CategoryJpaEntity category, Pageable pageable) {
+    public Page<ShopJpaEntity> findByCategory(CategoryJpaEntity category, Pageable pageable) {
 
         OrderSpecifier[] orders = createOrderSpecifier(pageable.getSort());
 
@@ -33,13 +36,50 @@ public class ShopCustomRepositoryImpl implements ShopCustomRepository {
             .limit(pageable.getPageSize())
             .fetch();
 
-        Long total = jpaQueryFactory
+        Long total = selectTotal(category);
+
+        return new PageImpl<>(content, pageable, total);
+    }
+
+    @Override
+    public Page<ShopJpaEntity> findByCategoryOrderByDistance(CategoryJpaEntity category, Coordinates coordinates,
+        Pageable pageable) {
+
+        final double EARTH_RADIUS_KM = 6371.0;      // 지구 반지름 (km)
+        final Double latitude = coordinates.getLatitude();
+        final Double longitude = coordinates.getLongitude();
+
+        // 하버사인 공식 구현
+        NumberTemplate<Double> distanceExpression = Expressions.numberTemplate(Double.class,
+            "({0} * acos(cos(radians({1})) * cos(radians({2})) * cos(radians({3}) - radians({4})) + sin(radians({1})) * sin(radians({2}))))",
+            EARTH_RADIUS_KM,
+            latitude,
+            shopJpaEntity.latitude,
+            longitude,
+            shopJpaEntity.longitude
+        );
+
+        List<ShopJpaEntity> content = jpaQueryFactory
+            .select(shopJpaEntity)
+            .from(shopJpaEntity)
+            .where(shopJpaEntity.category.eq(category))
+            .orderBy(distanceExpression.asc())
+            .orderBy(shopJpaEntity.id.asc())
+            .offset(pageable.getOffset())
+            .limit(pageable.getPageSize())
+            .fetch();
+
+        Long total = selectTotal(category);
+
+        return new PageImpl<>(content, pageable, total);
+    }
+
+    private Long selectTotal(CategoryJpaEntity category) {
+        return jpaQueryFactory
             .select(shopJpaEntity.count())
             .from(shopJpaEntity)
             .where(shopJpaEntity.category.eq(category))
             .fetchOne();
-
-        return new PageImpl<>(content, pageable, total);
     }
 
     private OrderSpecifier[] createOrderSpecifier(Sort sort) {

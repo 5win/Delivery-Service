@@ -218,6 +218,7 @@ public class OrderServiceTest {
             .deliveryFee(3000)
             .discount(0)
             .payMethod(PayMethod.TOSS)
+            .address("서울특별시")
             .build();
 
         Assertions.assertDoesNotThrow(() -> {
@@ -509,7 +510,6 @@ public class OrderServiceTest {
         List<OrderOptionGroup> orderOptionGroups = orderMenus.get(0).getOrderOptionGroups();
         List<OrderOption> orderOptions = orderOptionGroups.get(0).getOrderOptions();
 
-        assertThat(order.getAddress()).isEqualTo("서울특별시");
         assertThat(order.getPhone()).isEqualTo("010-1234-1234");
         assertThat(order.getPayMethod()).isEqualTo(PayMethod.TOSS);
         assertThat(orderMenus.size()).isEqualTo(1);
@@ -583,7 +583,7 @@ public class OrderServiceTest {
 
     private UserJpaEntity generateUserWithCarts() {
         UserJpaEntity user = UserJpaEntity.builder()
-            .username("user").address("서울특별시").phone("010-1234-1234").build();
+            .username("user").phone("010-1234-1234").build();
         ShopJpaEntity shop = ShopJpaEntity.builder()
             .name("bbq").build();
         MenuJpaEntity menu = MenuJpaEntity.builder()

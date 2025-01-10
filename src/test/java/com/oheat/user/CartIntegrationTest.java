@@ -81,7 +81,6 @@ public class CartIntegrationTest {
         UserJpaEntity user = UserJpaEntity.builder()
             .username("username")
             .password("pw")
-            .address("서울특별시")
             .phone("010-1234-1234")
             .role(Role.CUSTOMER)
             .build();
@@ -93,6 +92,8 @@ public class CartIntegrationTest {
             .minimumOrderAmount(10000)
             .deliveryFee(2000)
             .category(category)
+            .latitude(37.0)
+            .longitude(127.0)
             .build();
         MenuJpaEntity menu = MenuJpaEntity.builder()
             .name("황올")
@@ -205,7 +206,6 @@ public class CartIntegrationTest {
         UserJpaEntity user = UserJpaEntity.builder()
             .username("username")
             .password("pw")
-            .address("서울특별시")
             .phone("010-1234-1234")
             .role(Role.CUSTOMER)
             .build();
@@ -217,6 +217,8 @@ public class CartIntegrationTest {
             .minimumOrderAmount(10000)
             .deliveryFee(2000)
             .category(category)
+            .latitude(37.0)
+            .longitude(127.0)
             .build();
         MenuJpaEntity menu = MenuJpaEntity.builder()
             .name("황올")
