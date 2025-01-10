@@ -17,6 +17,7 @@ import com.oheat.food.fake.MemoryShopRepository;
 import com.oheat.food.repository.CategoryRepository;
 import com.oheat.food.repository.ShopRepository;
 import com.oheat.food.service.ShopService;
+import java.util.List;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -121,6 +122,102 @@ public class ShopServiceTest {
         Page<ShopFindResponse> result = shopService.findShopByCategory(findReq, pageable);
 
         Assertions.assertThat(result.getContent().size()).isEqualTo(3);
+    }
+
+    @Test
+    @DisplayName("Pageable 정렬 특성이 최소주문금액 낮은 순이면, 최소주문금액 오름차순으로 매장이 조회됨")
+    void whenFindShopByCategoryOrderByMiniMumOrderAmount_thenReturnMinimumOrderAmountAscendingOrder() {
+        CategoryJpaEntity category = CategoryJpaEntity.builder().name("치킨").build();
+        memoryCategoryRepository.save(category);
+
+        for (int i = 0; i < 3; i++) {
+            memoryShopRepository.save(ShopJpaEntity.builder()
+                .name("bbq " + i + "호점")
+                .latitude(37.0 + 0.1 * i)
+                .longitude(127.0 + 0.1 * i)
+                .deliveryFee(10000 - 1000 * i)
+                .minimumOrderAmount(10000 - 1000 * i)
+                .category(category)
+                .build());
+        }
+
+        ShopFindRequest findReq = ShopFindRequest.builder()
+            .categoryName("치킨")
+            .latitude(37.9)
+            .longitude(127.9)
+            .build();
+
+        PageRequest pageable = PageRequest.of(0, 5, Sort.by("minimumOrderAmount").ascending());
+
+        List<ShopFindResponse> result = shopService.findShopByCategory(findReq, pageable).getContent();
+
+        Assertions.assertThat(result.get(0).getName()).isEqualTo("bbq 2호점");
+        Assertions.assertThat(result.get(1).getName()).isEqualTo("bbq 1호점");
+        Assertions.assertThat(result.get(2).getName()).isEqualTo("bbq 0호점");
+    }
+
+    @Test
+    @DisplayName("Pageable 정렬 특성이 배달팁 낮은 순이면, 배달팁 오름차순으로 매장이 조회됨")
+    void whenFindShopByCategoryOrderByDeliveryFee_thenReturnDeliveryFeeAscendingOrder() {
+        CategoryJpaEntity category = CategoryJpaEntity.builder().name("치킨").build();
+        memoryCategoryRepository.save(category);
+
+        for (int i = 0; i < 3; i++) {
+            memoryShopRepository.save(ShopJpaEntity.builder()
+                .name("bbq " + i + "호점")
+                .latitude(37.0 + 0.1 * i)
+                .longitude(127.0 + 0.1 * i)
+                .deliveryFee(10000 - 1000 * i)
+                .minimumOrderAmount(10000 - 1000 * i)
+                .category(category)
+                .build());
+        }
+
+        ShopFindRequest findReq = ShopFindRequest.builder()
+            .categoryName("치킨")
+            .latitude(37.9)
+            .longitude(127.9)
+            .build();
+
+        PageRequest pageable = PageRequest.of(0, 5, Sort.by("deliveryFee").ascending());
+
+        List<ShopFindResponse> result = shopService.findShopByCategory(findReq, pageable).getContent();
+
+        Assertions.assertThat(result.get(0).getName()).isEqualTo("bbq 2호점");
+        Assertions.assertThat(result.get(1).getName()).isEqualTo("bbq 1호점");
+        Assertions.assertThat(result.get(2).getName()).isEqualTo("bbq 0호점");
+    }
+
+    @Test
+    @DisplayName("Pageable 정렬 기준이 distance이면, 가까운 거리순으로 매장이 조회됨.")
+    void whenFindShopByCategoryOrderByDistance_thenReturnCloseDistanceOrder() {
+        CategoryJpaEntity category = CategoryJpaEntity.builder().name("치킨").build();
+        memoryCategoryRepository.save(category);
+
+        for (int i = 0; i < 3; i++) {
+            memoryShopRepository.save(ShopJpaEntity.builder()
+                .name("bbq " + i + "호점")
+                .latitude(37.0 + 0.1 * i)
+                .longitude(127.0 + 0.1 * i)
+                .deliveryFee(10000 - 1000 * i)
+                .minimumOrderAmount(10000 - 1000 * i)
+                .category(category)
+                .build());
+        }
+
+        ShopFindRequest findReq = ShopFindRequest.builder()
+            .categoryName("치킨")
+            .latitude(37.9)
+            .longitude(127.9)
+            .build();
+
+        PageRequest pageable = PageRequest.of(0, 5, Sort.by("distance").ascending());
+
+        List<ShopFindResponse> result = shopService.findShopByCategory(findReq, pageable).getContent();
+
+        Assertions.assertThat(result.get(0).getName()).isEqualTo("bbq 2호점");
+        Assertions.assertThat(result.get(1).getName()).isEqualTo("bbq 1호점");
+        Assertions.assertThat(result.get(2).getName()).isEqualTo("bbq 0호점");
     }
 
     @Disabled
