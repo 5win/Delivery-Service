@@ -1,5 +1,6 @@
 package com.oheat.food.repository;
 
+import com.oheat.food.dto.Coordinates;
 import com.oheat.food.entity.CategoryJpaEntity;
 import com.oheat.food.entity.ShopJpaEntity;
 import java.util.Optional;
@@ -31,7 +32,13 @@ public class ShopRepositoryImpl implements ShopRepository {
 
     @Override
     public Page<ShopJpaEntity> findByCategory(CategoryJpaEntity category, Pageable pageable) {
-        return shopJpaRepository.findShopByCategory(category, pageable);
+        return shopJpaRepository.findByCategory(category, pageable);
+    }
+
+    @Override
+    public Page<ShopJpaEntity> findByCategoryOrderByDistance(CategoryJpaEntity category, Coordinates coordinates,
+        Pageable pageable) {
+        return shopJpaRepository.findByCategoryOrderByDistance(category, coordinates, pageable);
     }
 
     @Override

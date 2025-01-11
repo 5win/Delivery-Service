@@ -1,6 +1,7 @@
 package com.oheat.food.controller;
 
-import com.oheat.food.dto.ShopFindByCategoryResponse;
+import com.oheat.food.dto.ShopFindRequest;
+import com.oheat.food.dto.ShopFindResponse;
 import com.oheat.food.dto.ShopSaveRequest;
 import com.oheat.food.dto.ShopUpdateRequest;
 import com.oheat.food.service.ShopService;
@@ -33,10 +34,19 @@ public class ShopController {
     }
 
     @GetMapping
-    public Page<ShopFindByCategoryResponse> findShopByCategory(
-        @RequestParam String category, Pageable pageable) {
-        return shopService.findShopByCategory(category, pageable)
-            .map(ShopFindByCategoryResponse::from);
+    public Page<ShopFindResponse> findShopByCategory(
+        @RequestParam String category,
+        @RequestParam(required = false) Double latitude,
+        @RequestParam(required = false) Double longitude,
+        Pageable pageable) {
+
+        ShopFindRequest findReq = ShopFindRequest.builder()
+            .categoryName(category)
+            .latitude(latitude)
+            .longitude(longitude)
+            .build();
+
+        return shopService.findShopByCategory(findReq, pageable);
     }
 
     @PutMapping

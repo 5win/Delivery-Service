@@ -1,5 +1,6 @@
 package com.oheat.food.repository;
 
+import com.oheat.food.dto.Coordinates;
 import com.oheat.food.entity.CategoryJpaEntity;
 import com.oheat.food.entity.ShopJpaEntity;
 import java.util.Optional;
@@ -15,6 +16,9 @@ public interface ShopRepository {
     Optional<ShopJpaEntity> findByName(String name);
 
     Page<ShopJpaEntity> findByCategory(CategoryJpaEntity category, Pageable pageable);
+
+    Page<ShopJpaEntity> findByCategoryOrderByDistance(CategoryJpaEntity category, Coordinates coordinates,
+        Pageable pageable);
 
     void deleteById(Long shopId);
 }

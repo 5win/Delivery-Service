@@ -12,7 +12,6 @@ import com.oheat.user.repository.UserRepository;
 import com.oheat.user.service.UserService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -32,7 +31,6 @@ public class UserServiceTest {
         UserSaveRequest saveRequest = UserSaveRequest.builder()
             .username("sgoh")
             .password("pw")
-            .address("서울특별시 광진구")
             .role(Role.ADMIN)
             .build();
 
@@ -48,7 +46,6 @@ public class UserServiceTest {
         UserSaveRequest saveRequest = UserSaveRequest.builder()
             .username("sgoh")
             .password("pw")
-            .address("서울특별시 광진구")
             .role(Role.ADMIN)
             .build();
 
@@ -73,7 +70,6 @@ public class UserServiceTest {
         UserSaveRequest saveRequest = UserSaveRequest.builder()
             .username("sgoh")
             .password("pw")
-            .address("서울특별시 광진구")
             .role(Role.ADMIN)
             .build();
         LoginRequest loginRequest = LoginRequest.builder().username("sgoh").password("pw").build();
@@ -90,7 +86,6 @@ public class UserServiceTest {
         UserSaveRequest saveRequest = UserSaveRequest.builder()
             .username("sgoh")
             .password("pw")
-            .address("서울특별시 광진구")
             .role(Role.ADMIN)
             .build();
         LoginRequest loginRequest = LoginRequest.builder().username("sgoh").password("pw").build();
@@ -103,33 +98,5 @@ public class UserServiceTest {
 
         assertThat(username).isEqualTo("sgoh");
         assertThat(userRole).isEqualTo(Role.ADMIN);
-    }
-
-    @Disabled
-    @Test
-    @DisplayName("배달시킬 주소를 새로 등록한다")
-    void whenRegisterAddress_thenSuccess() {
-
-    }
-
-    @Disabled
-    @Test
-    @DisplayName("배달 주소 목록을 조회한다")
-    void whenFindAllAddress_thenReturnAddressList() {
-
-    }
-
-    @Disabled
-    @Test
-    @DisplayName("배달 주소 목록 중, 현재 선택된 배달 주소를 조회한다")
-    void whenFindSelectedAddress_thenReturnSelectedAddress() {
-
-    }
-
-    @Disabled
-    @Test
-    @DisplayName("배달 주소 목록 중, 기존에 등록했던 다른 주소를 선택하여 주소 설정 값을 변경한다")
-    void whenChangeSelectedAddress_thenSuccess() {
-
     }
 }

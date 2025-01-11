@@ -8,7 +8,7 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @Builder
 @RequiredArgsConstructor
-public class ShopFindByCategoryResponse {
+public class ShopFindResponse {
 
     private final Long id;
     private final String name;
@@ -16,15 +16,19 @@ public class ShopFindByCategoryResponse {
     private final String category;
     private final int minimumOrderAmount;
     private final int deliveryFee;
+    private final Double latitude;
+    private final Double longitude;
 
-    public static ShopFindByCategoryResponse from(ShopJpaEntity shopJpaEntity) {
-        return ShopFindByCategoryResponse.builder()
+    public static ShopFindResponse from(ShopJpaEntity shopJpaEntity) {
+        return ShopFindResponse.builder()
             .id(shopJpaEntity.getId())
             .name(shopJpaEntity.getName())
             .phone(shopJpaEntity.getPhone())
             .category(shopJpaEntity.getCategory().getName())
             .minimumOrderAmount(shopJpaEntity.getMinimumOrderAmount())
             .deliveryFee((shopJpaEntity.getDeliveryFee()))
+            .latitude(shopJpaEntity.getLatitude())
+            .longitude(shopJpaEntity.getLongitude())
             .build();
     }
 }

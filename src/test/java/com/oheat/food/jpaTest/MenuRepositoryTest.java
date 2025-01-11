@@ -15,17 +15,20 @@ import com.oheat.food.repository.OptionJpaRepository;
 import com.oheat.food.repository.ShopJpaRepository;
 import jakarta.persistence.EntityManager;
 import java.util.List;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.dao.DataIntegrityViolationException;
 
 @Import(TestConfig.class)
 @DataJpaTest
+@AutoConfigureTestDatabase(replace = Replace.NONE)
 public class MenuRepositoryTest {
 
     @Autowired
@@ -41,15 +44,15 @@ public class MenuRepositoryTest {
     @Autowired
     private EntityManager entityManager;
 
-    @AfterEach
-    void tearDown() {
-        entityManager.createNativeQuery("ALTER TABLE shop ALTER COLUMN id RESTART WITH 1")
+    @BeforeEach
+    void reset() {
+        entityManager.createNativeQuery("ALTER TABLE shop AUTO_INCREMENT=1")
             .executeUpdate();
-        entityManager.createNativeQuery("ALTER TABLE menu ALTER COLUMN id RESTART WITH 1")
+        entityManager.createNativeQuery("ALTER TABLE menu AUTO_INCREMENT=1")
             .executeUpdate();
-        entityManager.createNativeQuery("ALTER TABLE option_group ALTER COLUMN id RESTART WITH 1")
+        entityManager.createNativeQuery("ALTER TABLE option_group AUTO_INCREMENT=1")
             .executeUpdate();
-        entityManager.createNativeQuery("ALTER TABLE option ALTER COLUMN id RESTART WITH 1")
+        entityManager.createNativeQuery("ALTER TABLE options AUTO_INCREMENT=1")
             .executeUpdate();
     }
 
@@ -67,9 +70,10 @@ public class MenuRepositoryTest {
     @DisplayName("shopId에 해당하는 매장이 있으면, 메뉴 저장 성공")
     void usingJpa_givenMenuWithShopId_whenAddNewMenu_thenSuccess() {
         CategoryJpaEntity category = CategoryJpaEntity.builder().name("치킨").build();
+        ShopJpaEntity shop = ShopJpaEntity.builder()
+            .name("bbq").category(category).latitude(37.0).longitude(127.0).build();
         categoryJpaRepository.save(category);
-        ShopJpaEntity shop = shopJpaRepository.save(
-            ShopJpaEntity.builder().name("bbq").category(category).build());
+        shopJpaRepository.save(shop);
 
         Assertions.assertDoesNotThrow(() -> {
             menuJpaRepository.save(MenuJpaEntity.builder().name("황올").shop(shop).build());
@@ -80,9 +84,10 @@ public class MenuRepositoryTest {
     @DisplayName("하나의 매장에 3개 메뉴를 저장한 뒤, 매장 엔티티를 조회하면 menuList의 size는 3이어야 함")
     void usingJpa_givenThreeMenu_whenAddNewMenu_thenListSizeThree() {
         CategoryJpaEntity category = CategoryJpaEntity.builder().name("치킨").build();
+        ShopJpaEntity shop = ShopJpaEntity.builder()
+            .name("bbq").category(category).latitude(37.0).longitude(127.0).build();
         categoryJpaRepository.save(category);
-        ShopJpaEntity shop = shopJpaRepository.save(ShopJpaEntity.builder()
-            .name("bbq").category(category).build());
+        shopJpaRepository.save(shop);
 
         for (int i = 0; i < 3; i++) {
             menuJpaRepository.save(MenuJpaEntity.builder()
@@ -101,7 +106,8 @@ public class MenuRepositoryTest {
     @DisplayName("카테고리, 매장, 메뉴, 옵션 그룹, 옵션을 차례로 알맞게 저장하면 모두 저장 성공")
     void givenShopAndMenuAndOptionGroupAndOption_whenAddNewMenu_thenSuccess() {
         CategoryJpaEntity category = CategoryJpaEntity.builder().name("치킨").build();
-        ShopJpaEntity shop = ShopJpaEntity.builder().name("bbq").category(category).build();
+        ShopJpaEntity shop = ShopJpaEntity.builder()
+            .name("bbq").category(category).latitude(37.0).longitude(127.0).build();
         MenuJpaEntity menu = MenuJpaEntity.builder().name("황올").shop(shop).build();
         OptionGroupJpaEntity optionGroup = OptionGroupJpaEntity.builder()
             .name("부분육 선택").menu(menu).build();
@@ -132,7 +138,8 @@ public class MenuRepositoryTest {
     @DisplayName("각각 옵션이 2개인 옵션 그룹을 2개 가진 메뉴를 조회하면 총 옵션 개수는 4개임")
     void givenTwoOptionGroupsWithTwoOptions_whenFindMenu_thenTotalOptionFour() {
         CategoryJpaEntity category = CategoryJpaEntity.builder().name("치킨").build();
-        ShopJpaEntity shop = ShopJpaEntity.builder().name("bbq").category(category).build();
+        ShopJpaEntity shop = ShopJpaEntity.builder()
+            .name("bbq").category(category).latitude(37.0).longitude(127.0).build();
         MenuJpaEntity menu = MenuJpaEntity.builder().name("황올").shop(shop).build();
         OptionGroupJpaEntity optionGroup1 = OptionGroupJpaEntity.builder()
             .name("부분육 선택").menu(menu).build();
@@ -174,7 +181,8 @@ public class MenuRepositoryTest {
     @DisplayName("메뉴를 삭제하면, 옵션 그룹과 옵션도 삭제됨")
     void whenDeleteMenu_thenDeleteOptionGroupAndOption() {
         CategoryJpaEntity category = CategoryJpaEntity.builder().name("치킨").build();
-        ShopJpaEntity shop = ShopJpaEntity.builder().name("bbq").category(category).build();
+        ShopJpaEntity shop = ShopJpaEntity.builder()
+            .name("bbq").category(category).latitude(37.0).longitude(127.0).build();
         MenuJpaEntity menu = MenuJpaEntity.builder().name("황올").shop(shop).build();
         OptionGroupJpaEntity optionGroup = OptionGroupJpaEntity.builder()
             .name("부분육 선택").menu(menu).build();

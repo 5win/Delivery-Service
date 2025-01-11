@@ -16,17 +16,20 @@ import com.oheat.food.repository.ShopJpaRepository;
 import jakarta.persistence.EntityManager;
 import java.util.List;
 import java.util.Set;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.dao.DataIntegrityViolationException;
 
 @Import(TestConfig.class)
 @DataJpaTest
+@AutoConfigureTestDatabase(replace = Replace.NONE)
 public class MenuGroupRepositoryTest {
 
     @Autowired
@@ -42,11 +45,11 @@ public class MenuGroupRepositoryTest {
     @Autowired
     private EntityManager entityManager;
 
-    @AfterEach
-    void tearDown() {
-        entityManager.createNativeQuery("ALTER TABLE shop ALTER COLUMN id RESTART WITH 1")
+    @BeforeEach
+    void reset() {
+        entityManager.createNativeQuery("ALTER TABLE shop AUTO_INCREMENT=1")
             .executeUpdate();
-        entityManager.createNativeQuery("ALTER TABLE menu ALTER COLUMN id RESTART WITH 1")
+        entityManager.createNativeQuery("ALTER TABLE menu AUTO_INCREMENT=1")
             .executeUpdate();
     }
 
@@ -54,7 +57,8 @@ public class MenuGroupRepositoryTest {
     @DisplayName("해당 매장이 없으면, 새 메뉴 그룹 추가 실패")
     void usingJpa_givenWrongShop_whenRegisterMenuGroup_thenFail() {
         CategoryJpaEntity category = CategoryJpaEntity.builder().name("치킨").build();
-        ShopJpaEntity shop = ShopJpaEntity.builder().name("bbq").category(category).build();
+        ShopJpaEntity shop = ShopJpaEntity.builder()
+            .name("bbq").category(category).latitude(37.0).longitude(127.0).build();
 
         categoryJpaRepository.save(category);
 
@@ -74,7 +78,8 @@ public class MenuGroupRepositoryTest {
     @DisplayName("해당 매장이 존재하면, 새 메뉴 그룹 추가 성공")
     void usingJpa_givenShop_whenRegisterMenuGroup_thenSuccess() {
         CategoryJpaEntity category = CategoryJpaEntity.builder().name("치킨").build();
-        ShopJpaEntity shop = ShopJpaEntity.builder().name("bbq").category(category).build();
+        ShopJpaEntity shop = ShopJpaEntity.builder()
+            .name("bbq").category(category).latitude(37.0).longitude(127.0).build();
 
         categoryJpaRepository.save(category);
         shopJpaRepository.save(shop);
@@ -89,7 +94,8 @@ public class MenuGroupRepositoryTest {
     @DisplayName("해당 메뉴 그룹이 없으면, 메뉴 그룹에 메뉴 추가 실패")
     void usingJpa_givenWrongMenu_whenAddMenuGroup_thenFail() {
         CategoryJpaEntity category = CategoryJpaEntity.builder().name("치킨").build();
-        ShopJpaEntity shop = ShopJpaEntity.builder().name("bbq").category(category).build();
+        ShopJpaEntity shop = ShopJpaEntity.builder()
+            .name("bbq").category(category).latitude(37.0).longitude(127.0).build();
         MenuGroupJpaEntity menuGroup = MenuGroupJpaEntity.builder().name("후라이드").shop(shop).build();
         MenuJpaEntity menu = MenuJpaEntity.builder().name("황올").shop(shop).build();
 
@@ -114,7 +120,8 @@ public class MenuGroupRepositoryTest {
     @DisplayName("매장과 메뉴가 존재하면, 메뉴 그룹에 메뉴 추가 성공")
     void usingJpa_givenShopAndMenu_whenAddMenuGroup_thenSuccess() {
         CategoryJpaEntity category = CategoryJpaEntity.builder().name("치킨").build();
-        ShopJpaEntity shop = ShopJpaEntity.builder().name("bbq").category(category).build();
+        ShopJpaEntity shop = ShopJpaEntity.builder()
+            .name("bbq").category(category).latitude(37.0).longitude(127.0).build();
         MenuGroupJpaEntity menuGroup = MenuGroupJpaEntity.builder().name("후라이드").shop(shop).build();
         MenuJpaEntity menu = MenuJpaEntity.builder().name("황올").shop(shop).build();
 
@@ -133,7 +140,8 @@ public class MenuGroupRepositoryTest {
     @DisplayName("매장에 메뉴 그룹이 2개 있다면, 메뉴 그룹을 전체 조회했을 때 그룹 개수가 2개여야 함")
     void usingJpa_givenTwoMenuGroup_whenFindAllMenuGroup_thenReturnTwoMenuGroup() {
         CategoryJpaEntity category = CategoryJpaEntity.builder().name("치킨").build();
-        ShopJpaEntity shop = ShopJpaEntity.builder().name("bbq").category(category).build();
+        ShopJpaEntity shop = ShopJpaEntity.builder()
+            .name("bbq").category(category).latitude(37.0).longitude(127.0).build();
         MenuGroupJpaEntity menuGroup1 = MenuGroupJpaEntity.builder().name("후라이").shop(shop).build();
         MenuGroupJpaEntity menuGroup2 = MenuGroupJpaEntity.builder().name("양념").shop(shop).build();
 
@@ -153,7 +161,8 @@ public class MenuGroupRepositoryTest {
     @DisplayName("후라이드 메뉴 그룹에 치킨 메뉴가 2개 있다면, 메뉴 그룹을 통해 메뉴 2개가 조회되어야 함")
     void usingJpa_givenMenuGroupWithTwoMenu_whenFindMenuInMenuGroup_thenReturnTwoMenu() {
         CategoryJpaEntity category = CategoryJpaEntity.builder().name("치킨").build();
-        ShopJpaEntity shop = ShopJpaEntity.builder().name("bbq").category(category).build();
+        ShopJpaEntity shop = ShopJpaEntity.builder()
+            .name("bbq").category(category).latitude(37.0).longitude(127.0).build();
         MenuGroupJpaEntity menuGroup = MenuGroupJpaEntity.builder().name("후라이").shop(shop).build();
         MenuJpaEntity menu1 = MenuJpaEntity.builder().name("황올").shop(shop).build();
         MenuJpaEntity menu2 = MenuJpaEntity.builder().name("닭다리").shop(shop).build();

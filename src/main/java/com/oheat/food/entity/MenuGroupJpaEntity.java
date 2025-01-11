@@ -42,7 +42,7 @@ public class MenuGroupJpaEntity extends BaseTimeEntity {
     private String name;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "shop", nullable = false)
+    @JoinColumn(name = "shop_id", nullable = false)
     private ShopJpaEntity shop;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "menuGroup")
