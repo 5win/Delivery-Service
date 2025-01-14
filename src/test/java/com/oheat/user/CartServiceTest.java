@@ -285,7 +285,18 @@ public class CartServiceTest {
     @Test
     @DisplayName("장바구니에 담은 메뉴의 개수를 4개로 수정하면, Cart의 amount가 4로 변경된다.")
     void whenUpdateCartAmount_thenCartAmountIs4() {
+        registerOneCartItem();
+        CartUpdateRequest updateReq = CartUpdateRequest.builder()
+            .cartId(1L)
+            .amount(4)
+            .build();
 
+        Assertions.assertDoesNotThrow(() -> {
+            cartService.updateCartMenuAmount("username", updateReq);
+        });
+
+        CartJpaEntity result = memoryCartRepository.findById(1L).get();
+        assertThat(result.getAmount()).isEqualTo(4);
     }
 
     // Delete Test
