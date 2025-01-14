@@ -22,6 +22,7 @@ import com.oheat.food.repository.OptionRepository;
 import com.oheat.food.repository.ShopRepository;
 import com.oheat.user.dto.CartSaveRequest;
 import com.oheat.user.dto.CartSaveRequest.CartOptionGroupSaveRequest;
+import com.oheat.user.dto.CartUpdateRequest;
 import com.oheat.user.entity.CartJpaEntity;
 import com.oheat.user.entity.CartOptionGroup;
 import com.oheat.user.entity.CartOptionGroupOption;
@@ -251,6 +252,40 @@ public class CartServiceTest {
         assertThat(cartResult.calcPriceOfMenu()).isEqualTo(61_000);
         assertThat(cartResult.getMenu().getName()).isEqualTo("땡초 양념 치킨");
         assertThat(option1Result.getName()).isEqualTo("윙,봉 콤보");
+    }
+
+    // Update Test
+    @Test
+    @DisplayName("존재하지 않는 사용자이면, 업데이트 실패하고 UserNotExistsException")
+    void givenWrongUsername_whenUpdateCartAmount_thenThrowUserNotExistsException() {
+        CartUpdateRequest updateReq = CartUpdateRequest.builder()
+            .cartId(1L)
+            .amount(4)
+            .build();
+
+        Assertions.assertThrows(UserNotExistsException.class, () -> {
+            cartService.updateCartMenuAmount("username", updateReq);
+        });
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 장바구니 항목의 수량을 수정하면, CartNotExistsException")
+    void givenWrongCartId_whenUpdateCartAmount_thenThrowCartNotExistsException() {
+        registerOneCartItem();
+        CartUpdateRequest updateReq = CartUpdateRequest.builder()
+            .cartId(2L)
+            .amount(4)
+            .build();
+
+        Assertions.assertThrows(CartNotExistsException.class, () -> {
+            cartService.updateCartMenuAmount("username", updateReq);
+        });
+    }
+
+    @Test
+    @DisplayName("장바구니에 담은 메뉴의 개수를 4개로 수정하면, Cart의 amount가 4로 변경된다.")
+    void whenUpdateCartAmount_thenCartAmountIs4() {
+
     }
 
     // Delete Test
