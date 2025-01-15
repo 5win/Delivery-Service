@@ -13,6 +13,7 @@ import com.oheat.food.repository.OptionRepository;
 import com.oheat.food.repository.ShopRepository;
 import com.oheat.user.dto.CartSaveRequest;
 import com.oheat.user.dto.CartSaveRequest.CartOptionGroupSaveRequest;
+import com.oheat.user.dto.CartUpdateRequest;
 import com.oheat.user.entity.CartJpaEntity;
 import com.oheat.user.entity.CartOptionGroup;
 import com.oheat.user.entity.CartOptionGroupOption;
@@ -72,6 +73,16 @@ public class CartService {
             .orElseThrow(UserNotExistsException::new);
 
         return user.getCarts();
+    }
+
+    @Transactional
+    public void updateCartMenuAmount(String username, CartUpdateRequest updateRequest) {
+        userRepository.findByUsername(username)
+            .orElseThrow(UserNotExistsException::new);
+        CartJpaEntity cart = cartRepository.findById(updateRequest.getCartId())
+            .orElseThrow(CartNotExistsException::new);
+
+        cart.changeAmount(updateRequest.getAmount());
     }
 
     public void deleteCart(Long cartId) {
