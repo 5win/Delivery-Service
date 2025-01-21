@@ -76,14 +76,29 @@ export default function () {
   sleep(1);
 
   // 4. 카테고리로 최신 등록 순 매장 조회
-  const category = encodeURIComponent('치킨');
-  const sort = encodeURIComponent('id');
-  const page = encodeURIComponent(0);
-  const size = encodeURIComponent(10);
-  const shopRes = http.get(baseUrl + `/foods/shops?category=${category}&sort=${sort}&page=${page}&size=${size}`);
+  let category = encodeURIComponent('치킨');
+  let sort = encodeURIComponent('id');
+  let page = encodeURIComponent(0);
+  let size = encodeURIComponent(10);
+  const findShopOrderByIdRes = http.get(
+      baseUrl + `/foods/shops?category=${category}&sort=${sort}&page=${page}&size=${size}`);
 
-  check(shopRes, {
-    '매장 조회 성공': (res) => res.status === 200,
+  check(findShopOrderByIdRes, {
+    '최신 등록순 매장 조회 성공': (res) => res.status === 200,
+    '조회된 페이지 사이즈 10': (res) => JSON.parse(res.body)?.content?.length === 10
+  });
+
+  sleep(1);
+
+  // 5. 가까운 거리 순 매장 조회
+  sort = encodeURIComponent('distance,id');
+  const latitude = (Math.random() * (38.6 - 33.0)) + 33.0;
+  const longitude = (Math.random() * (131.0 - 124.0)) + 124.0;
+  const findShopOrderByDistRes = http.get(baseUrl
+      + `/foods/shops?category=${category}&sort=${sort}&latitude=${latitude}&longitude=${longitude}&page=${page}&size=${size}`);
+
+  check(findShopOrderByDistRes, {
+    '가까운 거리 순 매장 조회 성공': (res) => res.status === 200,
     '조회된 페이지 사이즈 10': (res) => JSON.parse(res.body)?.content?.length === 10
   });
 }
