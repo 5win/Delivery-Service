@@ -1,9 +1,10 @@
 package com.oheat.common.sido;
 
 
-import com.oheat.common.BaseTimeEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
@@ -18,22 +19,23 @@ import org.locationtech.jts.geom.Geometry;
 @EqualsAndHashCode(of = {"ogrFid"}, callSuper = false)
 @Entity
 @Table(name = "sido")
-public class Sido extends BaseTimeEntity {
+public class Sido {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ogr_fid", nullable = false)
     private Integer ogrFid;
 
     @Column(name = "geometry", nullable = false)
     private Geometry geometry;
 
-    @Column(name = "ctprvn_cd", nullable = false, unique = true, length = 2)
+    @Column(name = "ctprvn_cd", length = 2)
     private String ctprvnCd;
 
-    @Column(name = "ctp_kor_nm", nullable = false, length = 40)
+    @Column(name = "ctp_kor_nm", length = 40)
     private String ctpKorNm;
 
-    @Column(name = "ctp_eng_nm", nullable = false, length = 40)
+    @Column(name = "ctp_eng_nm", length = 40)
     private String ctpEngNm;
 
     @Builder
