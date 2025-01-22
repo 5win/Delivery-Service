@@ -1,5 +1,7 @@
 package com.oheat.food.jpaTest;
 
+import static com.oheat.common.SidogunguFixture.jongno_gu;
+import static com.oheat.common.SidogunguFixture.seoul;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.oheat.common.TestConfig;
@@ -58,7 +60,14 @@ public class MenuGroupRepositoryTest {
     void usingJpa_givenWrongShop_whenRegisterMenuGroup_thenFail() {
         CategoryJpaEntity category = CategoryJpaEntity.builder().name("치킨").build();
         ShopJpaEntity shop = ShopJpaEntity.builder()
-            .name("bbq").category(category).latitude(37.0).longitude(127.0).build();
+            .name("bbq")
+            .category(category)
+            .address("서울특별시 종로구")
+            .latitude(37.0)
+            .longitude(127.0)
+            .sido(seoul())
+            .sigungu(jongno_gu())
+            .build();
 
         categoryJpaRepository.save(category);
 
@@ -79,7 +88,14 @@ public class MenuGroupRepositoryTest {
     void usingJpa_givenShop_whenRegisterMenuGroup_thenSuccess() {
         CategoryJpaEntity category = CategoryJpaEntity.builder().name("치킨").build();
         ShopJpaEntity shop = ShopJpaEntity.builder()
-            .name("bbq").category(category).latitude(37.0).longitude(127.0).build();
+            .name("bbq")
+            .category(category)
+            .address("서울특별시 종로구")
+            .latitude(37.0)
+            .longitude(127.0)
+            .sido(seoul())
+            .sigungu(jongno_gu())
+            .build();
 
         categoryJpaRepository.save(category);
         shopJpaRepository.save(shop);
@@ -95,7 +111,14 @@ public class MenuGroupRepositoryTest {
     void usingJpa_givenWrongMenu_whenAddMenuGroup_thenFail() {
         CategoryJpaEntity category = CategoryJpaEntity.builder().name("치킨").build();
         ShopJpaEntity shop = ShopJpaEntity.builder()
-            .name("bbq").category(category).latitude(37.0).longitude(127.0).build();
+            .name("bbq")
+            .category(category)
+            .address("서울특별시 종로구")
+            .latitude(37.0)
+            .longitude(127.0)
+            .sido(seoul())
+            .sigungu(jongno_gu())
+            .build();
         MenuGroupJpaEntity menuGroup = MenuGroupJpaEntity.builder().name("후라이드").shop(shop).build();
         MenuJpaEntity menu = MenuJpaEntity.builder().name("황올").shop(shop).build();
 
@@ -121,7 +144,14 @@ public class MenuGroupRepositoryTest {
     void usingJpa_givenShopAndMenu_whenAddMenuGroup_thenSuccess() {
         CategoryJpaEntity category = CategoryJpaEntity.builder().name("치킨").build();
         ShopJpaEntity shop = ShopJpaEntity.builder()
-            .name("bbq").category(category).latitude(37.0).longitude(127.0).build();
+            .name("bbq")
+            .category(category)
+            .address("서울특별시 종로구")
+            .latitude(37.0)
+            .longitude(127.0)
+            .sido(seoul())
+            .sigungu(jongno_gu())
+            .build();
         MenuGroupJpaEntity menuGroup = MenuGroupJpaEntity.builder().name("후라이드").shop(shop).build();
         MenuJpaEntity menu = MenuJpaEntity.builder().name("황올").shop(shop).build();
 
@@ -141,7 +171,14 @@ public class MenuGroupRepositoryTest {
     void usingJpa_givenTwoMenuGroup_whenFindAllMenuGroup_thenReturnTwoMenuGroup() {
         CategoryJpaEntity category = CategoryJpaEntity.builder().name("치킨").build();
         ShopJpaEntity shop = ShopJpaEntity.builder()
-            .name("bbq").category(category).latitude(37.0).longitude(127.0).build();
+            .name("bbq")
+            .category(category)
+            .address("서울특별시 종로구")
+            .latitude(37.0)
+            .longitude(127.0)
+            .sido(seoul())
+            .sigungu(jongno_gu())
+            .build();
         MenuGroupJpaEntity menuGroup1 = MenuGroupJpaEntity.builder().name("후라이").shop(shop).build();
         MenuGroupJpaEntity menuGroup2 = MenuGroupJpaEntity.builder().name("양념").shop(shop).build();
 
@@ -162,7 +199,14 @@ public class MenuGroupRepositoryTest {
     void usingJpa_givenMenuGroupWithTwoMenu_whenFindMenuInMenuGroup_thenReturnTwoMenu() {
         CategoryJpaEntity category = CategoryJpaEntity.builder().name("치킨").build();
         ShopJpaEntity shop = ShopJpaEntity.builder()
-            .name("bbq").category(category).latitude(37.0).longitude(127.0).build();
+            .name("bbq")
+            .category(category)
+            .address("서울특별시 종로구")
+            .latitude(37.0)
+            .longitude(127.0)
+            .sido(seoul())
+            .sigungu(jongno_gu())
+            .build();
         MenuGroupJpaEntity menuGroup = MenuGroupJpaEntity.builder().name("후라이").shop(shop).build();
         MenuJpaEntity menu1 = MenuJpaEntity.builder().name("황올").shop(shop).build();
         MenuJpaEntity menu2 = MenuJpaEntity.builder().name("닭다리").shop(shop).build();

@@ -1,11 +1,15 @@
 package com.oheat.food.entity;
 
 import com.oheat.common.BaseTimeEntity;
+import com.oheat.common.sido.Sido;
+import com.oheat.common.sigungu.Sigungu;
 import com.oheat.food.dto.ShopUpdateRequest;
 import com.oheat.food.exception.DuplicateMenuException;
 import jakarta.persistence.Column;
+import jakarta.persistence.ConstraintMode;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -26,8 +30,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@EqualsAndHashCode(exclude = {"phone", "minimumOrderAmount", "deliveryFee", "category", "menuSet",
-    "menuGroups"}, callSuper = false)
+@EqualsAndHashCode(of = {"id", "name"}, callSuper = false)
 @Entity
 @Table(name = "shop")
 public class ShopJpaEntity extends BaseTimeEntity {
@@ -48,13 +51,24 @@ public class ShopJpaEntity extends BaseTimeEntity {
     @Column(name = "delivery_fee", nullable = false)
     private int deliveryFee;
 
+    @Column(name = "address", nullable = false)
+    private String address;
+
     @Column(name = "latitude", nullable = false)
     private Double latitude;
 
     @Column(name = "longitude", nullable = false)
     private Double longitude;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "sido_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    private Sido sido;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "sigungu_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    private Sigungu sigungu;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category", referencedColumnName = "name", nullable = false)
     private CategoryJpaEntity category;
 
@@ -66,24 +80,32 @@ public class ShopJpaEntity extends BaseTimeEntity {
 
     @Builder
     public ShopJpaEntity(String name, String phone, CategoryJpaEntity category,
-        int minimumOrderAmount, int deliveryFee, Double latitude, Double longitude) {
+        int minimumOrderAmount, int deliveryFee, String address, Double latitude, Double longitude,
+        Sido sido, Sigungu sigungu) {
         this.name = name;
         this.phone = phone;
         this.category = category;
         this.minimumOrderAmount = minimumOrderAmount;
         this.deliveryFee = deliveryFee;
+        this.address = address;
         this.latitude = latitude;
         this.longitude = longitude;
+        this.sido = sido;
+        this.sigungu = sigungu;
     }
 
-    public void updateShopInfo(ShopUpdateRequest updateRequest, CategoryJpaEntity category) {
+    public void updateShopInfo(ShopUpdateRequest updateRequest, CategoryJpaEntity category, Sido sido,
+        Sigungu sigungu) {
         this.name = updateRequest.getName();
         this.phone = updateRequest.getPhone();
         this.category = category;
         this.minimumOrderAmount = updateRequest.getMinimumOrderAmount();
         this.deliveryFee = updateRequest.getDeliveryFee();
+        this.address = updateRequest.getAddress();
         this.latitude = updateRequest.getLatitude();
         this.longitude = updateRequest.getLongitude();
+        this.sido = sido;
+        this.sigungu = sigungu;
     }
 
     public void addMenu(MenuJpaEntity menu) {
