@@ -101,4 +101,14 @@ export default function () {
     '가까운 거리 순 매장 조회 성공': (res) => res.status === 200,
     '조회된 페이지 사이즈 10': (res) => JSON.parse(res.body)?.content?.length === 10
   });
+
+  sleep(1);
+
+  // 6. VU 번호에 해당하는 id 매장의 메뉴 그룹 및 메뉴 조회
+  const menuGroupRes = http.get(baseUrl + `/foods/shops/menu-groups/${__VU}`);
+
+  check(menuGroupRes, {
+    '메뉴 그룹 조회 성공': (res) => res.status === 200,
+    '메뉴 그룹의 메뉴 개수 10개': (res) => JSON.parse(res.body)[0]?.menuList.length === 10
+  })
 }
