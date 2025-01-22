@@ -1,4 +1,4 @@
-package com.oheat.common;
+package com.oheat.common.jwt;
 
 import com.oheat.user.constant.Role;
 import com.oheat.user.entity.UserJpaEntity;

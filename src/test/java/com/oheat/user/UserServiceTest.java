@@ -2,7 +2,7 @@ package com.oheat.user;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.oheat.common.JwtUtils;
+import com.oheat.common.jwt.JwtUtils;
 import com.oheat.user.constant.Role;
 import com.oheat.user.dto.LoginRequest;
 import com.oheat.user.dto.UserSaveRequest;
