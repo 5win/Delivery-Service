@@ -1,4 +1,4 @@
-package com.oheat.common.sidogungu;
+package com.oheat.common.sido;
 
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -8,10 +8,10 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class SidoRepositoryImpl implements SidoRepository {
 
-    private final SidoJpaRepository jpaRepository;
+    private final SidoJpaRepository sidoJpaRepository;
 
     @Override
     public Optional<Sido> findByCtpKorNm(String ctpKorNm) {
-        return Optional.empty();
+        return sidoJpaRepository.findByCtpKorNm(ctpKorNm);
     }
 }
