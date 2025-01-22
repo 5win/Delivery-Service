@@ -1,8 +1,13 @@
 package com.oheat.food.serviceTest;
 
+import static com.oheat.common.SidogunguFixture.jongno_gu;
+import static com.oheat.common.SidogunguFixture.seoul;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.when;
 
+import com.oheat.common.sido.SidoRepository;
+import com.oheat.common.sigungu.SigunguRepository;
 import com.oheat.food.dto.ShopFindRequest;
 import com.oheat.food.dto.ShopFindResponse;
 import com.oheat.food.dto.ShopSaveRequest;
@@ -18,11 +23,13 @@ import com.oheat.food.repository.CategoryRepository;
 import com.oheat.food.repository.ShopRepository;
 import com.oheat.food.service.ShopService;
 import java.util.List;
+import java.util.Optional;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -33,9 +40,13 @@ public class ShopServiceTest {
     private final ShopRepository memoryShopRepository = new MemoryShopRepository();
     private final CategoryRepository memoryCategoryRepository = new MemoryCategoryRepository();
 
+    private final SidoRepository sidoRepository = Mockito.mock(SidoRepository.class);
+    private final SigunguRepository sigunguRepository = Mockito.mock(SigunguRepository.class);
+
     @BeforeEach
     void setUp() {
-        shopService = new ShopService(memoryShopRepository, memoryCategoryRepository);
+        shopService = new ShopService(memoryShopRepository, memoryCategoryRepository,
+            sidoRepository, sigunguRepository);
     }
 
     @Test
@@ -44,11 +55,18 @@ public class ShopServiceTest {
         CategoryJpaEntity category = CategoryJpaEntity.builder().name("치킨").build();
         memoryCategoryRepository.save(category);
 
+        when(sidoRepository.findByCtpKorNm("서울특별시"))
+            .thenReturn(Optional.of(seoul()));
+        when(sigunguRepository.findBySigKorNm("종로구"))
+            .thenReturn(Optional.of(jongno_gu()));
+
         assertDoesNotThrow(() -> {
             shopService.registerShop(
                 ShopSaveRequest.builder()
                     .name("bbq")
                     .category("치킨")
+                    .sido("서울특별시")
+                    .sigungu("종로구")
                     .build()
             );
         });
@@ -107,10 +125,17 @@ public class ShopServiceTest {
         CategoryJpaEntity category = CategoryJpaEntity.builder().name("치킨").build();
         memoryCategoryRepository.save(category);
 
+        when(sidoRepository.findByCtpKorNm("서울특별시"))
+            .thenReturn(Optional.of(seoul()));
+        when(sigunguRepository.findBySigKorNm("종로구"))
+            .thenReturn(Optional.of(jongno_gu()));
+
         for (int i = 0; i < 3; i++) {
             shopService.registerShop(ShopSaveRequest.builder()
                 .name("bbq " + i + "호점")
                 .category("치킨")
+                .sido("서울특별시")
+                .sigungu("종로구")
                 .build());
         }
 
@@ -265,9 +290,19 @@ public class ShopServiceTest {
         memoryCategoryRepository.save(category);
         memoryShopRepository.save(shop);
 
+        when(sidoRepository.findByCtpKorNm("서울특별시"))
+            .thenReturn(Optional.of(seoul()));
+        when(sigunguRepository.findBySigKorNm("종로구"))
+            .thenReturn(Optional.of(jongno_gu()));
+
         assertDoesNotThrow(() -> {
             shopService.updateShop(ShopUpdateRequest.builder()
-                .id(1L).name("bbq").category("치킨").build());
+                .id(1L)
+                .name("bbq")
+                .category("치킨")
+                .sido("서울특별시")
+                .sigungu("종로구")
+                .build());
         });
     }
 

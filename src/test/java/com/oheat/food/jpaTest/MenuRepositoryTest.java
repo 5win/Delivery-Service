@@ -1,5 +1,7 @@
 package com.oheat.food.jpaTest;
 
+import static com.oheat.common.SidogunguFixture.jongno_gu;
+import static com.oheat.common.SidogunguFixture.seoul;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.oheat.common.TestConfig;
@@ -71,7 +73,14 @@ public class MenuRepositoryTest {
     void usingJpa_givenMenuWithShopId_whenAddNewMenu_thenSuccess() {
         CategoryJpaEntity category = CategoryJpaEntity.builder().name("치킨").build();
         ShopJpaEntity shop = ShopJpaEntity.builder()
-            .name("bbq").category(category).latitude(37.0).longitude(127.0).build();
+            .name("bbq")
+            .category(category)
+            .address("서울특별시 종로구")
+            .latitude(37.0)
+            .longitude(127.0)
+            .sido(seoul())
+            .sigungu(jongno_gu())
+            .build();
         categoryJpaRepository.save(category);
         shopJpaRepository.save(shop);
 
@@ -83,9 +92,18 @@ public class MenuRepositoryTest {
     @Test
     @DisplayName("하나의 매장에 3개 메뉴를 저장한 뒤, 매장 엔티티를 조회하면 menuList의 size는 3이어야 함")
     void usingJpa_givenThreeMenu_whenAddNewMenu_thenListSizeThree() {
-        CategoryJpaEntity category = CategoryJpaEntity.builder().name("치킨").build();
+        CategoryJpaEntity category = CategoryJpaEntity.builder()
+            .name("치킨")
+            .build();
         ShopJpaEntity shop = ShopJpaEntity.builder()
-            .name("bbq").category(category).latitude(37.0).longitude(127.0).build();
+            .name("bbq")
+            .category(category)
+            .address("서울특별시 종로구")
+            .latitude(37.0)
+            .longitude(127.0)
+            .sido(seoul())
+            .sigungu(jongno_gu())
+            .build();
         categoryJpaRepository.save(category);
         shopJpaRepository.save(shop);
 
@@ -107,7 +125,14 @@ public class MenuRepositoryTest {
     void givenShopAndMenuAndOptionGroupAndOption_whenAddNewMenu_thenSuccess() {
         CategoryJpaEntity category = CategoryJpaEntity.builder().name("치킨").build();
         ShopJpaEntity shop = ShopJpaEntity.builder()
-            .name("bbq").category(category).latitude(37.0).longitude(127.0).build();
+            .name("bbq")
+            .category(category)
+            .address("서울특별시 종로구")
+            .latitude(37.0)
+            .longitude(127.0)
+            .sido(seoul())
+            .sigungu(jongno_gu())
+            .build();
         MenuJpaEntity menu = MenuJpaEntity.builder().name("황올").shop(shop).build();
         OptionGroupJpaEntity optionGroup = OptionGroupJpaEntity.builder()
             .name("부분육 선택").menu(menu).build();
@@ -139,7 +164,14 @@ public class MenuRepositoryTest {
     void givenTwoOptionGroupsWithTwoOptions_whenFindMenu_thenTotalOptionFour() {
         CategoryJpaEntity category = CategoryJpaEntity.builder().name("치킨").build();
         ShopJpaEntity shop = ShopJpaEntity.builder()
-            .name("bbq").category(category).latitude(37.0).longitude(127.0).build();
+            .name("bbq")
+            .category(category)
+            .address("서울특별시 종로구")
+            .latitude(37.0)
+            .longitude(127.0)
+            .sido(seoul())
+            .sigungu(jongno_gu())
+            .build();
         MenuJpaEntity menu = MenuJpaEntity.builder().name("황올").shop(shop).build();
         OptionGroupJpaEntity optionGroup1 = OptionGroupJpaEntity.builder()
             .name("부분육 선택").menu(menu).build();
@@ -182,7 +214,14 @@ public class MenuRepositoryTest {
     void whenDeleteMenu_thenDeleteOptionGroupAndOption() {
         CategoryJpaEntity category = CategoryJpaEntity.builder().name("치킨").build();
         ShopJpaEntity shop = ShopJpaEntity.builder()
-            .name("bbq").category(category).latitude(37.0).longitude(127.0).build();
+            .name("bbq")
+            .category(category)
+            .address("서울특별시 종로구")
+            .latitude(37.0)
+            .longitude(127.0)
+            .sido(seoul())
+            .sigungu(jongno_gu())
+            .build();
         MenuJpaEntity menu = MenuJpaEntity.builder().name("황올").shop(shop).build();
         OptionGroupJpaEntity optionGroup = OptionGroupJpaEntity.builder()
             .name("부분육 선택").menu(menu).build();

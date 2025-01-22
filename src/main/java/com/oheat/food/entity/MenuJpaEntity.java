@@ -23,7 +23,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@EqualsAndHashCode(exclude = {"price", "optionGroups"}, callSuper = false)
+@EqualsAndHashCode(of = {"id", "name"}, callSuper = false)
 @Entity
 @Table(name = "menu")
 public class MenuJpaEntity extends BaseTimeEntity {

@@ -1,4 +1,4 @@
-package com.oheat.common;
+package com.oheat.common.jwt;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

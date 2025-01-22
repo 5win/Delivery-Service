@@ -1,5 +1,7 @@
 package com.oheat.order;
 
+import static com.oheat.common.SidogunguFixture.jongno_gu;
+import static com.oheat.common.SidogunguFixture.seoul;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
@@ -287,8 +289,11 @@ public class OrderIntegrationTest {
             .minimumOrderAmount(10000)
             .deliveryFee(2000)
             .category(category)
+            .address("서울특별시 종로구")
             .latitude(37.0)
             .longitude(127.0)
+            .sido(seoul())
+            .sigungu(jongno_gu())
             .build();
         MenuJpaEntity menu = MenuJpaEntity.builder()
             .name("황올")

@@ -1,9 +1,13 @@
 package com.oheat.user.entity;
 
 import com.oheat.common.BaseTimeEntity;
+import com.oheat.common.sido.Sido;
+import com.oheat.common.sigungu.Sigungu;
 import jakarta.persistence.Column;
+import jakarta.persistence.ConstraintMode;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -27,7 +31,6 @@ public class Address extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-
     @Column(name = "address", nullable = false)
     private String address;
 
@@ -50,9 +53,17 @@ public class Address extends BaseTimeEntity {
     @JoinColumn(name = "user_id", nullable = false)
     private UserJpaEntity user;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "sido_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    private Sido sido;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "sigungu_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    private Sigungu sigungu;
+
     @Builder
     public Address(String address, String detailAddress, Double latitude, Double longitude,
-        String nickname, boolean selected, UserJpaEntity user) {
+        String nickname, boolean selected, UserJpaEntity user, Sido sido, Sigungu sigungu) {
         this.address = address;
         this.detailAddress = detailAddress;
         this.latitude = latitude;
@@ -60,6 +71,8 @@ public class Address extends BaseTimeEntity {
         this.nickname = nickname;
         this.selected = selected;
         this.user = user;
+        this.sido = sido;
+        this.sigungu = sigungu;
     }
 
     public void setSelected(boolean selected) {
