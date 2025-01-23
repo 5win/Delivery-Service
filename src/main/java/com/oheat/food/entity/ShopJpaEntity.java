@@ -61,11 +61,11 @@ public class ShopJpaEntity extends BaseTimeEntity {
     private Double longitude;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "sido_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(name = "sido_code", referencedColumnName = "ctprvn_cd", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private Sido sido;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "sigungu_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(name = "sigungu_code", referencedColumnName = "sig_cd", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private Sigungu sigungu;
 
     @ManyToOne(fetch = FetchType.LAZY)

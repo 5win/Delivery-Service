@@ -28,7 +28,7 @@ public class Sigungu {
     @Column(name = "geometry", nullable = false)
     private Geometry geometry;
 
-    @Column(name = "sig_cd", length = 2)
+    @Column(name = "sig_cd", length = 5)
     private String sigCd;
 
     @Column(name = "sig_kor_nm", length = 40)
