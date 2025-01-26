@@ -19,7 +19,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@EqualsAndHashCode(exclude = {"price"}, callSuper = false)
+@EqualsAndHashCode(of = {"id", "name"}, callSuper = false)
 @Entity
 @Table(name = "options")
 public class OptionJpaEntity extends BaseTimeEntity {

@@ -1,5 +1,11 @@
 package com.oheat.user.service;
 
+import com.oheat.common.sido.Sido;
+import com.oheat.common.sido.SidoNotExistsException;
+import com.oheat.common.sido.SidoRepository;
+import com.oheat.common.sigungu.Sigungu;
+import com.oheat.common.sigungu.SigunguNotExistsException;
+import com.oheat.common.sigungu.SigunguRepository;
 import com.oheat.user.dto.AddressFindResponse;
 import com.oheat.user.dto.AddressSaveRequest;
 import com.oheat.user.entity.Address;
@@ -20,12 +26,19 @@ public class AddressService {
 
     private final UserRepository userRepository;
     private final AddressRepository addressRepository;
+    private final SidoRepository sidoRepository;
+    private final SigunguRepository sigunguRepository;
 
     public void registerAddress(AddressSaveRequest saveRequest, String username) {
         UserJpaEntity user = userRepository.findByUsername(username)
             .orElseThrow(UserNotExistsException::new);
 
-        addressRepository.save(saveRequest.toEntity(user));
+        Sido sido = sidoRepository.findByCtpKorNm(saveRequest.getSido())
+            .orElseThrow(() -> new SidoNotExistsException(HttpStatus.BAD_REQUEST, "존재하지 않는 시도 지역입니다."));
+        Sigungu sigungu = sigunguRepository.findBySigKorNm(saveRequest.getSigungu())
+            .orElseThrow(() -> new SigunguNotExistsException(HttpStatus.BAD_REQUEST, "존재하지 않는 시군구 지역입니다."));
+
+        addressRepository.save(saveRequest.toEntity(user, sido, sigungu));
     }
 
     public List<AddressFindResponse> findAllByUsername(String username) {

@@ -1,6 +1,6 @@
 package com.oheat.user.service;
 
-import com.oheat.common.JwtUtils;
+import com.oheat.common.jwt.JwtUtils;
 import com.oheat.user.dto.LoginRequest;
 import com.oheat.user.dto.UserSaveRequest;
 import com.oheat.user.entity.UserJpaEntity;

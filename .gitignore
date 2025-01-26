@@ -90,3 +90,4 @@ nb-configuration.xml
 *.log
 
 src/main/resources/application-dev-mysql.yml
+src/main/resources/data.sql

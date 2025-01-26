@@ -13,6 +13,8 @@ public class AddressFindResponse {
     private final Long id;
     private final String address;
     private final String detailAddress;
+    private final String sido;
+    private final String sigungu;
     private final Double latitude;
     private final Double longitude;
     private final String nickname;
@@ -23,6 +25,8 @@ public class AddressFindResponse {
             .id(address.getId())
             .address(address.getAddress())
             .detailAddress(address.getDetailAddress())
+            .sido(address.getSido().getCtpKorNm())
+            .sigungu(address.getSigungu().getSigKorNm())
             .latitude(address.getLatitude())
             .longitude(address.getLongitude())
             .nickname(address.getNickname())

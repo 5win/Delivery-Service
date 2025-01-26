@@ -15,6 +15,9 @@ public class ShopUpdateRequest {
     private final String category;
     private final int minimumOrderAmount;
     private final int deliveryFee;
+    private final String address;
     private final Double latitude;
     private final Double longitude;
+    private final String sido;
+    private final String sigungu;
 }

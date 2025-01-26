@@ -23,7 +23,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@EqualsAndHashCode(exclude = {"required", "maxNumOfSelect", "options"}, callSuper = false)
+@EqualsAndHashCode(of = {"id", "name"}, callSuper = false)
 @Entity
 @Table(name = "option_group")
 public class OptionGroupJpaEntity extends BaseTimeEntity {

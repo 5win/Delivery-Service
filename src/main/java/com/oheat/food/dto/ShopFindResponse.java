@@ -16,6 +16,7 @@ public class ShopFindResponse {
     private final String category;
     private final int minimumOrderAmount;
     private final int deliveryFee;
+    private final String address;
     private final Double latitude;
     private final Double longitude;
 
@@ -27,6 +28,7 @@ public class ShopFindResponse {
             .category(shopJpaEntity.getCategory().getName())
             .minimumOrderAmount(shopJpaEntity.getMinimumOrderAmount())
             .deliveryFee((shopJpaEntity.getDeliveryFee()))
+            .address(shopJpaEntity.getAddress())
             .latitude(shopJpaEntity.getLatitude())
             .longitude(shopJpaEntity.getLongitude())
             .build();

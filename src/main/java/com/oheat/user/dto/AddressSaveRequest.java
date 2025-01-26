@@ -1,5 +1,7 @@
 package com.oheat.user.dto;
 
+import com.oheat.common.sido.Sido;
+import com.oheat.common.sigungu.Sigungu;
 import com.oheat.user.entity.Address;
 import com.oheat.user.entity.UserJpaEntity;
 import lombok.Builder;
@@ -13,12 +15,14 @@ public class AddressSaveRequest {
 
     private final String address;
     private final String detailAddress;
+    private final String sido;
+    private final String sigungu;
     private final Double latitude;
     private final Double longitude;
     private final String nickname;
     private final boolean selected;
 
-    public Address toEntity(UserJpaEntity user) {
+    public Address toEntity(UserJpaEntity user, Sido sido, Sigungu sigungu) {
         return Address.builder()
             .address(address)
             .detailAddress(detailAddress)
@@ -27,6 +31,8 @@ public class AddressSaveRequest {
             .nickname(nickname)
             .selected(selected)
             .user(user)
+            .sido(sido)
+            .sigungu(sigungu)
             .build();
     }
 }

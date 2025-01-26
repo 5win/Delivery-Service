@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/v1/food/shops/menuGroups")
+@RequestMapping("/api/v1/foods/shops/menu-groups")
 public class MenuGroupController {
 
     private final MenuGroupService menuGroupService;
